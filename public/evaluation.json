@@ -1,0 +1,610 @@
+{
+  "criteria": [
+    { "id": 1, "name": "CDKTF/CDK Terrain workflow support", "short": "CDKTF", "category": "critical", "defaultWeight": 5, "maxWeight": 5, "description": "pnpm/tsx synthesis in pre-plan hooks" },
+    { "id": 2, "name": "OpenTofu support", "short": "OpenTofu", "category": "critical", "defaultWeight": 5, "maxWeight": 5, "description": "Native, not just Terraform" },
+    { "id": 3, "name": "No Kubernetes requirement", "short": "No K8s", "category": "critical", "defaultWeight": 5, "maxWeight": 5, "description": "Docker/EC2 agents" },
+    { "id": 4, "name": "RBAC & SSO integration", "short": "RBAC/SSO", "category": "critical", "defaultWeight": 5, "maxWeight": 5, "description": "Enterprise identity management" },
+    { "id": 5, "name": "Dependency orchestration", "short": "Deps", "category": "high", "defaultWeight": 4, "maxWeight": 5, "description": "Cycle detection, ordered execution" },
+    { "id": 6, "name": "Drift detection", "short": "Drift", "category": "high", "defaultWeight": 4, "maxWeight": 5, "description": "Built-in, scheduled" },
+    { "id": 7, "name": "Secrets management", "short": "Secrets", "category": "high", "defaultWeight": 4, "maxWeight": 5, "description": "AWS OIDC, no static creds" },
+    { "id": 8, "name": "Pricing suitability", "short": "Pricing", "category": "high", "defaultWeight": 4, "maxWeight": 5, "description": "~250 modules, ~10 users, budget-conscious" },
+    { "id": 9, "name": "Golden paths / blueprints", "short": "Blueprints", "category": "medium", "defaultWeight": 3, "maxWeight": 5, "description": "Self-service templates" },
+    { "id": 10, "name": "Migration path from Atlantis", "short": "Migration", "category": "medium", "defaultWeight": 3, "maxWeight": 5, "description": "Documented Atlantis migration" },
+    { "id": 11, "name": "Custom workflows / hooks", "short": "Workflows", "category": "medium", "defaultWeight": 3, "maxWeight": 5, "description": "Pre-plan, post-apply hooks" },
+    { "id": 12, "name": "Private module registry", "short": "Registry", "category": "medium", "defaultWeight": 3, "maxWeight": 5, "description": "Monorepo-friendly" },
+    { "id": 13, "name": "InfraCost / cost estimation", "short": "Cost Est.", "category": "medium", "defaultWeight": 3, "maxWeight": 5, "description": "PR-level cost estimation" },
+    { "id": 14, "name": "Integrations (Teams, DataDog)", "short": "Integrations", "category": "medium", "defaultWeight": 3, "maxWeight": 5, "description": "MS Teams, DataDog" },
+    { "id": 15, "name": "Keep S3+DynamoDB state", "short": "S3 State", "category": "low", "defaultWeight": 2, "maxWeight": 5, "description": "Existing state backends" },
+    { "id": 16, "name": "AI features", "short": "AI", "category": "nice", "defaultWeight": 1, "maxWeight": 5, "description": "Plan summaries, error analysis" },
+    { "id": 17, "name": "Visualizations / graphs", "short": "Viz", "category": "low", "defaultWeight": 2, "maxWeight": 5, "description": "Resource graphs" },
+    { "id": 18, "name": "Ephemeral environments", "short": "Ephemeral", "category": "nice", "defaultWeight": 1, "maxWeight": 5, "description": "Short-lived environments" },
+    { "id": 19, "name": "Terraform provider", "short": "TF Provider", "category": "nice", "defaultWeight": 1, "maxWeight": 5, "description": "Platform management via TF" },
+    { "id": 20, "name": "Multi-cloud support", "short": "Multi-cloud", "category": "nice", "defaultWeight": 1, "maxWeight": 5, "description": "Future-proofing" },
+    { "id": 21, "name": "OPA / Conftest policies", "short": "OPA", "category": "medium", "defaultWeight": 3, "maxWeight": 5, "description": "Policy-as-code support" }
+  ],
+  "platforms": [
+    {
+      "id": "spacelift",
+      "name": "Spacelift",
+      "url": "https://spacelift.io",
+      "icon": "Rocket",
+      "color": "#4B6BFF",
+      "scores": [3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 3, 2, 2, 2, 1, 3, 3, 1, 3, 3, 3],
+      "rationales": [
+        "Documented CDKTF support. Custom runner Docker images, all languages.",
+        "Native first-class support. Toggle per-stack.",
+        "Docker-based worker pools on EC2. No K8s needed.",
+        "Granular space-based RBAC, SSO (SAML/OIDC).",
+        "Stack dependencies with trigger policies, visual DAG.",
+        "Built-in scheduled drift detection with reconciliation.",
+        "AWS OIDC, Vault, contexts, environment variables.",
+        "$399/mo Starter for up to 10 users, unlimited deploys.",
+        "Blueprints feature for self-service stack creation.",
+        "General migration docs. No Atlantis-specific kit.",
+        "Before/after init/plan/apply hooks, OPA/Rego policies.",
+        "Supports TF registry. Not monorepo-optimized.",
+        "InfraCost integration available.",
+        "Slack primary. MS Teams limited. DataDog via webhooks.",
+        "Managed state requires S3 migration. Can use own backend.",
+        "Saturnhead AI, Spacelift Intent NL provisioning.",
+        "Built-in resource visualization and dependency graphs.",
+        "Limited — can delete stacks on schedule.",
+        "Full Spacelift Terraform provider.",
+        "AWS, Azure, GCP, CloudFormation, Pulumi, K8s.",
+        "Native OPA/Rego plan policies. Strongest OPA story."
+      ],
+      "tagline": "Best technical fit — native CDKTF, dependency DAG, predictable pricing"
+    },
+    {
+      "id": "env0",
+      "name": "Env0",
+      "url": "https://www.env0.com",
+      "icon": "Leaf",
+      "color": "#00B389",
+      "scores": [2, 3, 3, 3, 3, 3, 3, 2, 3, 3, 3, 2, 3, 3, 3, 3, 1, 3, 3, 3, 3],
+      "rationales": [
+        "Custom flows (env0.yml). Arbitrary shell commands pre/post.",
+        "Native support. Founding member of OpenTofu.",
+        "Cloud-hosted or self-hosted Docker agents on EC2.",
+        "Comprehensive RBAC, SAML/OIDC SSO.",
+        "Workflow orchestration, variable hierarchy, ordered execution.",
+        "Built-in scheduled drift detection with notifications.",
+        "OIDC for AWS/Azure/GCP/Vault. No static creds.",
+        "Per-environment model. At ~250 envs, needs custom quote.",
+        "Templates with self-service catalog, approval workflows.",
+        "Dedicated video tutorial and migration guide.",
+        "Custom flows: before/after init/plan/apply, arbitrary shell.",
+        "Supports registry. Not monorepo-specific.",
+        "Built-in InfraCost + Terratag. PR-level cost estimates.",
+        "MS Teams, DataDog, OpsGenie, PagerDuty.",
+        "Supports existing S3 backends. Self-hosted remote state.",
+        "Cloud Analyst, AI PR summaries, MCP Server for IDE.",
+        "Limited visualization capabilities.",
+        "TTL policies, automated scale down/up.",
+        "Full env0 Terraform provider.",
+        "AWS, Azure, GCP via OIDC.",
+        "OPA natively + conftest in custom flows."
+      ],
+      "tagline": "Best operational fit — Teams+DD, Atlantis migration, InfraCost built-in"
+    },
+    {
+      "id": "scalr",
+      "name": "Scalr",
+      "url": "https://www.scalr.com",
+      "icon": "Scale",
+      "color": "#8B5CF6",
+      "scores": [1, 3, 3, 3, 2, 2, 3, 3, 3, 2, 1, 3, 2, 1, 2, 3, 1, 0, 3, 3, 3],
+      "rationales": [
+        "Community example only. No native CDKTF. Pro tier needed.",
+        "Native first-class support.",
+        "SaaS-hosted runners, agent pools on EC2/Docker.",
+        "Comprehensive RBAC. SSO free.",
+        "Variable hierarchy, remote state refs. No pipeline orchestration.",
+        "Available but less mature.",
+        "AWS OIDC, shell variables, variable hierarchy.",
+        "Run-based pricing. Free: 50 runs/mo. SSO+SCIM free.",
+        "Modules & blueprints, private registry as catalog.",
+        "TFC migration documented. No Atlantis guide.",
+        "Limited. Custom hooks only in Pro.",
+        "Monorepo-friendly, namespace support, comprehensive.",
+        "InfraCost integration available.",
+        "Limited. Backstage plugin. No Teams/DataDog.",
+        "Supports existing backends or hosted.",
+        "AI free on all plans. Plan summaries, error analysis.",
+        "Limited.",
+        "Not supported.",
+        "Full Scalr Terraform provider.",
+        "AWS, Azure, GCP.",
+        "OPA policies supported natively."
+      ],
+      "tagline": "Best free tier — AI included, monorepo registry, run-based pricing"
+    },
+    {
+      "id": "terramate",
+      "name": "Terramate Cloud",
+      "url": "https://terramate.io",
+      "icon": "Mountain",
+      "color": "#F97316",
+      "scores": [1, 3, 3, 2, 2, 3, 2, 3, 2, 1, 2, 1, 1, 2, 3, 1, 2, 0, 0, 3, 1],
+      "rationales": [
+        "No documented CDKTF support. Could work via terramate run.",
+        "Native first-class support.",
+        "Works with any CI/CD. No K8s needed.",
+        "RBAC exists. SSO via GitHub/GitLab/Google only.",
+        "Stack ordering, change detection. Not full orchestration.",
+        "Built-in, comprehensive, reconciliation workflows.",
+        "Delegates to CI/CD. No native secret store or OIDC.",
+        "Generous free tier. Per-stack pricing competitive.",
+        "Catalyst (scaffolding) in beta. Not production-ready.",
+        "No Atlantis-specific migration docs.",
+        "CLI terramate run any command. Requires own CI setup.",
+        "Not native. Relies on TF/OpenTofu registries.",
+        "Not built-in. Via custom scripts.",
+        "Slack notifications. Teams unclear.",
+        "Fully compatible — doesn't manage state.",
+        "Limited AI features.",
+        "Dashboard with stack views.",
+        "Not supported.",
+        "No Terraform provider.",
+        "Tool-agnostic, works with anything.",
+        "Delegates to CI/CD — run conftest yourself."
+      ],
+      "tagline": "Flexible OSS CLI — excellent drift detection, competitive pricing"
+    },
+    {
+      "id": "terrateam",
+      "name": "Terrateam",
+      "url": "https://terrateam.io",
+      "icon": "GitBranch",
+      "color": "#06B6D4",
+      "scores": [3, 3, 3, 2, 3, 3, 2, 2, 0, 3, 3, 1, 2, 1, 3, 0, 1, 0, 0, 2, 3],
+      "rationales": [
+        "Native CDKTF integration. Configure in .terrateam/config.yml.",
+        "Native first-class support.",
+        "Runs via GitHub Actions. Self-hosted Docker container.",
+        "RBAC via GitHub Teams + OPA/Rego. SSO via GitHub only.",
+        "Terrateam Stacks: plan_after, apply_after, layered orchestration.",
+        "Built-in. Real-time alerts with change tracking.",
+        "GitHub Secrets, OIDC. Self-hosted full control.",
+        "Free: 3 users, 50 runs. Paid tiers opaque.",
+        "No blueprint/template feature documented.",
+        "Direct drop-in Atlantis alternative. Same workflow.",
+        "Full custom workflow in .terrateam/config.yml.",
+        "No native registry. Relies on TF/OpenTofu registries.",
+        "OpenInfraQuote open-source cost estimation. AWS-only.",
+        "No MS Teams/DataDog integrations.",
+        "Works with existing S3+DynamoDB. Zero migration.",
+        "No AI features documented.",
+        "Limited. PR-based visibility.",
+        "Not supported.",
+        "No Terraform provider.",
+        "AWS, Azure, GCP via OIDC.",
+        "OPA/Rego built-in. Tag + cost policies via conftest."
+      ],
+      "tagline": "Direct Atlantis replacement — native CDKTF, OSS core, keeps S3 state"
+    },
+    {
+      "id": "hcp-terraform",
+      "name": "HCP Terraform",
+      "url": "https://www.hashicorp.com/products/terraform",
+      "icon": "Cloud",
+      "color": "#7C3AED",
+      "scores": [1, 0, 3, 3, 3, 3, 3, 1, 2, 1, 2, 3, 2, 2, 0, 1, 2, 1, 3, 3, 2],
+      "rationales": [
+        "CDKTF deprecated by HashiCorp. Can run synth via agent hooks.",
+        "No OpenTofu support. BSL-licensed only. Dealbreaker.",
+        "Cloud-hosted runners or agent pools on Docker/EC2.",
+        "Comprehensive RBAC. SSO (SAML/OIDC) included.",
+        "TF Stacks with orchestration rules, auto-approval. Run triggers.",
+        "Health assessments with scheduled drift detection.",
+        "Dynamic provider credentials, OIDC. Vault integration.",
+        "Per-RUM pricing. ~2,000 RUM ≈ $940/mo. Expensive.",
+        "No-code modules. Stacks for replication. Waypoint archived.",
+        "General workspace migration docs. No Atlantis tooling.",
+        "Run Tasks for hooks. Agent hooks. Less flexible.",
+        "Best-in-class private module registry. Monorepo-friendly.",
+        "Native cost estimation. AWS, Azure, GCP resources.",
+        "Slack, MS Teams via webhooks. ServiceNow.",
+        "Requires migration to HCP-managed state. No S3.",
+        "Limited AI features. Basic error context.",
+        "Workspace dashboards, resource views.",
+        "Can destroy workspaces programmatically.",
+        "Full tfe provider. Mature, widely used.",
+        "AWS, Azure, GCP. Full multi-cloud.",
+        "Sentinel (proprietary) primary. OPA via Run Tasks."
+      ],
+      "tagline": "Strong registry & Stacks — but no OpenTofu and expensive pricing"
+    },
+    {
+      "id": "opentaco",
+      "name": "OpenTaco",
+      "url": "https://opentaco.dev",
+      "icon": "Terminal",
+      "color": "#10B981",
+      "scores": [2, 3, 3, 2, 2, 2, 2, 3, 1, 3, 3, 1, 1, 1, 3, 0, 1, 0, 0, 2, 2],
+      "rationales": [
+        "CI-native: can run CDKTF synth as workflow step. Not native integration.",
+        "Native first-class OpenTofu support.",
+        "Self-hosted Docker or GitHub Actions runners. No K8s needed.",
+        "GitHub Teams RBAC + OPA. SSO via GitHub only. No enterprise SSO.",
+        "Basic dependency ordering via workflow config.",
+        "Available in Pro tier. Scheduled drift scans, GitHub issue creation.",
+        "GitHub Secrets, OIDC via CI. Self-hosted gives full control.",
+        "OSS free. Pro $49/user/mo. Very competitive for small teams.",
+        "No blueprint/template feature.",
+        "Direct Atlantis alternative. Same PR-comment workflow.",
+        "Full CI pipeline control. Arbitrary pre/post commands.",
+        "No native registry. Uses TF/OpenTofu registries.",
+        "Not built-in. Can add InfraCost to CI workflow.",
+        "GitHub-focused. No MS Teams/DataDog native integrations.",
+        "Works with existing S3+DynamoDB state. Zero migration.",
+        "No AI features.",
+        "Minimal — PR-based visibility only.",
+        "Not supported.",
+        "No Terraform provider.",
+        "AWS, Azure, GCP via CI OIDC.",
+        "OPA/Conftest via custom workflow hooks."
+      ],
+      "tagline": "Open-source Atlantis alternative — free self-hosted, per-user cloud pricing"
+    }
+  ],
+  "scoreLabels": ["None", "Limited", "Good", "Excellent"],
+  "categories": {
+    "critical": { "label": "Critical", "color": "#EF4444" },
+    "high": { "label": "High", "color": "#F59E0B" },
+    "medium": { "label": "Medium", "color": "#3B82F6" },
+    "low": { "label": "Low", "color": "#64748B" },
+    "nice": { "label": "Nice-to-have", "color": "#94A3B8" }
+  },
+  "pricing": {
+    "sliders": {
+      "users": { "min": 1, "max": 50, "default": 10, "step": 1, "label": "Team Size", "unit": "users" },
+      "resources": { "min": 100, "max": 10000, "default": 2000, "step": 100, "label": "Resources Under Management", "unit": "RUM" },
+      "runs": { "min": 50, "max": 5000, "default": 500, "step": 50, "label": "Monthly Runs", "unit": "runs/mo" }
+    },
+    "featureLabels": {
+      "privateWorkers": "Private Workers",
+      "opa": "OPA Policies",
+      "driftDetection": "Drift Detection",
+      "samlSso": "SAML SSO",
+      "blueprints": "Blueprints",
+      "auditLog": "Audit Log",
+      "customFlows": "Custom Flows",
+      "aiCloudAnalyst": "AI Cloud Analyst",
+      "advancedDrift": "Advanced Drift",
+      "allFeatures": "All Features",
+      "sso": "SSO",
+      "ai": "AI Features",
+      "auditTrails": "Audit Trails",
+      "noCodeProvisioning": "No-Code Provisioning",
+      "privateVcs": "Private VCS",
+      "sentinel": "Sentinel Policies",
+      "scheduledConfig": "Scheduled Config",
+      "applyRequirements": "Apply Requirements",
+      "api": "API Access",
+      "rbac": "RBAC",
+      "codeowners": "CODEOWNERS",
+      "gatekeeper": "Gatekeeper",
+      "changesets": "Changesets",
+      "selfHosted": "Self-Hosted",
+      "managedHosting": "Managed Hosting",
+      "dedicatedInstance": "Dedicated Instance",
+      "support": "Priority Support"
+    },
+    "platforms": {
+      "spacelift": {
+        "model": "Concurrency-based",
+        "description": "Flat tiers gated by user count and worker type",
+        "tiers": [
+          {
+            "name": "Free",
+            "basePrice": 0,
+            "includedUsers": 2, "includedResources": null, "includedRuns": null,
+            "perUser": 0, "perResource": 0, "perRun": 0,
+            "maxUsers": 2, "maxResources": null, "maxRuns": null,
+            "estimated": false,
+            "features": { "opa": false, "driftDetection": false, "privateWorkers": false, "samlSso": false, "blueprints": false, "auditLog": false },
+            "notes": "1 shared worker, 2 users max"
+          },
+          {
+            "name": "Starter",
+            "basePrice": 399,
+            "includedUsers": 10, "includedResources": null, "includedRuns": null,
+            "perUser": 0, "perResource": 0, "perRun": 0,
+            "maxUsers": 10, "maxResources": null, "maxRuns": null,
+            "estimated": false,
+            "features": { "opa": false, "driftDetection": false, "privateWorkers": false, "samlSso": false, "blueprints": false, "auditLog": false },
+            "notes": "2 shared workers, up to 10 users"
+          },
+          {
+            "name": "Starter+",
+            "basePrice": 800,
+            "includedUsers": null, "includedResources": null, "includedRuns": null,
+            "perUser": 0, "perResource": 0, "perRun": 0,
+            "maxUsers": null, "maxResources": null, "maxRuns": null,
+            "estimated": true,
+            "features": { "opa": true, "driftDetection": true, "privateWorkers": true, "samlSso": false, "blueprints": false, "auditLog": false },
+            "notes": "Private workers, OPA policies, drift detection"
+          },
+          {
+            "name": "Business",
+            "basePrice": 1500,
+            "includedUsers": null, "includedResources": null, "includedRuns": null,
+            "perUser": 0, "perResource": 0, "perRun": 0,
+            "maxUsers": null, "maxResources": null, "maxRuns": null,
+            "estimated": true,
+            "features": { "opa": true, "driftDetection": true, "privateWorkers": true, "samlSso": false, "blueprints": true, "auditLog": true },
+            "notes": "3+ private workers, blueprints, audit log"
+          },
+          {
+            "name": "Enterprise",
+            "basePrice": 3000,
+            "includedUsers": null, "includedResources": null, "includedRuns": null,
+            "perUser": 0, "perResource": 0, "perRun": 0,
+            "maxUsers": null, "maxResources": null, "maxRuns": null,
+            "estimated": true,
+            "features": { "opa": true, "driftDetection": true, "privateWorkers": true, "samlSso": true, "blueprints": true, "auditLog": true },
+            "notes": "5+ private workers, SAML SSO, self-hosted option"
+          }
+        ]
+      },
+      "env0": {
+        "model": "Per-environment",
+        "description": "Flat tiers capped by active environments (~resources ÷ 20)",
+        "tiers": [
+          {
+            "name": "Cloud Compass",
+            "basePrice": 1500,
+            "includedUsers": null, "includedResources": 2000, "includedRuns": null,
+            "perUser": 0, "perResource": 0, "perRun": 0,
+            "maxUsers": null, "maxResources": 2000, "maxRuns": null,
+            "estimated": false,
+            "features": { "customFlows": true, "samlSso": true, "auditLog": true, "aiCloudAnalyst": false, "advancedDrift": false },
+            "notes": "≈100 active environments (resources ÷ 20)"
+          },
+          {
+            "name": "Cloud Navigator",
+            "basePrice": 2500,
+            "includedUsers": null, "includedResources": null, "includedRuns": null,
+            "perUser": 0, "perResource": 0, "perRun": 0,
+            "maxUsers": null, "maxResources": null, "maxRuns": null,
+            "estimated": true,
+            "features": { "customFlows": true, "samlSso": true, "auditLog": true, "aiCloudAnalyst": false, "advancedDrift": false },
+            "notes": "Unlimited environments, IaC automation, GitOps"
+          },
+          {
+            "name": "Cloud Pilot",
+            "basePrice": 4000,
+            "includedUsers": null, "includedResources": null, "includedRuns": null,
+            "perUser": 0, "perResource": 0, "perRun": 0,
+            "maxUsers": null, "maxResources": null, "maxRuns": null,
+            "estimated": true,
+            "features": { "customFlows": true, "samlSso": true, "auditLog": true, "aiCloudAnalyst": true, "advancedDrift": true },
+            "notes": "AI Cloud Analyst, advanced drift remediation, enterprise SLA"
+          }
+        ]
+      },
+      "scalr": {
+        "model": "Per-run",
+        "description": "Usage-based per qualifying run, all features on every tier",
+        "tiers": [
+          {
+            "name": "Free",
+            "basePrice": 0,
+            "includedUsers": null, "includedResources": null, "includedRuns": 50,
+            "perUser": 0, "perResource": 0, "perRun": 0,
+            "maxUsers": null, "maxResources": null, "maxRuns": 50,
+            "estimated": false,
+            "features": { "allFeatures": true, "sso": true, "opa": true, "ai": true },
+            "notes": "50 free runs/mo, ALL features included"
+          },
+          {
+            "name": "Pro 100",
+            "basePrice": 99,
+            "includedUsers": null, "includedResources": null, "includedRuns": 100,
+            "perUser": 0, "perResource": 0, "perRun": 0.99,
+            "maxUsers": null, "maxResources": null, "maxRuns": null,
+            "estimated": false,
+            "features": { "allFeatures": true, "sso": true, "opa": true, "ai": true },
+            "notes": "100 prepaid runs, $0.99/flex run overage"
+          },
+          {
+            "name": "Pro 500",
+            "basePrice": 485,
+            "includedUsers": null, "includedResources": null, "includedRuns": 500,
+            "perUser": 0, "perResource": 0, "perRun": 0.97,
+            "maxUsers": null, "maxResources": null, "maxRuns": null,
+            "estimated": false,
+            "features": { "allFeatures": true, "sso": true, "opa": true, "ai": true },
+            "notes": "500 prepaid runs, $0.97/flex run overage"
+          },
+          {
+            "name": "Pro 1000",
+            "basePrice": 954,
+            "includedUsers": null, "includedResources": null, "includedRuns": 1000,
+            "perUser": 0, "perResource": 0, "perRun": 0.95,
+            "maxUsers": null, "maxResources": null, "maxRuns": null,
+            "estimated": false,
+            "features": { "allFeatures": true, "sso": true, "opa": true, "ai": true },
+            "notes": "1000 prepaid runs, $0.95/flex run overage"
+          },
+          {
+            "name": "Pro 2000",
+            "basePrice": 1875,
+            "includedUsers": null, "includedResources": null, "includedRuns": 2000,
+            "perUser": 0, "perResource": 0, "perRun": 0.94,
+            "maxUsers": null, "maxResources": null, "maxRuns": null,
+            "estimated": false,
+            "features": { "allFeatures": true, "sso": true, "opa": true, "ai": true },
+            "notes": "2000 prepaid runs, $0.94/flex run overage"
+          }
+        ]
+      },
+      "hcp-terraform": {
+        "model": "Per-resource (RUM)",
+        "description": "Per Resources Under Management, features gated by tier",
+        "tiers": [
+          {
+            "name": "Free",
+            "basePrice": 0,
+            "includedUsers": null, "includedResources": 500, "includedRuns": null,
+            "perUser": 0, "perResource": 0, "perRun": 0,
+            "maxUsers": null, "maxResources": 500, "maxRuns": null,
+            "estimated": false,
+            "features": { "driftDetection": false, "auditTrails": false, "noCodeProvisioning": false, "privateVcs": false, "sentinel": false },
+            "notes": "500 free RUM, 1 concurrent run"
+          },
+          {
+            "name": "Essentials",
+            "basePrice": 0,
+            "includedUsers": null, "includedResources": 0, "includedRuns": null,
+            "perUser": 0, "perResource": 0.10, "perRun": 0,
+            "maxUsers": null, "maxResources": null, "maxRuns": null,
+            "estimated": false,
+            "features": { "driftDetection": false, "auditTrails": false, "noCodeProvisioning": false, "privateVcs": false, "sentinel": false },
+            "notes": "$0.10/RUM/month, 3 concurrent runs"
+          },
+          {
+            "name": "Standard",
+            "basePrice": 0,
+            "includedUsers": null, "includedResources": 0, "includedRuns": null,
+            "perUser": 0, "perResource": 0.47, "perRun": 0,
+            "maxUsers": null, "maxResources": null, "maxRuns": null,
+            "estimated": false,
+            "features": { "driftDetection": true, "auditTrails": true, "noCodeProvisioning": true, "privateVcs": false, "sentinel": true },
+            "notes": "$0.47/RUM/month, drift detection, 10 concurrent runs"
+          },
+          {
+            "name": "Premium",
+            "basePrice": 0,
+            "includedUsers": null, "includedResources": 0, "includedRuns": null,
+            "perUser": 0, "perResource": 0.99, "perRun": 0,
+            "maxUsers": null, "maxResources": null, "maxRuns": null,
+            "estimated": false,
+            "features": { "driftDetection": true, "auditTrails": true, "noCodeProvisioning": true, "privateVcs": true, "sentinel": true },
+            "notes": "$0.99/RUM/month, private VCS, 200 concurrent runs"
+          }
+        ]
+      },
+      "terrateam": {
+        "model": "Flat-rate",
+        "description": "Flat per-tier pricing, unlimited users/runs/resources",
+        "tiers": [
+          {
+            "name": "Free",
+            "basePrice": 0,
+            "includedUsers": null, "includedResources": null, "includedRuns": null,
+            "perUser": 0, "perResource": 0, "perRun": 0,
+            "maxUsers": null, "maxResources": null, "maxRuns": null,
+            "estimated": false,
+            "features": { "driftDetection": false, "scheduledConfig": false, "applyRequirements": false, "api": false, "rbac": false, "codeowners": false },
+            "notes": "All core features, unlimited everything, 30-day audit retention"
+          },
+          {
+            "name": "Pro",
+            "basePrice": 224,
+            "includedUsers": null, "includedResources": null, "includedRuns": null,
+            "perUser": 0, "perResource": 0, "perRun": 0,
+            "maxUsers": null, "maxResources": null, "maxRuns": null,
+            "estimated": false,
+            "features": { "driftDetection": true, "scheduledConfig": true, "applyRequirements": true, "api": false, "rbac": false, "codeowners": false },
+            "notes": "Drift detection, scheduled config, 90-day audit retention"
+          },
+          {
+            "name": "Enterprise",
+            "basePrice": 563,
+            "includedUsers": null, "includedResources": null, "includedRuns": null,
+            "perUser": 0, "perResource": 0, "perRun": 0,
+            "maxUsers": null, "maxResources": null, "maxRuns": null,
+            "estimated": false,
+            "features": { "driftDetection": true, "scheduledConfig": true, "applyRequirements": true, "api": true, "rbac": true, "codeowners": true },
+            "notes": "API, RBAC, CODEOWNERS, gatekeeper, 365-day audit retention"
+          },
+          {
+            "name": "Enterprise+",
+            "basePrice": 1088,
+            "includedUsers": null, "includedResources": null, "includedRuns": null,
+            "perUser": 0, "perResource": 0, "perRun": 0,
+            "maxUsers": null, "maxResources": null, "maxRuns": null,
+            "estimated": false,
+            "features": { "driftDetection": true, "scheduledConfig": true, "applyRequirements": true, "api": true, "rbac": true, "codeowners": true },
+            "notes": "MSA, security questionnaires, PO invoicing, architecture reviews"
+          }
+        ]
+      },
+      "terramate": {
+        "model": "Flat + caps",
+        "description": "Flat tiers with user and resource caps",
+        "tiers": [
+          {
+            "name": "Community",
+            "basePrice": 0,
+            "includedUsers": 2, "includedResources": 1000, "includedRuns": null,
+            "perUser": 0, "perResource": 0, "perRun": 0,
+            "maxUsers": 2, "maxResources": 1000, "maxRuns": null,
+            "estimated": false,
+            "features": { "driftDetection": true, "changesets": true, "rbac": false, "samlSso": false, "auditLog": false },
+            "notes": "2 users, 1000 resources, 30-day data retention"
+          },
+          {
+            "name": "Teams",
+            "basePrice": 449,
+            "includedUsers": null, "includedResources": 5000, "includedRuns": null,
+            "perUser": 0, "perResource": 0, "perRun": 0,
+            "maxUsers": null, "maxResources": 5000, "maxRuns": null,
+            "estimated": false,
+            "features": { "driftDetection": true, "changesets": true, "rbac": false, "samlSso": false, "auditLog": false },
+            "notes": "Unlimited users, 5000 resources, 90-day data retention"
+          },
+          {
+            "name": "Enterprise",
+            "basePrice": 1200,
+            "includedUsers": null, "includedResources": null, "includedRuns": null,
+            "perUser": 0, "perResource": 0, "perRun": 0,
+            "maxUsers": null, "maxResources": null, "maxRuns": null,
+            "estimated": true,
+            "features": { "driftDetection": true, "changesets": true, "rbac": true, "samlSso": true, "auditLog": true },
+            "notes": "Unlimited everything, RBAC, SAML, audit logs, 4hr SLA"
+          }
+        ]
+      },
+      "opentaco": {
+        "model": "Per-user",
+        "description": "Per-user pricing with free open-source self-hosted option",
+        "tiers": [
+          {
+            "name": "Open Source",
+            "basePrice": 0,
+            "includedUsers": null, "includedResources": null, "includedRuns": null,
+            "perUser": 0, "perResource": 0, "perRun": 0,
+            "maxUsers": null, "maxResources": null, "maxRuns": null,
+            "estimated": false,
+            "features": { "selfHosted": true, "managedHosting": false, "dedicatedInstance": false, "support": false },
+            "notes": "Self-hosted, all features, you manage the infrastructure"
+          },
+          {
+            "name": "Pro",
+            "basePrice": 0,
+            "includedUsers": 0, "includedResources": null, "includedRuns": null,
+            "perUser": 49, "perResource": 0, "perRun": 0,
+            "maxUsers": null, "maxResources": null, "maxRuns": null,
+            "minUsers": 5,
+            "estimated": false,
+            "features": { "selfHosted": false, "managedHosting": true, "dedicatedInstance": false, "support": true },
+            "notes": "$49/user/mo, minimum 5 users ($245/mo min)"
+          },
+          {
+            "name": "Enterprise",
+            "basePrice": 4000,
+            "includedUsers": null, "includedResources": null, "includedRuns": null,
+            "perUser": 0, "perResource": 0, "perRun": 0,
+            "maxUsers": null, "maxResources": null, "maxRuns": null,
+            "estimated": true,
+            "features": { "selfHosted": false, "managedHosting": true, "dedicatedInstance": true, "support": true },
+            "notes": "Dedicated VPC-peered instance, ~$3000-5000/mo estimated"
+          }
+        ]
+      }
+    }
+  }
+}
