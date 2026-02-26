@@ -672,7 +672,7 @@ export default function App() {
                     Data sourced from public vendor documentation — February 2026
                   </p>
                   <a
-                    href={`${REPO_URL}/edit/master/public/evaluation.json`}
+                    href={`${REPO_URL}/edit/main/public/evaluation.json`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-[10px] font-semibold flex items-center gap-1 px-2 py-1 rounded-md border border-border dark:border-border-dark text-slate-500 dark:text-slate-400 hover:text-accent dark:hover:text-accent-light hover:border-accent/40 dark:hover:border-accent-light/40 transition-colors"

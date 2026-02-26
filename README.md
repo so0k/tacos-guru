@@ -80,4 +80,4 @@ Scores, rationales, and pricing data go out of date. To suggest a fix:
 
 ## Deployment
 
-Deployed to GitHub Pages via [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) on every push to `master`. Custom domain configured via [`public/CNAME`](public/CNAME).
+Deployed to GitHub Pages via [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) on every push to `main`. Custom domain configured via [`public/CNAME`](public/CNAME).
