@@ -260,7 +260,7 @@
     "sliders": {
       "users": { "min": 1, "max": 100, "default": 20, "step": 1, "label": "Team Size", "unit": "users" },
       "resources": { "min": 100, "max": 50000, "default": 23658, "step": 100, "label": "Resources Under Management", "unit": "RUM" },
-      "runs": { "min": 50, "max": 5000, "default": 1000, "step": 50, "label": "Monthly Runs", "unit": "runs/mo" }
+      "runs": { "min": 50, "max": 5000, "default": 250, "step": 50, "label": "Monthly Runs", "unit": "runs/mo" }
     },
     "featureLabels": {
       "privateWorkers": "Private Workers",

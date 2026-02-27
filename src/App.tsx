@@ -4,6 +4,7 @@ import {
   Sun, Moon, RotateCcw, Trophy, ChevronDown, ChevronRight,
   XCircle, AlertCircle, CheckCircle, CircleCheckBig,
   Info, TrendingUp, TrendingDown, Minus, ExternalLink, DollarSign, Github,
+  Menu, X, SlidersHorizontal,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -194,6 +195,7 @@ function Sidebar({
   onHoverCriterion,
   collapsed,
   onToggleCollapse,
+  isSheet = false,
 }: {
   data: EvalData
   weights: Record<number, number>
@@ -203,9 +205,8 @@ function Sidebar({
   onHoverCriterion: (id: number | null) => void
   collapsed: boolean
   onToggleCollapse: () => void
+  isSheet?: boolean
 }) {
-  const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({})
-
   const grouped = useMemo(() => {
     const g: Record<string, Criterion[]> = {}
     data.criteria.forEach((c) => {
@@ -215,13 +216,19 @@ function Sidebar({
     return g
   }, [data.criteria])
 
+  const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>(() => {
+    const initial: Record<string, boolean> = {}
+    CATEGORY_ORDER.forEach((cat) => { initial[cat] = true })
+    return initial
+  })
+
   const toggleGroup = useCallback((cat: string) => {
     setCollapsedGroups((prev) => ({ ...prev, [cat]: !prev[cat] }))
   }, [])
 
   const hasChanges = data.criteria.some((c) => (weights[c.id] ?? c.defaultWeight) !== c.defaultWeight)
 
-  if (collapsed) {
+  if (!isSheet && collapsed) {
     return (
       <div className="w-12 shrink-0 border-r border-border dark:border-border-dark bg-surface-raised dark:bg-surface-raised-dark flex flex-col items-center pt-4">
         <button
@@ -235,21 +242,35 @@ function Sidebar({
     )
   }
 
-  return (
-    <aside className="w-72 shrink-0 border-r border-border dark:border-border-dark bg-surface-raised dark:bg-surface-raised-dark flex flex-col overflow-hidden">
-      <div className="p-4 border-b border-border dark:border-border-dark">
-        <div className="flex items-center justify-between mb-2">
-          <h2 className="font-display font-bold text-sm text-slate-900 dark:text-white tracking-wide uppercase">
-            Criteria Weights
-          </h2>
-          <button
-            onClick={onToggleCollapse}
-            className="p-1 rounded hover:bg-surface-hover dark:hover:bg-surface-hover-dark text-slate-400"
-          >
-            <ChevronDown size={14} className="rotate-90" />
-          </button>
+  const sidebarContent = (
+    <>
+      {!isSheet && (
+        <div className="p-4 border-b border-border dark:border-border-dark">
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="font-display font-bold text-sm text-slate-900 dark:text-white tracking-wide uppercase">
+              Criteria Weights
+            </h2>
+            <button
+              onClick={onToggleCollapse}
+              className="p-1 rounded hover:bg-surface-hover dark:hover:bg-surface-hover-dark text-slate-400"
+            >
+              <ChevronDown size={14} className="rotate-90" />
+            </button>
+          </div>
+          {hasChanges && (
+            <button
+              onClick={onReset}
+              className="flex items-center gap-1.5 text-xs text-accent dark:text-accent-light hover:underline"
+            >
+              <RotateCcw size={12} />
+              Reset to defaults
+            </button>
+          )}
         </div>
-        {hasChanges && (
+      )}
+
+      {isSheet && hasChanges && (
+        <div className="px-4 pt-3">
           <button
             onClick={onReset}
             className="flex items-center gap-1.5 text-xs text-accent dark:text-accent-light hover:underline"
@@ -257,10 +278,10 @@ function Sidebar({
             <RotateCcw size={12} />
             Reset to defaults
           </button>
-        )}
-      </div>
+        </div>
+      )}
 
-      <div className="flex-1 overflow-y-auto p-2 space-y-4">
+      <div className={`${isSheet ? '' : 'flex-1 overflow-y-auto'} p-2 space-y-4`}>
         {CATEGORY_ORDER.map((cat) => {
           const criteria = grouped[cat]
           if (!criteria) return null
@@ -305,6 +326,14 @@ function Sidebar({
           )
         })}
       </div>
+    </>
+  )
+
+  if (isSheet) return sidebarContent
+
+  return (
+    <aside className="w-72 shrink-0 border-r border-border dark:border-border-dark bg-surface-raised dark:bg-surface-raised-dark flex flex-col overflow-hidden">
+      {sidebarContent}
     </aside>
   )
 }
@@ -349,9 +378,9 @@ function PlatformRow({
         onClick={onToggle}
       >
         {/* Main row */}
-        <div className="p-4 space-y-3">
+        <div className="p-3 space-y-2 md:p-4 md:space-y-3">
           {/* Top line: rank, name, score bar */}
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap md:flex-nowrap items-center gap-2 md:gap-4">
             {/* Rank */}
             <div className="w-8 text-center shrink-0">
               {platform.rank === 1 ? (
@@ -364,9 +393,9 @@ function PlatformRow({
             </div>
 
             {/* Platform info */}
-            <div className="flex items-center gap-3 w-44 shrink-0">
+            <div className="flex items-center gap-3 flex-1 md:w-44 md:shrink-0 md:flex-none min-w-0">
               <div
-                className="w-9 h-9 rounded-lg flex items-center justify-center"
+                className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
                 style={{ backgroundColor: platform.color + '18' }}
               >
                 <Icon size={18} style={{ color: platform.color }} />
@@ -398,9 +427,20 @@ function PlatformRow({
               </div>
             </div>
 
+            {/* Percentage + chevron on mobile (shown inline with name row) */}
+            <div className="flex items-center gap-2 md:hidden shrink-0">
+              <span className="text-sm font-bold font-mono" style={{ color: platform.color }}>
+                {platform.percentage.toFixed(0)}%
+              </span>
+              <ChevronDown
+                size={16}
+                className={`text-slate-400 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}
+              />
+            </div>
+
             {/* Score bar */}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-baseline gap-2 mb-1.5">
+            <div className="w-full md:w-auto md:flex-1 min-w-0">
+              <div className="hidden md:flex items-baseline gap-2 mb-1.5">
                 <span className="text-xl font-display font-black text-slate-900 dark:text-white">
                   {platform.weightedScore}
                 </span>
@@ -422,10 +462,10 @@ function PlatformRow({
               </div>
             </div>
 
-            {/* Expand chevron */}
+            {/* Expand chevron — desktop only (mobile chevron is next to name) */}
             <ChevronDown
               size={16}
-              className={`shrink-0 text-slate-400 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}
+              className={`hidden md:block shrink-0 text-slate-400 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}
             />
           </div>
 
@@ -457,7 +497,7 @@ function PlatformRow({
             </p>
 
             {/* Full score breakdown — visible on all screens when expanded */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1.5">
               {criteria.map((c, i) => {
                 const w = weights[c.id] ?? c.defaultWeight
                 const Icon = SCORE_ICONS[platform.scores[i]]
@@ -508,6 +548,8 @@ export default function App() {
   const [expandedPlatform, setExpandedPlatform] = useState<string | null>(null)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [activeTab, setActiveTab] = useState<'eval' | 'pricing'>('eval')
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [weightsSheetOpen, setWeightsSheetOpen] = useState(false)
 
   // Load data
   useEffect(() => {
@@ -558,30 +600,31 @@ export default function App() {
   return (
     <div className={`min-h-screen flex flex-col bg-surface dark:bg-surface-dark text-slate-900 dark:text-slate-100 transition-colors duration-300`}>
       {/* Header */}
-      <header className="shrink-0 border-b border-border dark:border-border-dark bg-surface-raised dark:bg-surface-raised-dark px-6 py-3">
+      <header className="shrink-0 border-b border-border dark:border-border-dark bg-surface-raised dark:bg-surface-raised-dark px-4 md:px-6 py-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 md:gap-3">
             <h1 className="font-display font-black text-xl tracking-tight">
               <span className="text-accent dark:text-accent-light">tacos</span>
               <span className="text-slate-400 font-semibold">.guru</span>
             </h1>
 
             {/* Tabs */}
-            <div className="flex items-center gap-0.5 bg-slate-100 dark:bg-slate-800 rounded-lg p-0.5 ml-2">
+            <div className="flex items-center gap-0.5 bg-slate-100 dark:bg-slate-800 rounded-lg p-0.5 ml-1 md:ml-2">
               <button
                 onClick={() => setActiveTab('eval')}
-                className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors flex items-center gap-1.5 ${
+                className={`px-2 md:px-3 py-1.5 rounded-md text-xs font-semibold transition-colors flex items-center gap-1.5 ${
                   activeTab === 'eval'
                     ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
                     : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
                 }`}
               >
                 <Info size={12} />
-                Evaluation
+                <span className="hidden sm:inline">Evaluation</span>
+                <span className="sm:hidden">Eval</span>
               </button>
               <button
                 onClick={() => setActiveTab('pricing')}
-                className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors flex items-center gap-1.5 ${
+                className={`px-2 md:px-3 py-1.5 rounded-md text-xs font-semibold transition-colors flex items-center gap-1.5 ${
                   activeTab === 'pricing'
                     ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
                     : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
@@ -593,7 +636,8 @@ export default function App() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          {/* Desktop actions */}
+          <div className="hidden md:flex items-center gap-2">
             {hasChanges && (
               <span className="text-xs font-mono px-2 py-1 rounded-md bg-accent/10 dark:bg-accent-light/10 text-accent dark:text-accent-light">
                 {totalWeight}w (default: {defaultTotalWeight})
@@ -616,26 +660,115 @@ export default function App() {
               {darkMode ? <Sun size={16} /> : <Moon size={16} />}
             </button>
           </div>
+
+          {/* Mobile hamburger */}
+          <div className="relative md:hidden">
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-2 rounded-lg hover:bg-surface-hover dark:hover:bg-surface-hover-dark text-slate-500 dark:text-slate-400 transition-colors"
+            >
+              {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
+
+            {/* Dropdown menu */}
+            {mobileMenuOpen && (
+              <div className="absolute right-0 top-full mt-1 w-48 bg-surface-raised dark:bg-surface-raised-dark rounded-xl border border-border dark:border-border-dark shadow-xl z-50 py-1 overflow-hidden">
+                <button
+                  onClick={() => { setDarkMode(!darkMode); setMobileMenuOpen(false) }}
+                  className="w-full px-4 py-2.5 text-left text-sm flex items-center gap-3 hover:bg-surface-hover dark:hover:bg-surface-hover-dark text-slate-700 dark:text-slate-300 transition-colors"
+                >
+                  {darkMode ? <Sun size={16} /> : <Moon size={16} />}
+                  {darkMode ? 'Light mode' : 'Dark mode'}
+                </button>
+                {activeTab === 'eval' && (
+                  <button
+                    onClick={() => { setWeightsSheetOpen(true); setMobileMenuOpen(false) }}
+                    className="w-full px-4 py-2.5 text-left text-sm flex items-center gap-3 hover:bg-surface-hover dark:hover:bg-surface-hover-dark text-slate-700 dark:text-slate-300 transition-colors"
+                  >
+                    <SlidersHorizontal size={16} />
+                    Adjust Weights
+                  </button>
+                )}
+                <a
+                  href={REPO_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full px-4 py-2.5 text-left text-sm flex items-center gap-3 hover:bg-surface-hover dark:hover:bg-surface-hover-dark text-slate-700 dark:text-slate-300 transition-colors"
+                >
+                  <Github size={16} />
+                  GitHub
+                  <ExternalLink size={10} className="ml-auto text-slate-400" />
+                </a>
+              </div>
+            )}
+          </div>
         </div>
       </header>
+
+      {/* Mobile weights bottom sheet */}
+      {weightsSheetOpen && (
+        <div className="fixed inset-0 z-40 md:hidden">
+          <div
+            className="absolute inset-0 bg-black/40 bottom-sheet-backdrop"
+            onClick={() => setWeightsSheetOpen(false)}
+          />
+          <div className="absolute bottom-0 left-0 right-0 bottom-sheet max-h-[70vh] bg-surface-raised dark:bg-surface-raised-dark rounded-t-2xl shadow-2xl flex flex-col overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-border dark:border-border-dark shrink-0">
+              <h2 className="font-display font-bold text-sm text-slate-900 dark:text-white tracking-wide uppercase">
+                Criteria Weights
+              </h2>
+              <button
+                onClick={() => setWeightsSheetOpen(false)}
+                className="p-1 rounded-lg hover:bg-surface-hover dark:hover:bg-surface-hover-dark text-slate-400"
+              >
+                <X size={18} />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto">
+              <Sidebar
+                data={data}
+                weights={weights}
+                onChange={handleWeightChange}
+                onReset={handleReset}
+                hoveredCriterion={hoveredCriterion}
+                onHoverCriterion={setHoveredCriterion}
+                collapsed={false}
+                onToggleCollapse={() => setWeightsSheetOpen(false)}
+                isSheet
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Close mobile menu on backdrop click */}
+      {mobileMenuOpen && (
+        <div
+          className="fixed inset-0 z-30 md:hidden"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
 
       {/* Body */}
       <div className="flex flex-1 overflow-hidden">
         {activeTab === 'eval' ? (
           <>
-            <Sidebar
-              data={data}
-              weights={weights}
-              onChange={handleWeightChange}
-              onReset={handleReset}
-              hoveredCriterion={hoveredCriterion}
-              onHoverCriterion={setHoveredCriterion}
-              collapsed={sidebarCollapsed}
-              onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
-            />
+            <div className="hidden md:flex">
+              <Sidebar
+                data={data}
+                weights={weights}
+                onChange={handleWeightChange}
+                onReset={handleReset}
+                hoveredCriterion={hoveredCriterion}
+                onHoverCriterion={setHoveredCriterion}
+                collapsed={sidebarCollapsed}
+                onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+              />
+            </div>
 
             <main className="flex-1 overflow-y-auto dot-grid">
-              <div className="p-6 max-w-5xl mx-auto space-y-3">
+              <div className="p-4 md:p-6 max-w-5xl mx-auto space-y-3">
                 {/* Column legend for heatmap */}
                 <div className="hidden lg:flex items-center gap-1 justify-end pr-10 mb-2">
                   <span className="text-[10px] text-slate-400 dark:text-slate-500 mr-2 font-mono">Score key:</span>
@@ -688,6 +821,17 @@ export default function App() {
           <PricingCalculator data={data} />
         )}
       </div>
+
+      {/* Mobile FAB — open weights bottom sheet */}
+      {activeTab === 'eval' && !weightsSheetOpen && (
+        <button
+          onClick={() => setWeightsSheetOpen(true)}
+          className="fixed bottom-5 right-5 z-30 md:hidden flex items-center gap-2 px-4 py-2.5 rounded-full bg-accent dark:bg-accent-light text-white dark:text-slate-900 shadow-lg hover:shadow-xl active:scale-95 transition-all font-display font-bold text-sm"
+        >
+          <SlidersHorizontal size={16} />
+          Weights
+        </button>
+      )}
     </div>
   )
 }

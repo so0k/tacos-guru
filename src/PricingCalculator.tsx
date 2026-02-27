@@ -201,7 +201,7 @@ function PricingCard({
       style={{ animationDelay: `${rank * 40}ms` }}
       onClick={() => setExpanded(!expanded)}
     >
-      <div className="p-4 flex items-center gap-4">
+      <div className="p-3 md:p-4 flex flex-wrap md:flex-nowrap items-center gap-2 md:gap-4">
         {/* Rank */}
         <div className="w-8 text-center shrink-0">
           {rank === 1 ? (
@@ -214,9 +214,9 @@ function PricingCard({
         </div>
 
         {/* Platform */}
-        <div className="flex items-center gap-3 w-40 shrink-0">
+        <div className="flex items-center gap-3 flex-1 md:w-40 md:shrink-0 md:flex-none min-w-0">
           <div
-            className="w-9 h-9 rounded-lg flex items-center justify-center"
+            className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
             style={{ backgroundColor: result.platformColor + '18' }}
           >
             <Icon size={18} style={{ color: result.platformColor }} />
@@ -238,8 +238,19 @@ function PricingCard({
           </div>
         </div>
 
-        {/* Cost */}
-        <div className="flex-1 min-w-0">
+        {/* Cost + Chevron on mobile (inline with name row) */}
+        <div className="flex items-center gap-2 md:hidden shrink-0">
+          <span className="text-lg font-display font-black text-slate-900 dark:text-white">
+            {activeCost === 0 ? 'Free' : `$${activeCost.toLocaleString()}`}
+          </span>
+          <ChevronDown
+            size={16}
+            className={`text-slate-400 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}
+          />
+        </div>
+
+        {/* Cost — desktop */}
+        <div className="hidden md:block flex-1 min-w-0">
           <div className="flex items-baseline gap-2">
             <span className="text-2xl font-display font-black text-slate-900 dark:text-white">
               {activeCost === 0 ? 'Free' : `$${activeCost.toLocaleString()}`}
@@ -254,7 +265,7 @@ function PricingCard({
         </div>
 
         {/* Badges */}
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="w-full md:w-auto flex flex-wrap items-center gap-1 md:gap-2 md:shrink-0">
           {isOverridden && (
             <button
               onClick={(e) => { e.stopPropagation(); onOverrideTier(result.platformId, null) }}
@@ -281,11 +292,16 @@ function PricingCard({
               Contact Sales
             </span>
           )}
+          {/* Notes visible on mobile below cost */}
+          <span className="w-full text-[10px] text-slate-500 dark:text-slate-400 md:hidden">
+            {activeTier.notes}
+          </span>
         </div>
 
+        {/* Chevron — desktop only */}
         <ChevronDown
           size={16}
-          className={`shrink-0 text-slate-400 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}
+          className={`hidden md:block shrink-0 text-slate-400 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}
         />
       </div>
 
@@ -383,11 +399,11 @@ export default function PricingCalculator({ data }: { data: EvalData }) {
 
   return (
     <main className="flex-1 overflow-y-auto dot-grid">
-      <div className="p-6 max-w-5xl mx-auto space-y-4">
+      <div className="p-4 md:p-6 max-w-5xl mx-auto space-y-4">
         <PricingSliders data={data} inputs={inputs} onChange={handleChange} />
 
         {/* Summary */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="bg-surface-raised dark:bg-surface-raised-dark rounded-xl border border-border dark:border-border-dark p-4 flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
               <Trophy size={16} className="text-emerald-600 dark:text-emerald-400" />

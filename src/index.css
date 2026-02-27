@@ -182,6 +182,29 @@ input[type="range"]::-moz-range-thumb {
   opacity: 1;
 }
 
+/* Bottom sheet */
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.bottom-sheet-backdrop {
+  animation: fadeIn 0.2s ease-out both;
+}
+
+.bottom-sheet {
+  animation: slideUp 0.3s ease-out both;
+}
+
 /* Dot grid background */
 .dot-grid {
   background-image: radial-gradient(circle, #cbd5e1 0.5px, transparent 0.5px);
