@@ -477,6 +477,7 @@ function DisqualifiedBadge({ platform, gates }: { platform: RankedPlatform; gate
     .filter((g) => platform.gates?.[g.id] && platform.gates[g.id].pass === false)
     .map((g) => g.label)
 
+  // Tooltip is left-anchored: the badge sits near the row's left edge, so a centred one gets squeezed.
   return (
     <div className="tooltip-trigger">
       <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
@@ -484,8 +485,8 @@ function DisqualifiedBadge({ platform, gates }: { platform: RankedPlatform; gate
         Disqualified
       </span>
       {failedLabels.length > 0 && (
-        <div className="tooltip-content">
-          <div className="bg-slate-900 dark:bg-slate-800 text-white text-xs rounded-lg px-3 py-2 shadow-xl max-w-xs whitespace-normal">
+        <div className="tooltip-content" style={{ left: 0, transform: 'none' }}>
+          <div className="bg-slate-900 dark:bg-slate-800 text-white text-xs rounded-lg px-3 py-2 shadow-xl w-64 whitespace-normal">
             <div className="font-semibold mb-1">Failed gates</div>
             <ul className="list-disc list-inside text-slate-300">
               {failedLabels.map((label) => <li key={label}>{label}</li>)}
