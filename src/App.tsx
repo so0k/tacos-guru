@@ -195,6 +195,7 @@ function WeightSlider({
   onLeave: () => void
 }) {
   const isChanged = weight !== criterion.defaultWeight
+  const [showInfo, setShowInfo] = useState(false)
 
   return (
     <div
@@ -206,8 +207,20 @@ function WeightSlider({
       onMouseLeave={onLeave}
     >
       <div className="flex items-center justify-between mb-1">
-        <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 truncate mr-2">
-          {criterion.short}
+        <span className="flex items-center gap-1 min-w-0 mr-2">
+          <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 truncate">
+            {criterion.short}
+          </span>
+          <button
+            type="button"
+            onClick={() => setShowInfo((v) => !v)}
+            title={`${criterion.name}: ${criterion.description}`}
+            aria-label={`About ${criterion.name}`}
+            aria-expanded={showInfo}
+            className="shrink-0 text-slate-400 hover:text-accent dark:text-slate-500 dark:hover:text-accent-light"
+          >
+            <Info size={11} />
+          </button>
         </span>
         <div className="flex items-center gap-1.5">
           {isChanged && (
@@ -232,11 +245,11 @@ function WeightSlider({
         onChange={(e) => onChange(criterion.id, parseInt(e.target.value))}
         className="w-full"
       />
-      <div className="flex items-center gap-1 mt-0.5">
-        <span className="text-[10px] text-slate-400 dark:text-slate-500 truncate">
+      {showInfo && (
+        <p className="mt-0.5 text-[10px] leading-snug text-slate-400 dark:text-slate-500">
           {criterion.description}
-        </span>
-      </div>
+        </p>
+      )}
     </div>
   )
 }
