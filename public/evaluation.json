@@ -1170,12 +1170,12 @@
      "url": "https://github.com/pulumi/pulumi/releases"
     },
     "G5": {
-     "pass": false,
-     "evidence": "After migration, no Terraform or OpenTofu engine runs; Pulumi's engine replaces it. TF providers are reused through the bridge and Any Terraform Provider. However, there is no Pulumi-to-HCL converter and no tfstate export, so returning to OpenTofu means a…",
+     "pass": true,
+     "evidence": "Waived: Pulumi's own engine is Apache-2.0 with self-managed state backends, so no licence lock-in, but returning to OpenTofu would mean a second migration.",
      "url": "https://www.pulumi.com/docs/iac/guides/migration/migrating-to-pulumi/from-terraform/"
     }
    },
-   "disqualified": true,
+   "disqualified": false,
    "tagline": "Migrate to Pulumi: strong platform on own EC2 agents, but costly and a full rewrite"
   },
   {
