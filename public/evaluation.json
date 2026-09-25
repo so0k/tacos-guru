@@ -318,7 +318,7 @@
     "Stack dependency DAG with output references, cycle rejection and ordered tracked runs. PR (proposed) runs ignore dependencies; no unknown-value planning.",
     "Scheduled per-stack drift detection on private workers, with notifications and optional auto-reconcile; granular drift RBAC added 2026.",
     "AWS integration assumes IAM roles per stack (read/write roles, external ID), optionally from the worker; OIDC tokens also available. No static keys.",
-    "At 21 users / 23.7k RUM / 1.5k runs / 255 stacks: Starter+ ≈ $1,667/mo",
+    "Starter+ ≈ $1,667/mo at the default calculator inputs",
     "No repo codegen for backend/provider boilerplate. Stacks can be declared via TF provider; Blueprints/Templates are UI self-service (Business+).",
     "Managed state with state import and external state access; space-level access, not resource-level; local dev plan/apply against managed state is limited.",
     "Atlantis-specific guides and PR comment commands, but the migration kit only automates Terraform Cloud exports.",
@@ -418,7 +418,7 @@
     "Workflows: YAML DAG (needs), output passing, per-node approvals, live graph. PR plans run per sub-env on deployed outputs, no unknown-value plan.",
     "Per-environment cron drift detection with notifications, AI cause analysis, and auto-remediation that either redeploys or opens a PR.",
     "Native OIDC for AWS, Azure, GCP and Vault (v2 per-provider audience). Project-scoped creds; agents can use their instance or task role.",
-    "At 21 users / 23.7k RUM / 1.5k runs / 255 stacks: Cloud Pilot ≈ $10,757/mo",
+    "Cloud Pilot ≈ $11,426/mo at the default calculator inputs",
     "env0-discovery.yml declares envs (triggers, PR plan, drift, remote backend) and auto-injects the backend. No provider/version codegen.",
     "Managed remote backend: per-role Read/Write State, state download, S3 self-hosted option, remote plan. Access is per workspace, not per resource.",
     "Atlantis-style PR comment commands (env0 plan/apply --all/--path), bulk import of existing TF dirs, and a migration blog/video. No atlantis.yaml import.",
@@ -518,7 +518,7 @@
     "Run triggers fire downstream after upstream success, cross-env via federation. No DAG, no in-change multi-apply (except Terragrunt run-all/stacks).",
     "Scheduled per-env drift with tag/name filters and time windows, not billed; Teams/Slack alerts with Ignore/Sync/Revert actions.",
     "Native AWS OIDC provider configurations per env/workspace; agents can also use EC2/ECS role. No static keys needed.",
-    "At 21 users / 23.7k RUM / 1.5k runs / 255 stacks: Business ≈ $1,485/mo",
+    "Enterprise ≈ $1,881/mo at the default calculator inputs",
     "No codegen. No-code workspaces are UI deploys of registry modules; wiring can be declared via Scalr TF provider. Terragrunt stacks supported.",
     "Managed state with version history & export; state-versions:read gates human access per scope. No resource-level RBAC; own-S3 storage is Enterprise.",
     "Atlantis-style /scalr plan|apply PR comments and GitHub check actions; no atlantis.yaml import or dedicated migration guide.",
@@ -618,7 +618,7 @@
     "Explicit DAG (after/before/wants), ordered runs in one CI job, dependency selection flags. Output sharing is experimental and plans against mock values.",
     "Scheduled drift runs in your CI per stack/tag, synced to Cloud with alerts, AI explanations and reconciliation jobs. Alerts are Slack-only.",
     "No credential brokering; AWS OIDC comes from your CI (e.g. GitHub OIDC) with per-stack roles wired via codegen. No static keys needed.",
-    "At 21 users / 23.7k RUM / 1.5k runs / 255 stacks: Enterprise — quote only",
+    "Enterprise — contact sales at the default calculator inputs",
     "generate_hcl/generate_file with hierarchical globals is a true fogg-style generator; Catalyst bundles/components/environments now in the OSS CLI.",
     "Does not manage state; keep your S3 backend with IAM isolation. No state RBAC, locking UI or export features; cross-state tracking only via outputs sharing.",
     "No Atlantis migration guide or atlantis.yaml import; `terramate create --all-terraform` can adopt existing root modules as stacks.",
@@ -718,7 +718,7 @@
     "Stacks and layered runs give in-PR apply_after ordering. IaaD mtx plans several states as one run with real unknowns and applies atomically.",
     "Scheduled drift per tag query; opens a GitHub issue; optional auto-reconcile. More than one schedule per repo needs Enterprise (every hosted tier).",
     "Documented AWS OIDC setup plus an OIDC hardening guide; per-workflow and per-environment role selection.",
-    "At 21 users / 23.7k RUM / 1.5k runs / 255 stacks: Orchestration Pro ≈ $1,000/mo",
+    "Orchestration Pro ≈ $1,000/mo at the default calculator inputs",
     "config_builder, tree_builder, indexer and centralized config generate orchestrator config only. No backend/provider codegen like fogg.",
     "IaaD: Postgres state, per-state and per-subgraph plan/apply tokens, SQL across states, tfstate export. Orchestration alone: bring your own S3.",
     "Same PR-comment plan/apply model as Atlantis. Stategraph docs cover running under Atlantis; no atlantis.yaml import.",
@@ -818,7 +818,7 @@
     "Stacks GA: component DAG, planning with unknowns/deferred changes, linked Stacks, per-deployment approvals. Custom auto-approve groups Premium.",
     "Health assessments (drift + continuous validation) on Standard/Premium, notifications on drift; remediation via new run.",
     "Dynamic provider credentials (OIDC) for AWS per workspace/Stack, separate plan/apply roles, quick setup added 2026.",
-    "At 21 users / 23.7k RUM / 1.5k runs / 255 stacks: Standard ≈ $11,119/mo",
+    "Standard ≈ $8,651/mo at the default calculator inputs",
     "No fogg-style codegen. Stacks declare providers/deployments once per stack; workspace wiring via tfe provider; no-code modules.",
     "Managed state, per-team state read/write permissions, state download as standard tfstate, restore. No resource-level RBAC.",
     "No Atlantis migration tooling; tf-migrate deprecated. Generic workspace and workspace-to-Stacks migration guides.",
@@ -918,7 +918,7 @@
     "depends_on plus respect_layers gives layer-by-layer plan/apply in one PR. Statesman flags stale edges. No plan with unknowns; PR-comment UX only.",
     "Scheduled per-project drift runs via the service or backendless GHA. Alerts go to Slack or GitHub Issues, with issue-driven apply to remediate.",
     "Uses native GHA OIDC to AWS, with aws_role_to_assume per project for separate plan/apply roles. No static keys.",
-    "At 21 users / 23.7k RUM / 1.5k runs / 255 stacks: Pro ≈ $410/mo",
+    "Pro ≈ $440/mo at the default calculator inputs",
     "generate_projects only builds the project list from dir globs. It does not generate backend/provider boilerplate, so it is no fogg replacement.",
     "Self-hosted Statesman has TFE-compatible state, prefix-wildcard RBAC, versions/rollback, dependency edges. Dormant since Mar 2026; you run it.",
     "Same PR-comment plan/apply model as Atlantis, but with no atlantis.yaml import and no migration guide.",
@@ -1018,7 +1018,7 @@
     "Variable graph detects remote_state edges and blast radius. Workflows can chain IaC deploys by hand. No unknown-value planning or downstream re-plan.",
     "Cron-scheduled discovery scans with session diffs and drift alerts. It compares cloud inventory, not a per-stack plan. Remediation from Pro tier.",
     "AWS access via cross-account IAM role assumption, with no stored keys and short-lived credentials per run. The role is assumed from ops0's own environment.",
-    "At 21 users / 23.7k RUM / 1.5k runs / 255 stacks: Enterprise — quote only",
+    "Enterprise — contact sales at the default calculator inputs",
     "Blueprints and a Developer Portal offer UI templates only. No declarative codegen for backend/provider boilerplate across many components.",
     "State stays in your own S3/GCS/Azure backend (or the ops0 DB). Has state viewer, history/restore and download. Access control is per project only.",
     "No Atlantis migration path. A generic per-project 'import existing Terraform project' guide only.",
@@ -1085,56 +1085,56 @@
    "icon": "Layers",
    "color": "#8A3391",
    "scores": [
-    0,
+    3,
+    1,
     2,
-    0,
+    3,
+    1,
+    3,
     3,
     0,
+    2,
+    2,
+    1,
+    3,
+    2,
     0,
     2,
-    1,
-    0,
-    2,
-    1,
-    0,
-    2,
-    0,
-    1,
-    1,
     2,
     2,
+    3,
     2,
-    1,
     2,
-    0,
-    1,
+    3,
+    3,
+    2,
     3
    ],
    "rationales": [
-    "No synth/pre-run step in hosted TF execution; cdktn works only in local mode with your own CI doing synth and affected detection.",
-    "Backend works with Terraform and OpenTofu CLIs; hosted runs always use OpenTofu at a Pulumi-managed, unpinnable version.",
-    "TF remote execution is Pulumi-hosted only; customer-managed agents and custom images are Pulumi-program-only features.",
-    "SAML SSO and custom roles (Pro+), SCIM (Enterprise), team/tag-scoped stack permissions, audit logs; applies to TF stacks.",
-    "No DAG or dependency triggers for Terraform stacks; docs point to CI pipeline sequencing. Deployment triggers are Pulumi-only.",
-    "Drift detection is explicitly unavailable for Terraform stacks (requires a Pulumi program).",
-    "ESC issues AWS OIDC creds per stack env; automatic in hosted runs, via esc run wrapper in local mode. OIDC token exchange for CI.",
-    "At 21 users / 23.7k RUM / 1.5k runs / 255 stacks: Essentials ≈ $4,266/mo",
-    "No fogg-like codegen for Terraform; templates/IDP features target Pulumi programs.",
-    "Managed encrypted versioned state, locking, per-stack team RBAC, CI-only via team tokens, export via state pull; no resource-level RBAC.",
-    "Backend swap via terraform init -migrate-state keeps Atlantis working; no atlantis.yaml import or PR-comment compatibility.",
-    "Hosted TF runs allow no pre/post hooks, custom images or env vars; custom gates only possible in your own CI.",
-    "HCP-compatible TF/OpenTofu module registry at tf.pulumi.com; publishing needs Pro+; modules auto-converted to Pulumi packages.",
-    "No cost estimation for Terraform plans.",
-    "Policies in TS/Python/Rego over mapped Pulumi schemas, not raw plan JSON; blocking only in hosted runs, audit-only in local mode.",
-    "Neo code reviews (GitHub, advisory) cover TF/OpenTofu PRs; trusted default-branch instructions and BYO model not verified.",
-    "Slack- and Teams-formatted webhooks with stack/deployment events; notifications only, no interactive approvals.",
-    "Hosted TF runs: VCS push/PR plans on GitHub, GitLab, Bitbucket, Azure DevOps; policy results in PR checks. Unused in local mode.",
-    "Generic JSON webhooks, audit log API and continuous S3/Sentinel export; no native Datadog or OTel integration.",
-    "TF resources appear in resource search and dashboards; dependency graphs mainly for Pulumi programs.",
-    "Remote MCP server and Neo agent see TF-backed resources; no TF drift to remediate. Neo can open PRs.",
-    "Review stacks and TTL stacks are Pulumi-program features; nothing for Terraform stacks.",
-    "Official management provider is Pulumi-native (pulumiservice); TF only via community providers that read outputs.",
-    "Cloud-agnostic backend; ESC supports AWS, Azure and GCP dynamic credentials."
+    "Requires migrating from CDK Terrain; Pulumi TS needs no synth. Per-stack path filters; shared TS package changes fan out via listed globs, not a dep graph.",
+    "Pulumi programs don't run TF/OpenTofu. TF providers reused via bridge/Any TF Provider; no Pulumi-to-HCL or tfstate export, so exit is a re-migration.",
+    "Customer-managed agents on EC2 with Docker, runner pools, custom executor images; Enterprise only; agent needs host Docker daemon; rootless builds unverified.",
+    "SAML SSO and custom roles (Pro+), SCIM and unlimited roles (Enterprise), team/stack-scoped permissions, audit logs.",
+    "Stack refs + deployment webhooks/Auto Deploy (preview) cascade after upstream apply; no DAG preview with unknowns or ordered multi-apply per change.",
+    "Scheduled per-stack drift detection with remediate-drift runs and webhook/Teams alerts (Pro+; on own agents Enterprise).",
+    "Native AWS OIDC in Deployments settings and via ESC environments per stack; no static keys.",
+    "Enterprise ≈ $9,477/mo at the default calculator inputs",
+    "Backend/provider boilerplate mostly disappears; templates, Automation API and pulumiservice provider wire stacks as code, but no fogg-style codegen.",
+    "Managed encrypted state, per-stack team RBAC, local dev previews, CI-only prod via agents; export is Pulumi JSON not tfstate; no resource-level RBAC.",
+    "Convert/import tools and Neo migration exist, but ~250 roots incl. CDK Terrain L2s need synth→convert→refactor; module resources skip bulk import.",
+    "preRunCommands, custom executor images, env vars, policy packs and in-program checks allow arbitrary gates (e.g. cosign verify before up).",
+    "Private Registry for Pulumi components/templates; components can be sourced from monorepo git paths; TF module registry also offered.",
+    "No native PR cost estimation for Pulumi previews; Infracost does not natively support Pulumi.",
+    "CrossGuard in TS/Python plus stable OPA/Rego analyzer over Pulumi resource inputs (not TF plan JSON); mandatory enforcement Pro+, remediation Enterprise.",
+    "Neo code reviews read preview output on GitHub, advisory; BYOK on Enterprise (Anthropic/Azure/custom endpoint); default-branch-only instructions unverified.",
+    "Slack- and Teams-formatted webhooks for stack/deployment/drift events; notifications only, no interactive approvals in chat.",
+    "GitHub app: PR preview comments, commit checks, review stacks, Neo reviews, policy results; GitLab/Azure DevOps/Bitbucket supported with fewer features.",
+    "Audit log API and automated S3 export (Pro+), deployment/stack webhooks; no native Datadog or OTel integration.",
+    "Per-stack resource graph, resource search, Insights, Context API graph (preview) across stacks and relationships.",
+    "Neo agent acts on drift, opens PRs, runs previews; remote MCP server over stacks and resources.",
+    "Review stacks per PR and TTL stacks with scheduled destroy.",
+    "Platform fully manageable as code via the Pulumi Service Provider v1.0 (Pulumi-native); no official Terraform provider.",
+    "AWS, Azure, GCP, Kubernetes and any bridged TF provider; ESC covers AWS/Azure/GCP dynamic creds."
    ],
    "variants": {
     "17": {
@@ -1142,41 +1142,41 @@
      "teams": 2
     },
     "18": {
-     "github": 2,
+     "github": 3,
      "gitlab": 2,
-     "bitbucket": 1,
-     "azure_devops": 1
+     "bitbucket": 2,
+     "azure_devops": 2
     }
    },
    "gates": {
     "G1": {
      "pass": true,
-     "evidence": "SaaS by default; self-hosted Pulumi Cloud (Enterprise) and customer-managed agents run outside Kubernetes. Nothing in the TF-state path needs K8s.",
-     "url": "https://www.pulumi.com/docs/integrations/terraform/state-backend/"
+     "evidence": "Customer-managed agents run in Docker mode on a plain VM/bare-metal host ('requires only a Docker daemon on the host'); Kubernetes mode is optional. SaaS control plane. The Pulumi Kubernetes Operator is a separate, K8s-only product and is not needed.",
+     "url": "https://www.pulumi.com/docs/deployments/deployments/customer-managed-agents/"
     },
     "G2": {
-     "pass": false,
-     "evidence": "Terraform/OpenTofu remote execution runs only on Pulumi-hosted runners; docs list 'runner pools/customer-managed agents' and custom executor images as not applicable to TF stacks.",
-     "url": "https://www.pulumi.com/docs/integrations/terraform/remote-execution/"
+     "pass": true,
+     "evidence": "Customer-managed agents (multiple runner pools, stacks assigned per pool, up to 150 concurrent workflows) run on EC2 with Docker inside our AWS account, so credentials stay in our boundary. This needs the Enterprise edition.",
+     "url": "https://www.pulumi.com/docs/deployments/deployments/customer-managed-agents/"
     },
     "G3": {
-     "pass": false,
-     "evidence": "Pre-run commands, dependency install and custom images do not apply to TF remote-execution stacks, so no pnpm/cdktn synth before plan. Synth only possible in your own CI with local execution mode.",
-     "url": "https://www.pulumi.com/docs/integrations/terraform/remote-execution/"
+     "pass": true,
+     "evidence": "Passes because no synth step is needed after migration: Pulumi TypeScript programs run directly with no synth step. If a build is needed anyway, Deployments support preRunCommands and a custom executor image (pnpm/turbo), and dependency install is built in.",
+     "url": "https://www.pulumi.com/docs/deployments/guides/custom-images/"
     },
     "G4": {
      "pass": true,
-     "evidence": "Very active: Aug 2026 TF/HCL release, Sep 2026 changelog entries, frequent CLI releases (v3.256+).",
-     "url": "https://www.pulumi.com/releases/changelog/"
+     "evidence": "CLI v3.264.0 was released 2026-09-23, with weekly releases. The changelog has entries through Sept 2026.",
+     "url": "https://github.com/pulumi/pulumi/releases"
     },
     "G5": {
-     "pass": true,
-     "evidence": "State backend documented for both Terraform and OpenTofu CLIs; remote execution engine is OpenTofu.",
-     "url": "https://www.pulumi.com/docs/integrations/terraform/state-backend/"
+     "pass": false,
+     "evidence": "After migration, no Terraform or OpenTofu engine runs; Pulumi's engine replaces it. TF providers are reused through the bridge and Any Terraform Provider. However, there is no Pulumi-to-HCL converter and no tfstate export, so returning to OpenTofu means a…",
+     "url": "https://www.pulumi.com/docs/iac/guides/migration/migrating-to-pulumi/from-terraform/"
     }
    },
    "disqualified": true,
-   "tagline": "Evaluated as a TF/OpenTofu backend, not the Pulumi IaC framework. Credible managed TF/OpenTofu state backend; hosted-only TF runs make it a poor TACOS"
+   "tagline": "Migrate to Pulumi: strong platform on own EC2 agents, but costly and a full rewrite"
   },
   {
    "id": "terragrunt-scale",
@@ -1218,7 +1218,7 @@
     "Strong explicit DAG (dependency blocks, Stacks, cycle checks, ordered apply on merge), but plans across unapplied deps use mock_outputs; no downstream re-plan.",
     "Scheduled drift detection GHA workflow with account/path filters; opens a remediation PR per run. Team tier and up; alerting is the PR itself.",
     "Native AWS OIDC per environment/unit with separate read-only plan and read-write apply roles; no static credentials.",
-    "At 21 users / 23.7k RUM / 1.5k runs / 255 stacks: Enterprise — quote only",
+    "Enterprise — contact sales at the default calculator inputs",
     "Terragrunt itself is the fogg-class tool: root.hcl includes, generate blocks for backend/provider, remote_state, Stacks codegen. No JS workspace wiring.",
     "No managed state: you run S3 backends (Terragrunt can bootstrap them). Env isolation via IAM roles; standard tfstate; dependency blocks track cross-state links.",
     "No Atlantis migration tooling or atlantis.yaml import; migration means restructuring the repo into Terragrunt units (Terralith-to-Terragrunt guides only).",
@@ -1318,7 +1318,7 @@
     "Explicit component DAG, dependency-ordered apply on merge, stack locking; PR plans mock unknown upstream outputs via yq defaults; GitHub Env approvals.",
     "Atmos Pro: daily + post-merge per-instance drift plans, optional auto-remediate apply, post-apply verification, Slack alerts; available on all tiers.",
     "GitHub OIDC to AWS/Azure/GCP via Atmos Auth identities per stack; no static credentials; Pro API also authenticated via GitHub OIDC.",
-    "At 21 users / 23.7k RUM / 1.5k runs / 255 stacks: Pro Team ≈ $2,100/mo",
+    "Pro Team ≈ $2,400/mo at the default calculator inputs",
     "Reference-class fogg equivalent: YAML stacks with imports/inheritance generate backend, provider, required_providers and arbitrary files per component.",
     "State stays in your own backend (e.g. S3), access governed by your IAM; Pro stores no state. No resource-level RBAC; standard tfstate.",
     "Generates atlantis.yaml from stacks (`atmos atlantis generate repo-config`), allowing incremental migration; migration skills for Terragrunt/Terramate.",
@@ -1418,7 +1418,7 @@
     "TFC-style run triggers (Apr 2026) queue downstream runs after upstream apply; no DAG, no in-change sequencing, no stacks.",
     "No drift detection or health assessments. Would need scheduled runs driven externally via the API.",
     "TFC-compatible dynamic provider credentials for AWS, but docs say only GCP is fully tested; EC2 agent instance roles are an alternative.",
-    "At 21 users / 23.7k RUM / 1.5k runs / 255 stacks: Self-hosted (TCO) ≈ $135/mo",
+    "Self-hosted (TCO) ≈ $135/mo at the default calculator inputs",
     "No codegen or scaffolding. Workspaces can be managed with the tfe provider/API instead.",
     "State in own Postgres, per-workspace read/plan/write/admin, remote-state sharing toggle, standard state pull; no resource-level RBAC.",
     "No Atlantis migration docs or atlantis.yaml import; only a TFC/local-state migration guide.",
@@ -1512,7 +1512,7 @@
    "users": {
     "min": 1,
     "max": 100,
-    "default": 21,
+    "default": 24,
     "step": 1,
     "label": "Team Size",
     "unit": "users"
@@ -1520,7 +1520,7 @@
    "resources": {
     "min": 100,
     "max": 50000,
-    "default": 23658,
+    "default": 18406,
     "step": 100,
     "label": "Resources Under Management",
     "unit": "RUM"
@@ -1528,7 +1528,7 @@
    "runs": {
     "min": 50,
     "max": 5000,
-    "default": 1500,
+    "default": 1900,
     "step": 50,
     "label": "Monthly Runs (per-stack plans + applies)",
     "unit": "runs/mo"
@@ -1536,7 +1536,7 @@
    "stacks": {
     "min": 1,
     "max": 1000,
-    "default": 255,
+    "default": 277,
     "step": 1,
     "label": "Stacks / Workspaces",
     "unit": "stacks"
@@ -2489,7 +2489,7 @@
    },
    "pulumi": {
     "model": "Resources under management (hourly)",
-    "description": "Every Terraform resource and stack stored counts; volume discounts via sales",
+    "description": "Every Pulumi-managed resource counts; customer-managed deployment agents need Enterprise",
     "tiers": [
      {
       "name": "Free",
@@ -2508,7 +2508,7 @@
       "maxStacks": null,
       "estimated": false,
       "quoteOnly": false,
-      "autoSelect": true,
+      "autoSelect": false,
       "features": {
        "privateWorkers": false,
        "opa": true,
@@ -2517,7 +2517,7 @@
        "auditLog": false,
        "registry": false
       },
-      "notes": "1 user",
+      "notes": "1 user; Pulumi-hosted deployments only",
       "source": "https://www.pulumi.com/pricing/"
      },
      {
@@ -2537,7 +2537,7 @@
       "maxStacks": null,
       "estimated": false,
       "quoteOnly": false,
-      "autoSelect": true,
+      "autoSelect": false,
       "features": {
        "privateWorkers": false,
        "opa": false,
@@ -2546,7 +2546,7 @@
        "auditLog": false,
        "registry": false
       },
-      "notes": "~500 resources included; advisory policies only, no SAML",
+      "notes": "~500 resources included; no customer-managed agents, advisory policies only",
       "source": "https://www.pulumi.com/pricing/"
      },
      {
@@ -2566,16 +2566,16 @@
       "maxStacks": null,
       "estimated": false,
       "quoteOnly": false,
-      "autoSelect": true,
+      "autoSelect": false,
       "features": {
        "privateWorkers": false,
        "opa": true,
-       "driftDetection": false,
+       "driftDetection": true,
        "samlSso": true,
        "auditLog": true,
        "registry": true
       },
-      "notes": "~2,000 resources included; SAML, enforced policies, audit export",
+      "notes": "~2,000 resources included; SAML, drift; Pulumi-hosted deployments only (no own agents)",
       "source": "https://www.pulumi.com/pricing/"
      },
      {
@@ -2597,14 +2597,14 @@
       "quoteOnly": false,
       "autoSelect": true,
       "features": {
-       "privateWorkers": false,
+       "privateWorkers": true,
        "opa": true,
-       "driftDetection": false,
+       "driftDetection": true,
        "samlSso": true,
        "auditLog": true,
        "registry": true
       },
-      "notes": "List-rate ceiling; volume-priced via sales above ~4,750 resources",
+      "notes": "Customer-managed agents (EC2/Docker); list-rate ceiling, volume-priced via sales above ~4,750 resources",
       "source": "https://www.pulumi.com/pricing/"
      }
     ]
