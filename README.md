@@ -6,7 +6,7 @@ An interactive evaluation tool for comparing TACOS (Terraform Automation & Colla
 
 ## Features
 
-- **Evaluation tab** — 24 criteria with adjustable weight sliders. Changing weights recalculates and re-sorts platform scores in real time. Two criteria (Chat integration, VCS integration) are scored per-variant — pick your chat tool and VCS provider from the sidebar selects and the weighted total updates to match. Expand any platform row to see per-criterion rationales, the 5 hard gates (pass/fail with evidence + source link), and — for disqualified platforms — which gates failed.
+- **Evaluation tab** — 24 criteria with adjustable weight sliders. Changing weights recalculates and re-sorts platform scores in real time. Two criteria (Collaboration integration, VCS integration) are scored per-variant — pick your collaboration tool and VCS provider from the sidebar selects and the weighted total updates to match. Expand any platform row to see per-criterion rationales, the 5 hard gates (pass/fail with evidence + source link), and — for disqualified platforms — which gates failed.
 - **Hard gates** — G1–G5 (no Kubernetes required, self-hosted runners in your cloud account, can run a CDK Terrain synth step, maintained within 6 months, OpenTofu support) are shown per platform. A platform that fails any gate is marked **Disqualified**, sorted after qualified platforms, and can be hidden entirely with the "Show disqualified" toggle.
 - **Pricing tab** — 4 input sliders (users, resources under management, monthly runs, stacks/workspaces). Auto-selects the cheapest usable tier per platform; quote-only tiers show "Contact sales" instead of a price, and tiers not viable at team scale are labelled accordingly. Override tiers manually by clicking them in the expanded card. The Evaluation tab's "Pricing suitability" criterion is computed live from these same slider inputs, so changing them re-scores every platform.
 
@@ -37,7 +37,7 @@ pnpm preview
 All evaluation data lives in a single file: [`public/evaluation.json`](public/evaluation.json)
 
 It contains:
-- **`criteria`** — 24 evaluation criteria with default weights (1–5) and categories (Critical / High / Medium / Low / Nice-to-have). Two criteria carry `variants` (Chat integration: Slack / MS Teams / Google Chat; VCS integration: GitHub / GitLab / Bitbucket / Azure DevOps) with a `defaultVariant`.
+- **`criteria`** — 24 evaluation criteria with default weights (1–5) and categories (Critical / High / Medium / Low / Nice-to-have). Two criteria carry `variants` (Collaboration integration: Slack / MS Teams; VCS integration: GitHub / GitLab / Bitbucket / Azure DevOps) with a `defaultVariant`.
 - **`gates`** — the 5 hard gates (G1–G5) shown on every platform, each with a pass/fail result, evidence text, and a source link.
 - **`excluded`** — platforms considered but excluded before scoring (e.g. Terrakube — requires Kubernetes), shown as a subtle note below the platform list.
 - **`platforms`** — 12 platforms, each with scores (0–3) per criterion, per-variant scores for the two variant criteria, gate results, a `disqualified` flag, rationale text, and metadata.
@@ -77,7 +77,7 @@ A platform failing any gate is disqualified — still shown and scored, but rank
 | 14 | Cost estimation | **3** | Medium |
 | 15 | Policy as code | **3** | Medium |
 | 16 | AI: trusted PR review | **3** | Medium |
-| 17 | Chat integration (variant-scored) | **4** | High |
+| 17 | Collaboration integration (variant-scored) | **4** | High |
 | 18 | VCS integration (variant-scored) | **3** | Medium |
 | 19 | Observability | **3** | Medium |
 | 20 | Visualizations / graphs | **2** | Low |

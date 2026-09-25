@@ -264,7 +264,7 @@ function VariantSelectors({
           <select
             value={variantSelections[c.id] ?? c.defaultVariant ?? ''}
             onChange={(e) => onVariantChange(c.id, e.target.value)}
-            className="text-xs font-mono rounded-md border border-border dark:border-border-dark bg-surface dark:bg-surface-dark text-slate-700 dark:text-slate-200 px-1.5 py-1"
+            className="w-32 shrink-0 text-xs font-mono rounded-md border border-border dark:border-border-dark bg-surface dark:bg-surface-dark text-slate-700 dark:text-slate-200 px-1.5 py-1"
           >
             {c.variants!.map((v) => (
               <option key={v.id} value={v.id}>{v.label}</option>
@@ -603,9 +603,9 @@ function PlatformRow({
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={(e) => e.stopPropagation()}
-                  className="font-display font-bold text-sm text-slate-900 dark:text-white truncate hover:text-accent dark:hover:text-accent-light transition-colors inline-flex items-center gap-1 group/link"
+                  className="font-display font-bold text-sm text-slate-900 dark:text-white hover:text-accent dark:hover:text-accent-light transition-colors inline-flex max-w-full items-center gap-1 group/link"
                 >
-                  {platform.name}
+                  <span className="truncate">{platform.name}</span>
                   <ExternalLink size={10} className="opacity-0 group-hover/link:opacity-100 transition-opacity shrink-0" />
                 </a>
                 <div className="flex items-center gap-1.5 flex-wrap">
@@ -1090,7 +1090,7 @@ export default function App() {
                 )}
 
                 {/* Footer */}
-                <div className="flex items-center justify-center gap-4 pt-6 pb-4">
+                <div className="flex flex-col md:flex-row items-center justify-center gap-2 md:gap-4 pt-6 pb-20 md:pb-4 text-center">
                   <p className="text-[10px] text-slate-400 dark:text-slate-500 font-mono">
                     Data sourced from public vendor documentation — {formatResearched(data.researched)}
                     {' · '}

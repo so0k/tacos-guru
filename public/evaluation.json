@@ -147,12 +147,12 @@
   },
   {
    "id": 17,
-   "name": "Chat integration",
-   "short": "Chat",
+   "name": "Collaboration integration",
+   "short": "Collab",
    "category": "high",
    "defaultWeight": 4,
    "maxWeight": 5,
-   "description": "Interactive approvals > rich notifications > webhooks",
+   "description": "Slack / MS Teams: interactive approvals > rich notifications > webhooks",
    "variants": [
     {
      "id": "slack",
@@ -161,10 +161,6 @@
     {
      "id": "teams",
      "label": "MS Teams"
-    },
-    {
-     "id": "google_chat",
-     "label": "Google Chat"
     }
    ],
    "defaultVariant": "teams"
@@ -343,8 +339,7 @@
    "variants": {
     "17": {
      "slack": 3,
-     "teams": 1,
-     "google_chat": 1
+     "teams": 1
     },
     "18": {
      "github": 3,
@@ -385,7 +380,7 @@
   },
   {
    "id": "env0",
-   "name": "env zero (formerly env0)",
+   "name": "env zero",
    "url": "https://www.envzero.com",
    "icon": "Leaf",
    "color": "#00B389",
@@ -444,8 +439,7 @@
    "variants": {
     "17": {
      "slack": 2,
-     "teams": 2,
-     "google_chat": 1
+     "teams": 2
     },
     "18": {
      "github": 3,
@@ -457,12 +451,12 @@
    "gates": {
     "G1": {
      "pass": true,
-     "evidence": "Two agent types documented: Kubernetes (Helm) and a standalone Docker agent (`docker run ghcr.io/env0/deployment-agent`), with ECS credential guidance. Kubernetes is not required; the old claim that s",
+     "evidence": "Two agent types documented: Kubernetes (Helm) and a standalone Docker agent (`docker run ghcr.io/env0/deployment-agent`), with ECS credential guidance. Kubernetes is not required; the old claim that self-hosting needs K8s is outdated.",
      "url": "https://docs.envzero.com/guides/admin-guide/self-hosted-kubernetes-agent/standalone-docker-agent"
     },
     "G2": {
      "pass": true,
-     "evidence": "Self-hosted Docker agent runs in our AWS account, needs outbound-only internet, and can use the ECS task role via ADDITIONAL_ENV_VARS. Subscription docs say the agent is on every plan (1 on Free, unli",
+     "evidence": "Self-hosted Docker agent runs in our AWS account, needs outbound-only internet, and can use the ECS task role via ADDITIONAL_ENV_VARS. Subscription docs say the agent is on every plan (1 on Free, unlimited on paid).",
      "url": "https://docs.envzero.com/guides/billing/subscription-tiers"
     },
     "G3": {
@@ -482,7 +476,7 @@
     }
    },
    "disqualified": false,
-   "tagline": "Mature OpenTofu TACOS: Docker agents, Workflows DAG, OPA, drift; costly at 250 envs"
+   "tagline": "Formerly env0. Mature OpenTofu TACOS: Docker agents, Workflows DAG, OPA, drift; costly at 250 envs"
   },
   {
    "id": "scalr",
@@ -545,8 +539,7 @@
    "variants": {
     "17": {
      "slack": 3,
-     "teams": 3,
-     "google_chat": 1
+     "teams": 3
     },
     "18": {
      "github": 3,
@@ -568,7 +561,7 @@
     },
     "G3": {
      "pass": true,
-     "evidence": "pre-init/pre-plan hooks run arbitrary shell in the run container; custom runner image (SCALR_AGENT_CONTAINER_TASK_IMAGE) can bundle node/pnpm. No first-party CDKTF/cdktn docs; community example (hoo29",
+     "evidence": "pre-init/pre-plan hooks run arbitrary shell in the run container; custom runner image (SCALR_AGENT_CONTAINER_TASK_IMAGE) can bundle node/pnpm. No first-party CDKTF/cdktn docs; community example (hoo29/scalr-cdktf) uses a pre-plan synth hook. Needs POC.",
      "url": "https://docs.scalr.io/docs/hooks-1"
     },
     "G4": {
@@ -587,7 +580,7 @@
   },
   {
    "id": "terramate",
-   "name": "Terramate (CLI + Terramate Cloud)",
+   "name": "Terramate",
    "url": "https://terramate.io",
    "icon": "Mountain",
    "color": "#F97316",
@@ -646,8 +639,7 @@
    "variants": {
     "17": {
      "slack": 2,
-     "teams": 0,
-     "google_chat": 0
+     "teams": 0
     },
     "18": {
      "github": 3,
@@ -664,7 +656,7 @@
     },
     "G2": {
      "pass": true,
-     "evidence": "Terramate has no runners of its own: all plan/apply runs in your CI, e.g. GitHub Actions self-hosted runners on EC2 in your AWS account. Terramate Cloud needs no cloud creds, state or source access; o",
+     "evidence": "Terramate has no runners of its own: all plan/apply runs in your CI, e.g. GitHub Actions self-hosted runners on EC2 in your AWS account. Terramate Cloud needs no cloud creds, state or source access; only sanitized plan/log data is synced.",
      "url": "https://terramate.io/docs/security/"
     },
     "G3": {
@@ -688,7 +680,7 @@
   },
   {
    "id": "stategraph",
-   "name": "Stategraph (Orchestration, formerly Terrateam + Infrastructure as a Database)",
+   "name": "Stategraph",
    "url": "https://stategraph.com",
    "icon": "Network",
    "color": "#06B6D4",
@@ -747,8 +739,7 @@
    "variants": {
     "17": {
      "slack": 1,
-     "teams": 1,
-     "google_chat": 1
+     "teams": 1
     },
     "18": {
      "github": 3,
@@ -760,7 +751,7 @@
    "gates": {
     "G1": {
      "pass": true,
-     "evidence": "No Kubernetes required. The Orchestration server self-hosts via Docker Compose or the ECS/Fargate Terraform module. The IaaD server offers Compose, ECS, Cloud Run or K8s. Runs execute on GitHub Action",
+     "evidence": "No Kubernetes required. The Orchestration server self-hosts via Docker Compose or the ECS/Fargate Terraform module. The IaaD server offers Compose, ECS, Cloud Run or K8s. Runs execute on GitHub Actions runners.",
      "url": "https://docs.terrateam.io/quickstart/self-hosted/aws/"
     },
     "G2": {
@@ -770,7 +761,7 @@
     },
     "G3": {
      "pass": true,
-     "evidence": "Custom workflow steps and hooks run arbitrary commands before init/plan, so a pnpm/turbo synth step works. There is a native CDKTF engine. The cdktn binary is not named in the docs, so it needs a cust",
+     "evidence": "Custom workflow steps and hooks run arbitrary commands before init/plan, so a pnpm/turbo synth step works. There is a native CDKTF engine. The cdktn binary is not named in the docs, so it needs a custom run step.",
      "url": "https://docs.terrateam.io/integrations/iac-tools/cdktf/"
     },
     "G4": {
@@ -780,12 +771,12 @@
     },
     "G5": {
      "pass": true,
-     "evidence": "PASSES: the 'no OpenTofu' premise is wrong. The Stategraph CLI runs tofu by default (TF_CMD default: tofu; set TF_CMD=terraform to switch). Terrateam's stategraph engine accepts tf_cmd: tofu, and Orch",
+     "evidence": "PASSES: the 'no OpenTofu' premise is wrong. The Stategraph CLI runs tofu by default (TF_CMD default: tofu; set TF_CMD=terraform to switch). Terrateam's stategraph engine accepts tf_cmd: tofu, and Orchestration supports OpenTofu natively.",
      "url": "https://stategraph.com/docs/cli/tf"
     }
    },
    "disqualified": false,
-   "tagline": "Ex-Terrateam GitOps plus a paid graph state engine with atomic multi-state applies"
+   "tagline": "Formerly Terrateam. Ex-Terrateam GitOps plus a paid graph state engine with atomic multi-state applies"
   },
   {
    "id": "hcp-terraform",
@@ -848,8 +839,7 @@
    "variants": {
     "17": {
      "slack": 2,
-     "teams": 2,
-     "google_chat": 1
+     "teams": 2
     },
     "18": {
      "github": 2,
@@ -871,7 +861,7 @@
     },
     "G3": {
      "pass": true,
-     "evidence": "Workspaces: synth possible in agent pre-plan hook (arbitrary executable, non-zero exit fails run) or in CI with CLI-driven runs. Caveat: agent hooks do not support Stack workflows, so Stacks need synt",
+     "evidence": "Workspaces: synth possible in agent pre-plan hook (arbitrary executable, non-zero exit fails run) or in CI with CLI-driven runs. Caveat: agent hooks do not support Stack workflows, so Stacks need synth in CI + config upload.",
      "url": "https://developer.hashicorp.com/terraform/cloud-docs/agents/hooks"
     },
     "G4": {
@@ -890,7 +880,7 @@
   },
   {
    "id": "opentaco",
-   "name": "OpenTaco (formerly Digger)",
+   "name": "OpenTaco",
    "url": "https://opentaco.dev",
    "icon": "Terminal",
    "color": "#10B981",
@@ -949,8 +939,7 @@
    "variants": {
     "17": {
      "slack": 2,
-     "teams": 0,
-     "google_chat": 0
+     "teams": 0
     },
     "18": {
      "github": 3,
@@ -967,7 +956,7 @@
     },
     "G2": {
      "pass": true,
-     "evidence": "Terraform runs inside your own GitHub Actions jobs. Docs recommend self-hosted GHA runners on EC2 (runs-on: my-selfhosted-runner). Cloud creds never leave the runner. Hosted orchestrator only dispatch",
+     "evidence": "Terraform runs inside your own GitHub Actions jobs. Docs recommend self-hosted GHA runners on EC2 (runs-on: my-selfhosted-runner). Cloud creds never leave the runner. Hosted orchestrator only dispatches workflows.",
      "url": "https://docs.opentaco.dev/ce/features/private-runners"
     },
     "G3": {
@@ -977,7 +966,7 @@
     },
     "G4": {
      "pass": true,
-     "evidence": "v0.6.151 was released on 2026-09-13 and releases are roughly monthly. Caveat: most releases are maintenance-only, the company is focused on OpenComputer, and the state backend has been dormant since M",
+     "evidence": "v0.6.151 was released on 2026-09-13 and releases are roughly monthly. Caveat: most releases are maintenance-only, the company is focused on OpenComputer, and the state backend has been dormant since Mar 2026.",
      "url": "https://github.com/diggerhq/digger/releases"
     },
     "G5": {
@@ -987,7 +976,7 @@
     }
    },
    "disqualified": false,
-   "tagline": "MIT-licensed PR automation in your own GitHub Actions; vendor focus has moved to AI agents"
+   "tagline": "Formerly Digger. MIT-licensed PR automation in your own GitHub Actions; vendor focus has moved to AI agents"
   },
   {
    "id": "ops0",
@@ -1050,8 +1039,7 @@
    "variants": {
     "17": {
      "slack": 2,
-     "teams": 1,
-     "google_chat": 1
+     "teams": 1
     },
     "18": {
      "github": 2,
@@ -1063,17 +1051,17 @@
    "gates": {
     "G1": {
      "pass": true,
-     "evidence": "The SaaS runs plan/apply in ops0's own isolated containers, so you do not need Kubernetes for IaC. The in-cluster agent is only for the Kubernetes-ops features. What the Enterprise self-hosted install",
+     "evidence": "The SaaS runs plan/apply in ops0's own isolated containers, so you do not need Kubernetes for IaC. The in-cluster agent is only for the Kubernetes-ops features. What the Enterprise self-hosted install needs is not documented.",
      "url": "https://docs.ops0.com/docs/introduction/architecture"
     },
     "G2": {
      "pass": false,
-     "evidence": "'Terraform plan and apply runs execute inside ops0's isolated execution environment' after assuming a cross-account IAM role. No customer-hosted runner or agent is documented. A self-hosted or air-gap",
+     "evidence": "'Terraform plan and apply runs execute inside ops0's isolated execution environment' after assuming a cross-account IAM role. No customer-hosted runner or agent is documented.",
      "url": "https://docs.ops0.com/docs/security"
     },
     "G3": {
      "pass": false,
-     "evidence": "An IaC project is a directory of .tf files synced from Git. The docs describe no pre-init or pre-plan hook, no custom image and no build step. Workflow 'Script' steps (bash/python/node) exist, but not",
+     "evidence": "An IaC project is a directory of .tf files synced from Git. The docs describe no pre-init or pre-plan hook, no custom image and no build step. Workflow 'Script' steps (bash/python/node) exist, but nothing documented feeds their output into an IaC Deploy step.",
      "url": "https://docs.ops0.com/docs/how-to/setup-gitops"
     },
     "G4": {
@@ -1092,7 +1080,7 @@
   },
   {
    "id": "pulumi",
-   "name": "Pulumi Cloud (as Terraform/OpenTofu state backend + remote execution)",
+   "name": "Pulumi",
    "url": "https://www.pulumi.com",
    "icon": "Layers",
    "color": "#8A3391",
@@ -1151,8 +1139,7 @@
    "variants": {
     "17": {
      "slack": 2,
-     "teams": 2,
-     "google_chat": 1
+     "teams": 2
     },
     "18": {
      "github": 2,
@@ -1169,7 +1156,7 @@
     },
     "G2": {
      "pass": false,
-     "evidence": "Terraform/OpenTofu remote execution runs only on Pulumi-hosted runners; docs list 'runner pools/customer-managed agents' and custom executor images as not applicable to TF stacks. Only escape is local",
+     "evidence": "Terraform/OpenTofu remote execution runs only on Pulumi-hosted runners; docs list 'runner pools/customer-managed agents' and custom executor images as not applicable to TF stacks.",
      "url": "https://www.pulumi.com/docs/integrations/terraform/remote-execution/"
     },
     "G3": {
@@ -1193,7 +1180,7 @@
   },
   {
    "id": "terragrunt-scale",
-   "name": "Terragrunt Scale (Gruntwork Pipelines + Drift Detection + Patcher)",
+   "name": "Terragrunt Scale",
    "url": "https://terragrunt.com/terragrunt-scale",
    "icon": "Blocks",
    "color": "#5B21B6",
@@ -1252,8 +1239,7 @@
    "variants": {
     "17": {
      "slack": 0,
-     "teams": 0,
-     "google_chat": 0
+     "teams": 0
     },
     "18": {
      "github": 2,
@@ -1270,12 +1256,12 @@
     },
     "G2": {
      "pass": true,
-     "evidence": "All plan/apply runs execute in the customer's own CI runners; the reusable workflow takes a `runner` input for self-hosted GitHub runners (workflow must be forked into your own org). Gruntwork 'never ",
+     "evidence": "All plan/apply runs execute in the customer's own CI runners; the reusable workflow takes a `runner` input for self-hosted GitHub runners (workflow must be forked into your own org).",
      "url": "https://github.com/gruntwork-io/pipelines-workflows/blob/main/.github/workflows/pipelines.yml"
     },
     "G3": {
      "pass": true,
-     "evidence": "Conditional pass: arbitrary pre-plan steps possible via Terragrunt before_hook (e.g. `pnpm synth` on init/plan) or by adding custom actions to a forked pipelines-workflows. No native CDK Terrain suppo",
+     "evidence": "Conditional pass: arbitrary pre-plan steps possible via Terragrunt before_hook (e.g. `pnpm synth` on init/plan) or by adding custom actions to a forked pipelines-workflows. No native CDK Terrain support; unverified end-to-end.",
      "url": "https://docs.gruntwork.io/2.0/docs/pipelines/guides/extending-pipelines/"
     },
     "G4": {
@@ -1294,7 +1280,7 @@
   },
   {
    "id": "atmos",
-   "name": "Atmos + Atmos Pro (Cloud Posse)",
+   "name": "Atmos",
    "url": "https://atmos.tools",
    "icon": "Atom",
    "color": "#0EA5E9",
@@ -1353,8 +1339,7 @@
    "variants": {
     "17": {
      "slack": 3,
-     "teams": 1,
-     "google_chat": 1
+     "teams": 1
     },
     "18": {
      "github": 3,
@@ -1454,8 +1439,7 @@
    "variants": {
     "17": {
      "slack": 1,
-     "teams": 0,
-     "google_chat": 0
+     "teams": 0
     },
     "18": {
      "github": 2,
@@ -1467,7 +1451,7 @@
    "gates": {
     "G1": {
      "pass": true,
-     "evidence": "Single Go binary otfd + PostgreSQL; docker compose and plain binary installs documented. The default fork executor runs terraform/tofu as child processes. Kubernetes is only used by the optional kuber",
+     "evidence": "Single Go binary otfd + PostgreSQL; docker compose and plain binary installs documented. The default fork executor runs terraform/tofu as child processes. Kubernetes is only used by the optional kubernetes executor / Helm charts.",
      "url": "https://github.com/leg100/otf/blob/master/docs/docs/install.md"
     },
     "G2": {
@@ -1477,12 +1461,12 @@
     },
     "G3": {
      "pass": true,
-     "evidence": "No pre-plan hooks in the runner, so VCS-driven runs cannot synth. The CLI-driven workflow works: CI runs pnpm/turbo synth, then terraform plan/apply with the cloud/remote backend uploads cdktf.out sta",
+     "evidence": "No pre-plan hooks in the runner, so VCS-driven runs cannot synth. The CLI-driven workflow works: CI runs pnpm/turbo synth, then terraform plan/apply with the cloud/remote backend uploads cdktf.out stacks, and they execute on an agent.",
      "url": "https://github.com/leg100/otf/blob/master/docs/docs/tfc_migration.md"
     },
     "G4": {
      "pass": true,
-     "evidence": "Last release v0.6.3 on 2026-06-11 (3.5 months ago, inside the 6-month window). Warning signs: one maintainer (leg100 has ~1200 of ~1350 commits), no maintainer activity since mid-July 2026, and commun",
+     "evidence": "Last release v0.6.3 on 2026-06-11 (3.5 months ago, inside the 6-month window). Warning signs: one maintainer (leg100 has ~1200 of ~1350 commits), no maintainer activity since mid-July 2026, and community PRs left unreviewed.",
      "url": "https://github.com/leg100/otf/releases"
     },
     "G5": {

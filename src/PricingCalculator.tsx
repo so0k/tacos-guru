@@ -430,7 +430,13 @@ export default function PricingCalculator({
   }, [baseResults, effectiveFor])
 
   const cheapest = results[0]
-  const mostExpensive = results[results.length - 1]
+  // Quote-only and over-limit tiers have no comparable price, so they're left out of "most expensive".
+  const pricedResults = results.filter((r) => {
+    const e = effectiveFor(r)
+    return e.canHandle && !e.quoteOnly
+  })
+  const mostExpensive = pricedResults[pricedResults.length - 1]
+  const unpricedCount = results.length - pricedResults.length
   const cheapestInfo = cheapest ? effectiveFor(cheapest) : null
   const mostExpensiveInfo = mostExpensive ? effectiveFor(mostExpensive) : null
 
@@ -459,10 +465,20 @@ export default function PricingCalculator({
               <AlertTriangle size={16} className="text-red-600 dark:text-red-400" />
             </div>
             <div>
-              <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Most Expensive</div>
+              <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+                Most Expensive
+                {unpricedCount > 0 && (
+                  <span
+                    className="ml-0.5 cursor-help"
+                    title={`Excludes ${unpricedCount} platform${unpricedCount > 1 ? 's' : ''} that only quote through sales (or exceed every published tier) at these inputs`}
+                  >
+                    *
+                  </span>
+                )}
+              </div>
               <div className="font-display font-black text-slate-900 dark:text-white">
                 {mostExpensive
-                  ? `${mostExpensiveInfo?.quoteOnly ? 'Contact sales' : formatCost(mostExpensiveInfo?.cost ?? 0)} — ${mostExpensive.platformName}`
+                  ? `${formatCost(mostExpensiveInfo?.cost ?? 0)} — ${mostExpensive.platformName}`
                   : '—'}
               </div>
             </div>
