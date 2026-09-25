@@ -1080,7 +1080,7 @@
   },
   {
    "id": "pulumi",
-   "name": "Pulumi",
+   "name": "Pulumi Cloud",
    "url": "https://www.pulumi.com",
    "icon": "Layers",
    "color": "#8A3391",
@@ -1176,7 +1176,7 @@
     }
    },
    "disqualified": true,
-   "tagline": "Credible managed TF/OpenTofu state backend; hosted-only TF runs make it a poor TACOS"
+   "tagline": "Evaluated as a TF/OpenTofu backend, not the Pulumi IaC framework. Credible managed TF/OpenTofu state backend; hosted-only TF runs make it a poor TACOS"
   },
   {
    "id": "terragrunt-scale",

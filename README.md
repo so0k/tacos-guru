@@ -1,6 +1,6 @@
 # tacos.guru
 
-An interactive evaluation tool for comparing TACOS (Terraform Automation & Collaboration Software) platforms. Compare Spacelift, env0, Scalr, Terramate, Stategraph (formerly Terrateam), HCP Terraform, OpenTaco (formerly Digger), ops0, Pulumi, Terragrunt Scale, Atmos, and OTF across 24 weighted criteria — plus 5 hard gates that can disqualify a platform outright — and estimate monthly costs based on your team size, resources, run volume, and stack count.
+An interactive evaluation tool for comparing TACOS (Terraform Automation & Collaboration Software) platforms. Compare Spacelift, env0, Scalr, Terramate, Stategraph (formerly Terrateam), HCP Terraform, OpenTaco (formerly Digger), ops0, Pulumi Cloud, Terragrunt Scale, Atmos, and OTF across 24 weighted criteria — plus 5 hard gates that can disqualify a platform outright — and estimate monthly costs based on your team size, resources, run volume, and stack count.
 
 **Live site:** [tacos.guru](https://tacos.guru)
 
