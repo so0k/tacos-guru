@@ -9,10 +9,25 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 
-const REPO_URL = 'https://github.com/so0k/tacos-guru'
 import type { Criterion, Platform, EvalData, RankedPlatform, PricingInputs, PricingResult, Gate } from './types'
 import { computeAllPricingResults, computePricingScore } from './pricing'
 import PricingCalculator from './PricingCalculator'
+
+const REPO_URL = 'https://github.com/so0k/tacos-guru'
+
+// Deep links: #pricing selects the tab; query params hold only values changed from their defaults,
+// as absolute values (e.g. ?users=15&orchestration=3&collab=slack).
+const PRICING_KEYS: Array<keyof PricingInputs> = ['users', 'resources', 'runs', 'stacks']
+const paramKey = (c: Criterion) => c.short.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+const tabFromHash = (): 'eval' | 'pricing' => (window.location.hash === '#pricing' ? 'pricing' : 'eval')
+
+function readIntParam(params: URLSearchParams, key: string, min: number, max: number): number | null {
+  const raw = params.get(key)
+  if (raw === null || raw.trim() === '') return null
+  const n = Number(raw)
+  if (!Number.isFinite(n)) return null
+  return Math.min(max, Math.max(min, Math.round(n)))
+}
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -775,7 +790,7 @@ export default function App() {
   const [hoveredCriterion, setHoveredCriterion] = useState<number | null>(null)
   const [expandedPlatform, setExpandedPlatform] = useState<string | null>(null)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
-  const [activeTab, setActiveTab] = useState<'eval' | 'pricing'>('eval')
+  const [activeTab, setActiveTab] = useState<'eval' | 'pricing'>(tabFromHash)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [weightsSheetOpen, setWeightsSheetOpen] = useState(false)
 
@@ -800,8 +815,57 @@ export default function App() {
           sliderDefaults[key as keyof PricingInputs] = cfg.default
         })
         setPricingInputs(sliderDefaults)
+
+        const params = new URLSearchParams(window.location.search)
+        d.criteria.forEach((c) => {
+          const wv = readIntParam(params, paramKey(c), 0, c.maxWeight)
+          if (wv !== null) w[c.id] = wv
+          const vv = params.get(paramKey(c))
+          if (c.variants && vv && c.variants.some((v) => v.id === vv)) vs[c.id] = vv
+        })
+        PRICING_KEYS.forEach((key) => {
+          const cfg = d.pricing.sliders[key]
+          const v = cfg ? readIntParam(params, key, cfg.min, cfg.max) : null
+          if (v !== null) sliderDefaults[key] = v
+        })
+        if (params.get('dq') === '0') setShowDisqualified(false)
+        setWeights({ ...w })
+        setVariantSelections({ ...vs })
+        setPricingInputs({ ...sliderDefaults })
       })
   }, [])
+
+  // Keep the tab in sync with back/forward navigation between #pricing and #evaluation.
+  useEffect(() => {
+    const onHashChange = () => setActiveTab(tabFromHash())
+    window.addEventListener('hashchange', onHashChange)
+    return () => window.removeEventListener('hashchange', onHashChange)
+  }, [])
+
+  // Mirror non-default state into the URL so any view can be shared.
+  useEffect(() => {
+    if (!data) return
+    const params = new URLSearchParams()
+    data.criteria.forEach((c) => {
+      if (c.variants) {
+        const v = variantSelections[c.id]
+        if (v && v !== c.defaultVariant) params.set(paramKey(c), v)
+      } else if (weights[c.id] !== undefined && weights[c.id] !== c.defaultWeight) {
+        params.set(paramKey(c), String(weights[c.id]))
+      }
+    })
+    PRICING_KEYS.forEach((key) => {
+      const cfg = data.pricing.sliders[key]
+      if (cfg && pricingInputs[key] !== cfg.default) params.set(key, String(pricingInputs[key]))
+    })
+    if (!showDisqualified) params.set('dq', '0')
+    const query = params.toString()
+    const hash = activeTab === 'pricing' ? '#pricing' : ''
+    const url = `${window.location.pathname}${query ? `?${query}` : ''}${hash}`
+    if (url !== `${window.location.pathname}${window.location.search}${window.location.hash}`) {
+      window.history.replaceState(null, '', url)
+    }
+  }, [data, weights, variantSelections, pricingInputs, showDisqualified, activeTab])
 
   // Sync dark mode class
   useEffect(() => {
