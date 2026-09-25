@@ -232,7 +232,7 @@ function PricingCard({
       style={{ animationDelay: `${rank * 40}ms` }}
       onClick={() => setExpanded(!expanded)}
     >
-      <div className="p-3 md:p-4 flex flex-wrap md:flex-nowrap items-center gap-2 md:gap-4">
+      <div className="p-3 md:p-4 flex flex-wrap items-center gap-2 md:gap-x-4 md:gap-y-1">
         {/* Rank */}
         <div className="w-8 text-center shrink-0">
           {rank === 1 ? (
@@ -291,9 +291,6 @@ function PricingCard({
               <span className="text-xs text-slate-400 dark:text-slate-500 font-mono">/mo</span>
             )}
           </div>
-          <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-            {activeTier.notes}
-          </div>
         </div>
 
         {/* Badges */}
@@ -340,6 +337,11 @@ function PricingCard({
           size={16}
           className={`hidden md:block shrink-0 text-slate-400 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}
         />
+
+        {/* Notes — desktop: own line under price and badges, aligned with the price column (rank 2rem + platform 12rem + gaps) */}
+        <div className="hidden md:block basis-full pl-64 text-[11px] text-slate-500 dark:text-slate-400">
+          {activeTier.notes}
+        </div>
       </div>
 
       {expanded && (
