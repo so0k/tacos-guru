@@ -488,6 +488,11 @@ export default function PricingCalculator({
           </div>
         </div>
 
+        <p className="text-[11px] text-slate-400 dark:text-slate-500 px-1">
+          Licence and infrastructure only. Engineering time is excluded for every platform: self-hosting means
+          patching and upgrades, a managed service means integrating and porting workflows.
+        </p>
+
         {/* Pricing cards */}
         <div className="space-y-3">
           {results.map((result, i) => (

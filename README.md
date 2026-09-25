@@ -1,6 +1,6 @@
 # tacos.guru
 
-An interactive evaluation tool for comparing TACOS (Terraform Automation & Collaboration Software) platforms. Compare Spacelift, env0, Scalr, Terramate, Stategraph (formerly Terrateam), HCP Terraform, OpenTaco (formerly Digger), ops0, Pulumi Cloud, Terragrunt Scale, Atmos, and OTF across 24 weighted criteria — plus 5 hard gates that can disqualify a platform outright — and estimate monthly costs based on your team size, resources, run volume, and stack count.
+An interactive evaluation tool for comparing TACOS (Terraform Automation & Collaboration Software) platforms. Compare Atlantis, Spacelift, env0, Scalr, Terramate, Stategraph (formerly Terrateam), HCP Terraform, OpenTaco (formerly Digger), ops0, Pulumi Cloud, Terragrunt Scale, Atmos, and OTF across 24 weighted criteria — plus 5 hard gates that can disqualify a platform outright — and estimate monthly costs based on your team size, resources, run volume, and stack count.
 
 **Live site:** [tacos.guru](https://tacos.guru)
 
@@ -40,7 +40,7 @@ It contains:
 - **`criteria`** — 24 evaluation criteria with default weights (1–5) and categories (Critical / High / Medium / Low / Nice-to-have). Two criteria carry `variants` (Collaboration integration: Slack / MS Teams; VCS integration: GitHub / GitLab / Bitbucket / Azure DevOps) with a `defaultVariant`.
 - **`gates`** — the 5 hard gates (G1–G5) shown on every platform, each with a pass/fail result, evidence text, and a source link.
 - **`excluded`** — platforms considered but excluded before scoring (e.g. Terrakube — requires Kubernetes), shown as a subtle note below the platform list.
-- **`platforms`** — 12 platforms, each with scores (0–3) per criterion, per-variant scores for the two variant criteria, gate results, a `disqualified` flag, rationale text, and metadata.
+- **`platforms`** — 13 platforms, each with scores (0–3) per criterion, per-variant scores for the two variant criteria, gate results, a `disqualified` flag, rationale text, and metadata.
 - **`pricing`** — tier definitions for each platform including base prices, per-unit costs (including per-stack), feature gates, quote-only/auto-select flags, a source link, and a `pricingScore` mapping (cost bands → 0–3) used to derive the "Pricing suitability" criterion live from the calculator.
 
 Scores and pricing were researched from public vendor documentation in September 2026.
@@ -63,7 +63,7 @@ A platform failing any gate is disqualified — still shown and scored, but rank
 |---|-----------|:------:|----------|
 | 1 | CDK Terrain workflow | **5** | Critical |
 | 2 | OpenTofu support | **5** | Critical |
-| 3 | Self-hosted runners, no K8s | **5** | Critical |
+| 3 | Self-hosted runners (no K8s required) | **5** | Critical |
 | 4 | RBAC & SSO | **5** | Critical |
 | 5 | Linked-state orchestration | **5** | Critical |
 | 6 | Drift detection | **4** | High |

@@ -104,7 +104,7 @@ const svg = `<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">
   <!-- Footer: left — stats -->
   <text x="60" y="${H - 20}"
     font-family="Ubuntu, Liberation Sans, Arial, sans-serif"
-    font-size="16" font-weight="600" fill="#22D3EE">12 platforms</text>
+    font-size="16" font-weight="600" fill="#22D3EE">13 platforms</text>
   <text x="195" y="${H - 20}"
     font-family="Ubuntu, Liberation Sans, Arial, sans-serif"
     font-size="16" fill="#334155">·</text>
