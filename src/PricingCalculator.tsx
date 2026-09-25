@@ -245,7 +245,7 @@ function PricingCard({
         </div>
 
         {/* Platform */}
-        <div className="flex items-center gap-3 flex-1 md:w-40 md:shrink-0 md:flex-none min-w-0">
+        <div className="flex items-center gap-3 flex-1 md:w-48 md:shrink-0 md:flex-none min-w-0">
           <div
             className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
             style={{ backgroundColor: result.platformColor + '18' }}
@@ -258,9 +258,10 @@ function PricingCard({
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
-              className="font-display font-bold text-sm text-slate-900 dark:text-white truncate hover:text-accent dark:hover:text-accent-light transition-colors inline-flex items-center gap-1 group/link"
+              className="font-display font-bold text-sm text-slate-900 dark:text-white hover:text-accent dark:hover:text-accent-light transition-colors inline-flex max-w-full items-center gap-1 group/link"
+              title={result.platformName}
             >
-              {result.platformName}
+              <span className="truncate">{result.platformName}</span>
               <ExternalLink size={10} className="opacity-0 group-hover/link:opacity-100 transition-opacity shrink-0" />
             </a>
             <div className="text-[10px] text-slate-400 dark:text-slate-500 font-mono">

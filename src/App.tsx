@@ -604,7 +604,7 @@ function PlatformRow({
             </div>
 
             {/* Platform info */}
-            <div className="flex items-center gap-3 flex-1 md:w-44 md:shrink-0 md:flex-none min-w-0">
+            <div className="flex items-center gap-3 flex-1 md:w-48 md:shrink-0 md:flex-none min-w-0">
               <div
                 className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
                 style={{ backgroundColor: platform.color + '18' }}
@@ -618,6 +618,7 @@ function PlatformRow({
                   rel="noopener noreferrer"
                   onClick={(e) => e.stopPropagation()}
                   className="font-display font-bold text-sm text-slate-900 dark:text-white hover:text-accent dark:hover:text-accent-light transition-colors inline-flex max-w-full items-center gap-1 group/link"
+                  title={platform.name}
                 >
                   <span className="truncate">{platform.name}</span>
                   <ExternalLink size={10} className="opacity-0 group-hover/link:opacity-100 transition-opacity shrink-0" />
