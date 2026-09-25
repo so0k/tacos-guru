@@ -21,9 +21,9 @@ pnpm preview     # preview production build
 - **`src/pricing.ts`** — pure pricing calculation logic (no React)
 - **`src/types.ts`** — all TypeScript interfaces
 
-Scores are 0–3. Weights are 1–5. Weighted score = `sum(score × weight)`. Max = `65 × 3 = 195`.
+Scores are 0–3. Weights are 1–5. Weighted score = `sum(score × weight)`. Max is computed from the current weights (default weight total 80 → max 240), not hardcoded. Criteria 17 (Chat) and 18 (VCS) are variant-scored — see `Criterion.variants`/`Platform.variants` in `src/types.ts`. Criterion 8 (Pricing suitability) is derived live from the pricing calculator via `computePricingScore` in `src/pricing.ts` rather than a static score.
 
-Pricing tier selection picks the cheapest tier that can handle the given inputs (users, RUM, runs/mo).
+Pricing tier selection picks the cheapest autoSelect-able tier that can handle the given inputs (users, RUM, runs/mo, stacks); falls back to a quote-only tier, then to the last tier flagged as exceeding limits. `PricingInputs`/pricing state now live in `App.tsx` and are passed down, so both tabs share one set of slider values.
 
 ## Recommended skills
 

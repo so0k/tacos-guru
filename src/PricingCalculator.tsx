@@ -1,21 +1,23 @@
 import { useState, useMemo, useCallback } from 'react'
 import {
   Rocket, Leaf, Scale, Mountain, GitBranch, Cloud, Terminal,
+  Network, ShieldCheck, Layers, Blocks, Atom, Server,
   Users, Database, Zap, ChevronDown, ExternalLink,
   Check, X, Trophy, AlertTriangle, Github,
   type LucideIcon,
 } from 'lucide-react'
 import type { EvalData, PricingInputs, PricingResult, PricingTier } from './types'
-import { computeAllPricingResults } from './pricing'
 
 const ICON_MAP: Record<string, LucideIcon> = {
   Rocket, Leaf, Scale, Mountain, GitBranch, Cloud, Terminal,
+  Network, ShieldCheck, Layers, Blocks, Atom, Server,
 }
 
 const SLIDER_ICONS: Record<string, LucideIcon> = {
   users: Users,
   resources: Database,
   runs: Zap,
+  stacks: Layers,
 }
 
 function formatCost(cost: number): string {
@@ -132,6 +134,12 @@ function TierMiniCard({
       : inputs.runs * tier.perRun
     if (runCost > 0) breakdown.push(`Runs: $${Math.round(runCost)}`)
   }
+  if (tier.perStack > 0) {
+    const stackCost = tier.includedStacks !== null
+      ? Math.max(0, inputs.stacks - tier.includedStacks) * tier.perStack
+      : inputs.stacks * tier.perStack
+    if (stackCost > 0) breakdown.push(`Stacks: $${Math.round(stackCost)}`)
+  }
 
   return (
     <div
@@ -156,14 +164,35 @@ function TierMiniCard({
           </span>
         )}
       </div>
-      <div className="font-display font-black text-slate-900 dark:text-white">
-        ${Math.round(cost).toLocaleString()}<span className="text-[10px] font-normal text-slate-400">/mo</span>
-      </div>
+      {tier.quoteOnly ? (
+        <div className="font-display font-black text-slate-500 dark:text-slate-400 text-sm">
+          Contact sales
+        </div>
+      ) : (
+        <div className="font-display font-black text-slate-900 dark:text-white">
+          ${Math.round(cost).toLocaleString()}<span className="text-[10px] font-normal text-slate-400">/mo</span>
+        </div>
+      )}
       {!canHandle && (
         <div className="text-[10px] text-score-0 mt-0.5">Exceeds limits</div>
       )}
-      {breakdown.length > 0 && canHandle && (
+      {tier.autoSelect === false && (
+        <div className="text-[10px] text-amber-600 dark:text-amber-400 mt-0.5">Not usable at team scale</div>
+      )}
+      {breakdown.length > 0 && canHandle && !tier.quoteOnly && (
         <div className="text-[10px] text-slate-400 mt-0.5">{breakdown.join(' + ')}</div>
+      )}
+      {tier.source && (
+        <a
+          href={tier.source}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={(e) => e.stopPropagation()}
+          className="inline-flex items-center gap-0.5 text-[9px] text-slate-400 hover:text-accent dark:hover:text-accent-light mt-1"
+        >
+          <ExternalLink size={8} />
+          source
+        </a>
       )}
     </div>
   )
@@ -194,6 +223,8 @@ function PricingCard({
   const activeTier = activeTierData ? activeTierData.tier : result.selectedTier
   const activeCost = activeTierData ? Math.round(activeTierData.cost) : result.monthlyCost
   const isOverridden = overrideTier !== null && overrideTier !== result.selectedTier.name
+  const activeCanHandle = activeTierData ? activeTierData.canHandle : !result.exceeds
+  const activeIsQuoteOnly = activeTier.quoteOnly
 
   return (
     <div
@@ -201,7 +232,7 @@ function PricingCard({
       style={{ animationDelay: `${rank * 40}ms` }}
       onClick={() => setExpanded(!expanded)}
     >
-      <div className="p-3 md:p-4 flex flex-wrap md:flex-nowrap items-center gap-2 md:gap-4">
+      <div className="p-3 md:p-4 flex flex-wrap items-center gap-2 md:gap-x-4 md:gap-y-1">
         {/* Rank */}
         <div className="w-8 text-center shrink-0">
           {rank === 1 ? (
@@ -214,7 +245,7 @@ function PricingCard({
         </div>
 
         {/* Platform */}
-        <div className="flex items-center gap-3 flex-1 md:w-40 md:shrink-0 md:flex-none min-w-0">
+        <div className="flex items-center gap-3 flex-1 md:w-48 md:shrink-0 md:flex-none min-w-0">
           <div
             className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
             style={{ backgroundColor: result.platformColor + '18' }}
@@ -227,9 +258,10 @@ function PricingCard({
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
-              className="font-display font-bold text-sm text-slate-900 dark:text-white truncate hover:text-accent dark:hover:text-accent-light transition-colors inline-flex items-center gap-1 group/link"
+              className="font-display font-bold text-sm text-slate-900 dark:text-white hover:text-accent dark:hover:text-accent-light transition-colors inline-flex max-w-full items-center gap-1 group/link"
+              title={result.platformName}
             >
-              {result.platformName}
+              <span className="truncate">{result.platformName}</span>
               <ExternalLink size={10} className="opacity-0 group-hover/link:opacity-100 transition-opacity shrink-0" />
             </a>
             <div className="text-[10px] text-slate-400 dark:text-slate-500 font-mono">
@@ -240,8 +272,8 @@ function PricingCard({
 
         {/* Cost + Chevron on mobile (inline with name row) */}
         <div className="flex items-center gap-2 md:hidden shrink-0">
-          <span className="text-lg font-display font-black text-slate-900 dark:text-white">
-            {activeCost === 0 ? 'Free' : `$${activeCost.toLocaleString()}`}
+          <span className={`font-display font-black ${activeIsQuoteOnly ? 'text-sm text-slate-500 dark:text-slate-400' : 'text-lg text-slate-900 dark:text-white'}`}>
+            {activeIsQuoteOnly ? 'Contact sales' : activeCost === 0 ? 'Free' : `$${activeCost.toLocaleString()}`}
           </span>
           <ChevronDown
             size={16}
@@ -252,15 +284,12 @@ function PricingCard({
         {/* Cost — desktop */}
         <div className="hidden md:block flex-1 min-w-0">
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-display font-black text-slate-900 dark:text-white">
-              {activeCost === 0 ? 'Free' : `$${activeCost.toLocaleString()}`}
+            <span className={`font-display font-black ${activeIsQuoteOnly ? 'text-lg text-slate-500 dark:text-slate-400' : 'text-2xl text-slate-900 dark:text-white'}`}>
+              {activeIsQuoteOnly ? 'Contact sales' : activeCost === 0 ? 'Free' : `$${activeCost.toLocaleString()}`}
             </span>
-            {activeCost > 0 && (
+            {!activeIsQuoteOnly && activeCost > 0 && (
               <span className="text-xs text-slate-400 dark:text-slate-500 font-mono">/mo</span>
             )}
-          </div>
-          <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-            {activeTier.notes}
           </div>
         </div>
 
@@ -287,9 +316,14 @@ function PricingCard({
               Estimated
             </span>
           )}
-          {result.exceeds && !isOverridden && (
+          {activeTier.autoSelect === false && (
+            <span className="text-[10px] font-semibold px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+              Not usable at team scale
+            </span>
+          )}
+          {!activeCanHandle && (
             <span className="text-[10px] font-semibold px-2 py-1 rounded-md bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400">
-              Contact Sales
+              Exceeds limits
             </span>
           )}
           {/* Notes visible on mobile below cost */}
@@ -303,6 +337,11 @@ function PricingCard({
           size={16}
           className={`hidden md:block shrink-0 text-slate-400 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}
         />
+
+        {/* Notes — desktop: own line under price and badges, aligned with the price column (rank 2rem + platform 12rem + gaps) */}
+        <div className="hidden md:block basis-full pl-64 text-[11px] text-slate-500 dark:text-slate-400">
+          {activeTier.notes}
+        </div>
       </div>
 
       {expanded && (
@@ -352,55 +391,62 @@ function PricingCard({
   )
 }
 
-export default function PricingCalculator({ data }: { data: EvalData }) {
-  const [inputs, setInputs] = useState<PricingInputs>({
-    users: data.pricing.sliders.users.default,
-    resources: data.pricing.sliders.resources.default,
-    runs: data.pricing.sliders.runs.default,
-  })
+export default function PricingCalculator({
+  data,
+  inputs,
+  onInputsChange,
+  results: baseResults,
+}: {
+  data: EvalData
+  inputs: PricingInputs
+  onInputsChange: (key: keyof PricingInputs, value: number) => void
+  results: PricingResult[]
+}) {
   const [tierOverrides, setTierOverrides] = useState<Record<string, string | null>>({})
-
-  const handleChange = (key: keyof PricingInputs, value: number) => {
-    setInputs((prev) => ({ ...prev, [key]: value }))
-  }
 
   const handleOverrideTier = useCallback((platformId: string, tierName: string | null) => {
     setTierOverrides((prev) => ({ ...prev, [platformId]: tierName }))
   }, [])
 
-  const baseResults = useMemo(
-    () => computeAllPricingResults(data.pricing, data.platforms, inputs),
-    [data, inputs],
-  )
+  // Effective (override-aware) cost/quoteOnly/canHandle for a result, used for
+  // both re-sorting and the cheapest/most-expensive summary below.
+  const effectiveFor = useCallback((r: PricingResult) => {
+    const overrideName = tierOverrides[r.platformId]
+    const overrideData = overrideName ? r.allTiers.find((t) => t.tier.name === overrideName) : null
+    return {
+      cost: overrideData ? Math.round(overrideData.cost) : r.monthlyCost,
+      quoteOnly: overrideData ? overrideData.tier.quoteOnly : r.quoteOnly,
+      canHandle: overrideData ? overrideData.canHandle : !r.exceeds,
+    }
+  }, [tierOverrides])
 
-  // Re-sort applying tier overrides so the list stays ordered by effective cost
+  // Re-sort applying tier overrides: priced ascending, then quote-only, then exceeds.
   const results = useMemo(() => {
     return [...baseResults].sort((a, b) => {
-      const aOverride = tierOverrides[a.platformId]
-      const bOverride = tierOverrides[b.platformId]
-      const aCost = aOverride
-        ? Math.round(a.allTiers.find((t) => t.tier.name === aOverride)?.cost ?? a.monthlyCost)
-        : a.monthlyCost
-      const bCost = bOverride
-        ? Math.round(b.allTiers.find((t) => t.tier.name === bOverride)?.cost ?? b.monthlyCost)
-        : b.monthlyCost
-      return aCost - bCost
+      const ea = effectiveFor(a)
+      const eb = effectiveFor(b)
+      const rank = (e: ReturnType<typeof effectiveFor>) => (!e.canHandle ? 2 : e.quoteOnly ? 1 : 0)
+      const rankDiff = rank(ea) - rank(eb)
+      if (rankDiff !== 0) return rankDiff
+      return ea.cost - eb.cost
     })
-  }, [baseResults, tierOverrides])
+  }, [baseResults, effectiveFor])
 
   const cheapest = results[0]
-  const mostExpensive = results[results.length - 1]
-  const cheapestCost = tierOverrides[cheapest?.platformId]
-    ? Math.round(cheapest.allTiers.find((t) => t.tier.name === tierOverrides[cheapest.platformId])?.cost ?? cheapest.monthlyCost)
-    : cheapest?.monthlyCost
-  const mostExpensiveCost = tierOverrides[mostExpensive?.platformId]
-    ? Math.round(mostExpensive.allTiers.find((t) => t.tier.name === tierOverrides[mostExpensive.platformId])?.cost ?? mostExpensive.monthlyCost)
-    : mostExpensive?.monthlyCost
+  // Quote-only and over-limit tiers have no comparable price, so they're left out of "most expensive".
+  const pricedResults = results.filter((r) => {
+    const e = effectiveFor(r)
+    return e.canHandle && !e.quoteOnly
+  })
+  const mostExpensive = pricedResults[pricedResults.length - 1]
+  const unpricedCount = results.length - pricedResults.length
+  const cheapestInfo = cheapest ? effectiveFor(cheapest) : null
+  const mostExpensiveInfo = mostExpensive ? effectiveFor(mostExpensive) : null
 
   return (
     <main className="flex-1 overflow-y-auto dot-grid">
       <div className="p-4 md:p-6 max-w-5xl mx-auto space-y-4">
-        <PricingSliders data={data} inputs={inputs} onChange={handleChange} />
+        <PricingSliders data={data} inputs={inputs} onChange={onInputsChange} />
 
         {/* Summary */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -411,7 +457,9 @@ export default function PricingCalculator({ data }: { data: EvalData }) {
             <div>
               <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Cheapest</div>
               <div className="font-display font-black text-slate-900 dark:text-white">
-                {cheapest ? `${formatCost(cheapestCost ?? 0)} — ${cheapest.platformName}` : '—'}
+                {cheapest
+                  ? `${cheapestInfo?.quoteOnly ? 'Contact sales' : formatCost(cheapestInfo?.cost ?? 0)} — ${cheapest.platformName}`
+                  : '—'}
               </div>
             </div>
           </div>
@@ -420,13 +468,30 @@ export default function PricingCalculator({ data }: { data: EvalData }) {
               <AlertTriangle size={16} className="text-red-600 dark:text-red-400" />
             </div>
             <div>
-              <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Most Expensive</div>
+              <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+                Most Expensive
+                {unpricedCount > 0 && (
+                  <span
+                    className="ml-0.5 cursor-help"
+                    title={`Excludes ${unpricedCount} platform${unpricedCount > 1 ? 's' : ''} that only quote through sales (or exceed every published tier) at these inputs`}
+                  >
+                    *
+                  </span>
+                )}
+              </div>
               <div className="font-display font-black text-slate-900 dark:text-white">
-                {mostExpensive ? `${formatCost(mostExpensiveCost ?? 0)} — ${mostExpensive.platformName}` : '—'}
+                {mostExpensive
+                  ? `${formatCost(mostExpensiveInfo?.cost ?? 0)} — ${mostExpensive.platformName}`
+                  : '—'}
               </div>
             </div>
           </div>
         </div>
+
+        <p className="text-[11px] text-slate-400 dark:text-slate-500 px-1">
+          Licence and infrastructure only. Engineering time is excluded for every platform: self-hosting means
+          patching and upgrades, a managed service means integrating and porting workflows.
+        </p>
 
         {/* Pricing cards */}
         <div className="space-y-3">

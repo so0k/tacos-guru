@@ -1,13 +1,14 @@
 # tacos.guru
 
-An interactive evaluation tool for comparing TACOS (Terraform Automation & Collaboration Software) platforms. Compare Spacelift, Env0, Scalr, Terrateam, Terramate Cloud, HCP Terraform, and OpenTaco across 21 weighted criteria — and estimate monthly costs based on your team size, resources, and run volume.
+An interactive evaluation tool for comparing TACOS (Terraform Automation & Collaboration Software) platforms. Compare Atlantis, Spacelift, env0, Scalr, Terramate, Stategraph (formerly Terrateam), HCP Terraform, OpenTaco (formerly Digger), ops0, Pulumi Cloud, Terragrunt Scale, Atmos, and OTF across 24 weighted criteria — plus 5 hard gates that can disqualify a platform outright — and estimate monthly costs based on your team size, resources, run volume, and stack count.
 
 **Live site:** [tacos.guru](https://tacos.guru)
 
 ## Features
 
-- **Evaluation tab** — 21 criteria with adjustable weight sliders. Changing weights recalculates and re-sorts platform scores in real time. Expand any platform row to see per-criterion rationales.
-- **Pricing tab** — 3 input sliders (users, resources under management, monthly runs). Auto-selects the cheapest tier per platform. Override tiers manually by clicking them in the expanded card.
+- **Evaluation tab** — 24 criteria with adjustable weight sliders. Changing weights recalculates and re-sorts platform scores in real time. Two criteria (Collaboration integration, VCS integration) are scored per-variant — pick your collaboration tool and VCS provider from the sidebar selects and the weighted total updates to match. Expand any platform row to see per-criterion rationales, the 5 hard gates (pass/fail with evidence + source link), and — for disqualified platforms — which gates failed.
+- **Hard gates** — G1–G5 (no Kubernetes required, self-hosted runners in your cloud account, can run a CDK Terrain synth step, maintained within 6 months, OpenTofu support) are shown per platform. A platform that fails any gate is marked **Disqualified**, sorted after qualified platforms, and can be hidden entirely with the "Show disqualified" toggle.
+- **Pricing tab** — 4 input sliders (users, resources under management, monthly runs, stacks/workspaces). Auto-selects the cheapest usable tier per platform; quote-only tiers show "Contact sales" instead of a price, and tiers not viable at team scale are labelled accordingly. Override tiers manually by clicking them in the expanded card. The Evaluation tab's "Pricing suitability" criterion is computed live from these same slider inputs, so changing them re-scores every platform.
 
 ## Running locally
 
@@ -36,39 +37,56 @@ pnpm preview
 All evaluation data lives in a single file: [`public/evaluation.json`](public/evaluation.json)
 
 It contains:
-- **`criteria`** — 21 evaluation criteria with default weights (1–5) and categories (Critical / High / Medium / Low / Nice-to-have)
-- **`platforms`** — 7 platforms, each with scores (0–3) per criterion, rationale text, and metadata
-- **`pricing`** — tier definitions for each platform including base prices, per-unit costs, feature gates, and whether a price is published or estimated
+- **`criteria`** — 24 evaluation criteria with default weights (1–5) and categories (Critical / High / Medium / Low / Nice-to-have). Two criteria carry `variants` (Collaboration integration: Slack / MS Teams; VCS integration: GitHub / GitLab / Bitbucket / Azure DevOps) with a `defaultVariant`.
+- **`gates`** — the 5 hard gates (G1–G5) shown on every platform, each with a pass/fail result, evidence text, and a source link.
+- **`excluded`** — platforms considered but excluded before scoring (e.g. Terrakube — requires Kubernetes), shown as a subtle note below the platform list.
+- **`platforms`** — 13 platforms, each with scores (0–3) per criterion, per-variant scores for the two variant criteria, gate results, a `disqualified` flag, rationale text, and metadata.
+- **`pricing`** — tier definitions for each platform including base prices, per-unit costs (including per-stack), feature gates, quote-only/auto-select flags, a source link, and a `pricingScore` mapping (cost bands → 0–3) used to derive the "Pricing suitability" criterion live from the calculator.
 
-Scores and pricing were researched from public vendor documentation in February 2026.
+Scores and pricing were researched from public vendor documentation in September 2026.
+
+### Hard gates
+
+| Gate | Requirement |
+|------|-------------|
+| G1 | No Kubernetes required |
+| G2 | Self-hosted runners in your cloud account |
+| G3 | Can run a CDK Terrain synth step before plan |
+| G4 | Maintained (release in last 6 months) |
+| G5 | OpenTofu support |
+
+A platform failing any gate is disqualified — still shown and scored, but ranked after every qualified platform.
 
 ### Evaluation criteria
 
 | # | Criterion | Weight | Category |
 |---|-----------|:------:|----------|
-| 1 | CDKTF/CDK Terrain workflow support | **5** | Critical |
+| 1 | CDK Terrain workflow | **5** | Critical |
 | 2 | OpenTofu support | **5** | Critical |
-| 3 | No Kubernetes requirement | **5** | Critical |
-| 4 | RBAC & SSO integration | **5** | Critical |
-| 5 | Dependency orchestration | **4** | High |
+| 3 | Self-hosted runners (no K8s required) | **5** | Critical |
+| 4 | RBAC & SSO | **5** | Critical |
+| 5 | Linked-state orchestration | **5** | Critical |
 | 6 | Drift detection | **4** | High |
-| 7 | Secrets management (AWS OIDC) | **4** | High |
+| 7 | Cloud credentials (OIDC) | **4** | High |
 | 8 | Pricing suitability | **4** | High |
-| 9 | Golden paths / blueprints | **3** | Medium |
-| 10 | Migration path from Atlantis | **3** | Medium |
-| 11 | Custom workflows / hooks | **3** | Medium |
-| 12 | Private module registry | **3** | Medium |
-| 13 | InfraCost / cost estimation | **3** | Medium |
-| 14 | Integrations (MS Teams, DataDog) | **3** | Medium |
-| 15 | Keep S3+DynamoDB state backends | **2** | Low |
-| 16 | Visualizations / resource graphs | **2** | Low |
-| 17 | OPA / Conftest policies | **3** | Medium |
-| 18 | AI features | **1** | Nice-to-have |
-| 19 | Ephemeral environments | **1** | Nice-to-have |
-| 20 | Terraform provider | **1** | Nice-to-have |
-| 21 | Multi-cloud support | **1** | Nice-to-have |
+| 9 | Repo scaffolding & codegen | **4** | High |
+| 10 | State governance & RBAC | **4** | High |
+| 11 | Migration from Atlantis | **3** | Medium |
+| 12 | Custom workflows, hooks & gates | **3** | Medium |
+| 13 | Private module registry | **3** | Medium |
+| 14 | Cost estimation | **3** | Medium |
+| 15 | Policy as code | **3** | Medium |
+| 16 | AI: trusted PR review | **3** | Medium |
+| 17 | Collaboration integration (variant-scored) | **4** | High |
+| 18 | VCS integration (variant-scored) | **3** | Medium |
+| 19 | Observability | **3** | Medium |
+| 20 | Visualizations / graphs | **2** | Low |
+| 21 | AI: agentic ops & MCP | **2** | Low |
+| 22 | Ephemeral environments | **1** | Nice-to-have |
+| 23 | Terraform provider | **1** | Nice-to-have |
+| 24 | Multi-cloud support | **1** | Nice-to-have |
 
-All weights are adjustable in the app. **Max weighted score: 195** (weight total × 3).
+All weights are adjustable in the app, and the max weighted score is computed from the current weights rather than hardcoded — with default weights (total 80) it's **240** (weight total × 3).
 
 ## Submitting corrections
 

@@ -1,16 +1,33 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import {
   Rocket, Leaf, Scale, Mountain, GitBranch, Cloud, Terminal,
+  Network, ShieldCheck, Layers, Blocks, Atom, Server,
   Sun, Moon, RotateCcw, Trophy, ChevronDown, ChevronRight,
   XCircle, AlertCircle, CheckCircle, CircleCheckBig,
   Info, TrendingUp, TrendingDown, Minus, ExternalLink, DollarSign, Github,
-  Menu, X, SlidersHorizontal,
+  Menu, X, SlidersHorizontal, Ban, Link as LinkIcon, Eye, EyeOff, ArrowUpDown, ArrowDownWideNarrow,
   type LucideIcon,
 } from 'lucide-react'
 
-const REPO_URL = 'https://github.com/so0k/tacos-guru'
-import type { Criterion, Platform, EvalData, RankedPlatform } from './types'
+import type { Criterion, Platform, EvalData, RankedPlatform, PricingInputs, PricingResult, Gate } from './types'
+import { computeAllPricingResults, computePricingScore } from './pricing'
 import PricingCalculator from './PricingCalculator'
+
+const REPO_URL = 'https://github.com/so0k/tacos-guru'
+
+// Deep links: #pricing selects the tab; query params hold only values changed from their defaults,
+// as absolute values (e.g. ?users=15&orchestration=3&collab=slack).
+const PRICING_KEYS: Array<keyof PricingInputs> = ['users', 'resources', 'runs', 'stacks']
+const paramKey = (c: Criterion) => c.short.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+const tabFromHash = (): 'eval' | 'pricing' => (window.location.hash === '#pricing' ? 'pricing' : 'eval')
+
+function readIntParam(params: URLSearchParams, key: string, min: number, max: number): number | null {
+  const raw = params.get(key)
+  if (raw === null || raw.trim() === '') return null
+  const n = Number(raw)
+  if (!Number.isFinite(n)) return null
+  return Math.min(max, Math.max(min, Math.round(n)))
+}
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -18,6 +35,7 @@ import PricingCalculator from './PricingCalculator'
 
 const ICON_MAP: Record<string, LucideIcon> = {
   Rocket, Leaf, Scale, Mountain, GitBranch, Cloud, Terminal,
+  Network, ShieldCheck, Layers, Blocks, Atom, Server,
 }
 
 const SCORE_ICONS: LucideIcon[] = [XCircle, AlertCircle, CheckCircle, CircleCheckBig]
@@ -32,37 +50,90 @@ const SCORE_BG = [
 
 const CATEGORY_ORDER = ['critical', 'high', 'medium', 'low', 'nice']
 
+// Criterion id for "Pricing suitability" — its score is derived live from
+// the pricing calculator rather than taken from the static scores array.
+const PRICING_CRITERION_ID = 8
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
+
+function formatResearched(researched: string): string {
+  const [year, month] = researched.split('-').map(Number)
+  if (!year || !month) return researched
+  const date = new Date(year, month - 1, 1)
+  return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+}
+
+function pricingRationale(result: PricingResult | undefined): string | null {
+  if (!result) return null
+  if (result.quoteOnly) {
+    return `${result.selectedTier.name} — quote only at current calculator inputs`
+  }
+  if (result.exceeds) {
+    return `${result.selectedTier.name} — exceeds limits at current calculator inputs`
+  }
+  return `${result.selectedTier.name} ≈ $${result.monthlyCost.toLocaleString()}/mo at current calculator inputs`
+}
+
+function getEffectiveScore(
+  platform: Platform,
+  criterion: Criterion,
+  index: number,
+  variantSelections: Record<number, string>,
+  pricingScores: Record<string, number>,
+): number {
+  if (criterion.variants && criterion.variants.length > 0) {
+    const variantScores = platform.variants?.[String(criterion.id)]
+    const variantId = variantSelections[criterion.id] ?? criterion.defaultVariant
+    if (variantScores && variantId && variantScores[variantId] !== undefined) {
+      return variantScores[variantId]
+    }
+  }
+  if (criterion.id === PRICING_CRITERION_ID && pricingScores[platform.id] !== undefined) {
+    return pricingScores[platform.id]
+  }
+  return platform.scores[index]
+}
 
 function computeRankings(
   platforms: Platform[],
   criteria: Criterion[],
   weights: Record<number, number>,
+  variantSelections: Record<number, string>,
+  pricingScores: Record<string, number>,
+  sortCriterionId: number | null = null,
 ): RankedPlatform[] {
   const scored = platforms.map((p) => {
+    const effectiveScores = criteria.map((c, i) => getEffectiveScore(p, c, i, variantSelections, pricingScores))
     let weightedScore = 0
     let maxPossible = 0
     criteria.forEach((c, i) => {
       const w = weights[c.id] ?? c.defaultWeight
-      weightedScore += p.scores[i] * w
+      weightedScore += effectiveScores[i] * w
       maxPossible += 3 * w
     })
     const percentage = maxPossible > 0 ? (weightedScore / maxPossible) * 100 : 0
-    return { ...p, weightedScore, maxPossible, percentage, rank: 0, defaultRank: 0, rankDelta: 0 }
+    return { ...p, effectiveScores, weightedScore, maxPossible, percentage, rank: 0, defaultRank: 0, rankDelta: 0 }
   })
 
-  scored.sort((a, b) => b.weightedScore - a.weightedScore)
+  // Disqualified platforms always sort after qualified ones, ranked by score within each group.
+  const disqualificationAwareSort = (a: { weightedScore: number; disqualified?: boolean }, b: { weightedScore: number; disqualified?: boolean }) => {
+    if (!!a.disqualified !== !!b.disqualified) return a.disqualified ? 1 : -1
+    return b.weightedScore - a.weightedScore
+  }
+
+  scored.sort(disqualificationAwareSort)
   scored.forEach((p, i) => { p.rank = i + 1 })
 
   // Compute default rankings for delta
   const defaultScored = platforms.map((p) => {
+    const effectiveScores = criteria.map((c, i) => getEffectiveScore(p, c, i, variantSelections, pricingScores))
     let ws = 0
-    criteria.forEach((c, i) => { ws += p.scores[i] * c.defaultWeight })
-    return { id: p.id, ws }
+    criteria.forEach((c, i) => { ws += effectiveScores[i] * c.defaultWeight })
+    return { id: p.id, weightedScore: ws, disqualified: p.disqualified }
   })
-  defaultScored.sort((a, b) => b.ws - a.ws)
+  defaultScored.sort(disqualificationAwareSort)
   const defaultRankMap: Record<string, number> = {}
   defaultScored.forEach((p, i) => { defaultRankMap[p.id] = i + 1 })
 
@@ -70,6 +141,24 @@ function computeRankings(
     p.defaultRank = defaultRankMap[p.id]
     p.rankDelta = p.defaultRank - p.rank // positive = moved up
   })
+
+  // Sort-by-criterion view: order by that one score (weighted total breaks ties) and give
+  // equal scores the same rank. Rank deltas compare against the weighted ranking, so drop them.
+  const sortIndex = sortCriterionId === null ? -1 : criteria.findIndex((c) => c.id === sortCriterionId)
+  if (sortIndex >= 0) {
+    scored.sort((a, b) => {
+      if (!!a.disqualified !== !!b.disqualified) return a.disqualified ? 1 : -1
+      const diff = b.effectiveScores[sortIndex] - a.effectiveScores[sortIndex]
+      return diff !== 0 ? diff : b.weightedScore - a.weightedScore
+    })
+    scored.forEach((p, i) => {
+      const prev = scored[i - 1]
+      const tied = prev && !!prev.disqualified === !!p.disqualified
+        && prev.effectiveScores[sortIndex] === p.effectiveScores[sortIndex]
+      p.rank = tied ? prev.rank : i + 1
+      p.rankDelta = 0
+    })
+  }
 
   return scored
 }
@@ -131,6 +220,8 @@ function WeightSlider({
   isHovered,
   onHover,
   onLeave,
+  isSorted,
+  onToggleSort,
 }: {
   criterion: Criterion
   weight: number
@@ -138,21 +229,46 @@ function WeightSlider({
   isHovered: boolean
   onHover: () => void
   onLeave: () => void
+  isSorted: boolean
+  onToggleSort: () => void
 }) {
   const isChanged = weight !== criterion.defaultWeight
+  const [showInfo, setShowInfo] = useState(false)
 
   return (
     <div
       className={`
         px-3 py-2 rounded-lg transition-colors duration-150
-        ${isHovered ? 'bg-accent/10 dark:bg-accent-light/10' : 'hover:bg-surface-hover dark:hover:bg-surface-hover-dark'}
+        ${isHovered || isSorted ? 'bg-accent/10 dark:bg-accent-light/10' : 'hover:bg-surface-hover dark:hover:bg-surface-hover-dark'}
       `}
       onMouseEnter={onHover}
       onMouseLeave={onLeave}
     >
       <div className="flex items-center justify-between mb-1">
-        <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 truncate mr-2">
-          {criterion.short}
+        <span className="flex items-center gap-1 min-w-0 mr-2">
+          <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 truncate">
+            {criterion.short}
+          </span>
+          <button
+            type="button"
+            onClick={() => setShowInfo((v) => !v)}
+            title={`${criterion.name}: ${criterion.description}`}
+            aria-label={`About ${criterion.name}`}
+            aria-expanded={showInfo}
+            className="shrink-0 text-slate-400 hover:text-accent dark:text-slate-500 dark:hover:text-accent-light"
+          >
+            <Info size={11} />
+          </button>
+          <button
+            type="button"
+            onClick={onToggleSort}
+            title={isSorted ? 'Back to weighted ranking' : `Rank platforms by ${criterion.short}`}
+            aria-label={isSorted ? 'Back to weighted ranking' : `Rank platforms by ${criterion.name}`}
+            aria-pressed={isSorted}
+            className={`shrink-0 ${isSorted ? 'text-accent dark:text-accent-light' : 'text-slate-400 hover:text-accent dark:text-slate-500 dark:hover:text-accent-light'}`}
+          >
+            {isSorted ? <ArrowDownWideNarrow size={11} /> : <ArrowUpDown size={11} />}
+          </button>
         </span>
         <div className="flex items-center gap-1.5">
           {isChanged && (
@@ -177,11 +293,46 @@ function WeightSlider({
         onChange={(e) => onChange(criterion.id, parseInt(e.target.value))}
         className="w-full"
       />
-      <div className="flex items-center gap-1 mt-0.5">
-        <span className="text-[10px] text-slate-400 dark:text-slate-500 truncate">
+      {showInfo && (
+        <p className="mt-0.5 text-[10px] leading-snug text-slate-400 dark:text-slate-500">
           {criterion.description}
-        </span>
+        </p>
+      )}
+    </div>
+  )
+}
+
+function VariantSelectors({
+  criteria,
+  variantSelections,
+  onVariantChange,
+}: {
+  criteria: Criterion[]
+  variantSelections: Record<number, string>
+  onVariantChange: (criterionId: number, variantId: string) => void
+}) {
+  const variantCriteria = criteria.filter((c) => c.variants && c.variants.length > 0)
+  if (variantCriteria.length === 0) return null
+
+  return (
+    <div className="px-4 py-3 border-b border-border dark:border-border-dark space-y-2">
+      <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+        Score by variant
       </div>
+      {variantCriteria.map((c) => (
+        <label key={c.id} className="flex items-center justify-between gap-2 text-xs">
+          <span className="text-slate-600 dark:text-slate-300 font-semibold">{c.short}</span>
+          <select
+            value={variantSelections[c.id] ?? c.defaultVariant ?? ''}
+            onChange={(e) => onVariantChange(c.id, e.target.value)}
+            className="w-32 shrink-0 text-xs font-mono rounded-md border border-border dark:border-border-dark bg-surface dark:bg-surface-dark text-slate-700 dark:text-slate-200 px-1.5 py-1"
+          >
+            {c.variants!.map((v) => (
+              <option key={v.id} value={v.id}>{v.label}</option>
+            ))}
+          </select>
+        </label>
+      ))}
     </div>
   )
 }
@@ -195,6 +346,12 @@ function Sidebar({
   onHoverCriterion,
   collapsed,
   onToggleCollapse,
+  variantSelections,
+  onVariantChange,
+  showDisqualified,
+  onToggleShowDisqualified,
+  sortCriterion,
+  onToggleSort,
   isSheet = false,
 }: {
   data: EvalData
@@ -205,6 +362,12 @@ function Sidebar({
   onHoverCriterion: (id: number | null) => void
   collapsed: boolean
   onToggleCollapse: () => void
+  variantSelections: Record<number, string>
+  onVariantChange: (criterionId: number, variantId: string) => void
+  showDisqualified: boolean
+  onToggleShowDisqualified: () => void
+  sortCriterion: number | null
+  onToggleSort: (id: number) => void
   isSheet?: boolean
 }) {
   const grouped = useMemo(() => {
@@ -281,6 +444,29 @@ function Sidebar({
         </div>
       )}
 
+      <VariantSelectors
+        criteria={data.criteria}
+        variantSelections={variantSelections}
+        onVariantChange={onVariantChange}
+      />
+
+      <div className="px-4 py-3 border-b border-border dark:border-border-dark">
+        <button
+          onClick={onToggleShowDisqualified}
+          className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300"
+        >
+          {showDisqualified ? <Eye size={13} /> : <EyeOff size={13} />}
+          <span className="font-semibold">Show disqualified</span>
+          <span
+            className={`ml-auto inline-flex items-center w-8 h-[18px] rounded-full transition-colors ${showDisqualified ? 'bg-accent dark:bg-accent-light' : 'bg-slate-300 dark:bg-slate-700'}`}
+          >
+            <span
+              className={`w-3.5 h-3.5 rounded-full bg-white shadow transition-transform ${showDisqualified ? 'translate-x-4' : 'translate-x-0.5'}`}
+            />
+          </span>
+        </button>
+      </div>
+
       <div className={`${isSheet ? '' : 'flex-1 overflow-y-auto'} p-2 space-y-4`}>
         {CATEGORY_ORDER.map((cat) => {
           const criteria = grouped[cat]
@@ -318,6 +504,8 @@ function Sidebar({
                       isHovered={hoveredCriterion === c.id}
                       onHover={() => onHoverCriterion(c.id)}
                       onLeave={() => onHoverCriterion(null)}
+                      isSorted={sortCriterion === c.id}
+                      onToggleSort={() => onToggleSort(c.id)}
                     />
                   ))}
                 </div>
@@ -338,13 +526,88 @@ function Sidebar({
   )
 }
 
+function DisqualifiedBadge({ platform, gates }: { platform: RankedPlatform; gates: Gate[] }) {
+  const failedLabels = gates
+    .filter((g) => platform.gates?.[g.id] && platform.gates[g.id].pass === false)
+    .map((g) => g.label)
+
+  // Tooltip is left-anchored: the badge sits near the row's left edge, so a centred one gets squeezed.
+  return (
+    <div className="tooltip-trigger">
+      <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+        <Ban size={10} />
+        Disqualified
+      </span>
+      {failedLabels.length > 0 && (
+        <div className="tooltip-content" style={{ left: 0, transform: 'none' }}>
+          <div className="bg-slate-900 dark:bg-slate-800 text-white text-xs rounded-lg px-3 py-2 shadow-xl w-64 whitespace-normal">
+            <div className="font-semibold mb-1">Failed gates</div>
+            <ul className="list-disc list-inside text-slate-300">
+              {failedLabels.map((label) => <li key={label}>{label}</li>)}
+            </ul>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function GatesSection({ platform, gates }: { platform: RankedPlatform; gates: Gate[] }) {
+  if (!platform.gates) return null
+  return (
+    <div className="mb-3">
+      <div className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">
+        Hard gates
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+        {gates.map((g) => {
+          const result = platform.gates?.[g.id]
+          if (!result) return null
+          return (
+            <div
+              key={g.id}
+              className="flex items-start gap-2 p-2 rounded-lg text-xs bg-slate-50 dark:bg-slate-800/50"
+            >
+              {result.pass
+                ? <CheckCircle size={14} className="shrink-0 mt-0.5 text-score-3" />
+                : <XCircle size={14} className="shrink-0 mt-0.5 text-score-0" />}
+              <div className="min-w-0">
+                <span className="font-semibold text-slate-700 dark:text-slate-200">{g.label}</span>
+                <div className="text-slate-500 dark:text-slate-400 leading-relaxed mt-0.5">
+                  {result.evidence}
+                  {result.url && (
+                    <a
+                      href={result.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="inline-flex items-center gap-0.5 ml-1 text-accent dark:text-accent-light hover:underline"
+                    >
+                      <LinkIcon size={9} />
+                      source
+                    </a>
+                  )}
+                </div>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 function PlatformRow({
   platform,
   criteria,
   weights,
   scoreLabels,
+  gates,
+  variantSelections,
+  pricingResult,
   hoveredCriterion,
   onHoverCriterion,
+  sortCriterion,
   animDelay,
   expanded,
   onToggle,
@@ -353,8 +616,12 @@ function PlatformRow({
   criteria: Criterion[]
   weights: Record<number, number>
   scoreLabels: string[]
+  gates: Gate[]
+  variantSelections: Record<number, string>
+  pricingResult: PricingResult | undefined
   hoveredCriterion: number | null
   onHoverCriterion: (id: number | null) => void
+  sortCriterion: number | null
   animDelay: number
   expanded: boolean
   onToggle: () => void
@@ -393,7 +660,7 @@ function PlatformRow({
             </div>
 
             {/* Platform info */}
-            <div className="flex items-center gap-3 flex-1 md:w-44 md:shrink-0 md:flex-none min-w-0">
+            <div className="flex items-center gap-3 flex-1 md:w-48 md:shrink-0 md:flex-none min-w-0">
               <div
                 className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
                 style={{ backgroundColor: platform.color + '18' }}
@@ -406,19 +673,21 @@ function PlatformRow({
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={(e) => e.stopPropagation()}
-                  className="font-display font-bold text-sm text-slate-900 dark:text-white truncate hover:text-accent dark:hover:text-accent-light transition-colors inline-flex items-center gap-1 group/link"
+                  className="font-display font-bold text-sm text-slate-900 dark:text-white hover:text-accent dark:hover:text-accent-light transition-colors inline-flex max-w-full items-center gap-1 group/link"
+                  title={platform.name}
                 >
-                  {platform.name}
+                  <span className="truncate">{platform.name}</span>
                   <ExternalLink size={10} className="opacity-0 group-hover/link:opacity-100 transition-opacity shrink-0" />
                 </a>
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  {platform.disqualified && <DisqualifiedBadge platform={platform} gates={gates} />}
                   {platform.rankDelta !== 0 && (
                     <span className={`flex items-center text-[10px] ${platform.rankDelta > 0 ? 'text-score-3' : 'text-score-0'}`}>
                       {platform.rankDelta > 0 ? <TrendingUp size={10} /> : <TrendingDown size={10} />}
                       {Math.abs(platform.rankDelta)}
                     </span>
                   )}
-                  {platform.rankDelta === 0 && (
+                  {platform.rankDelta === 0 && sortCriterion === null && (
                     <span className="flex items-center text-[10px] text-slate-400">
                       <Minus size={10} />
                     </span>
@@ -478,11 +747,11 @@ function PlatformRow({
                 onMouseLeave={() => onHoverCriterion(null)}
               >
                 <ScoreCell
-                  score={platform.scores[i]}
+                  score={platform.effectiveScores[i]}
                   criterionName={c.name}
-                  rationale={platform.rationales[i]}
-                  scoreLabel={scoreLabels[platform.scores[i]]}
-                  isHighlighted={hoveredCriterion === c.id}
+                  rationale={c.id === PRICING_CRITERION_ID ? (pricingRationale(pricingResult) ?? platform.rationales[i]) : platform.rationales[i]}
+                  scoreLabel={scoreLabels[platform.effectiveScores[i]]}
+                  isHighlighted={hoveredCriterion === c.id || sortCriterion === c.id}
                 />
               </div>
             ))}
@@ -496,31 +765,43 @@ function PlatformRow({
               {platform.tagline}
             </p>
 
+            <GatesSection platform={platform} gates={gates} />
+
             {/* Full score breakdown — visible on all screens when expanded */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1.5">
               {criteria.map((c, i) => {
                 const w = weights[c.id] ?? c.defaultWeight
-                const Icon = SCORE_ICONS[platform.scores[i]]
+                const score = platform.effectiveScores[i]
+                const Icon = SCORE_ICONS[score]
+                const variantLabel = c.variants
+                  ? c.variants.find((v) => v.id === (variantSelections[c.id] ?? c.defaultVariant))?.label
+                  : null
+                const rationale = c.id === PRICING_CRITERION_ID
+                  ? (pricingRationale(pricingResult) ?? platform.rationales[i])
+                  : platform.rationales[i]
                 return (
                   <div
                     key={c.id}
                     className={`
                       flex items-start gap-2 p-2 rounded-lg text-xs
-                      ${hoveredCriterion === c.id ? 'bg-accent/10 dark:bg-accent-light/10' : 'bg-slate-50 dark:bg-slate-800/50'}
+                      ${hoveredCriterion === c.id || sortCriterion === c.id ? 'bg-accent/10 dark:bg-accent-light/10' : 'bg-slate-50 dark:bg-slate-800/50'}
                     `}
                     onMouseEnter={() => onHoverCriterion(c.id)}
                     onMouseLeave={() => onHoverCriterion(null)}
                   >
-                    <Icon size={14} className={`shrink-0 mt-0.5 ${SCORE_COLORS[platform.scores[i]]}`} />
+                    <Icon size={14} className={`shrink-0 mt-0.5 ${SCORE_COLORS[score]}`} />
                     <div className="min-w-0">
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1 flex-wrap">
                         <span className="font-semibold text-slate-700 dark:text-slate-200">{c.short}</span>
+                        {variantLabel && (
+                          <span className="text-slate-400 dark:text-slate-500 text-[10px]">({variantLabel})</span>
+                        )}
                         <span className="text-slate-400 font-mono">
-                          {platform.scores[i]}x{w}={platform.scores[i] * w}
+                          {score}x{w}={score * w}
                         </span>
                       </div>
                       <div className="text-slate-500 dark:text-slate-400 leading-relaxed mt-0.5">
-                        {platform.rationales[i]}
+                        {rationale}
                       </div>
                     </div>
                   </div>
@@ -541,13 +822,17 @@ function PlatformRow({
 export default function App() {
   const [data, setData] = useState<EvalData | null>(null)
   const [weights, setWeights] = useState<Record<number, number>>({})
+  const [variantSelections, setVariantSelections] = useState<Record<number, string>>({})
+  const [showDisqualified, setShowDisqualified] = useState(true)
+  const [pricingInputs, setPricingInputs] = useState<PricingInputs>({ users: 0, resources: 0, runs: 0, stacks: 0 })
   const [darkMode, setDarkMode] = useState(() =>
     window.matchMedia('(prefers-color-scheme: dark)').matches
   )
   const [hoveredCriterion, setHoveredCriterion] = useState<number | null>(null)
+  const [sortCriterion, setSortCriterion] = useState<number | null>(null)
   const [expandedPlatform, setExpandedPlatform] = useState<string | null>(null)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
-  const [activeTab, setActiveTab] = useState<'eval' | 'pricing'>('eval')
+  const [activeTab, setActiveTab] = useState<'eval' | 'pricing'>(tabFromHash)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [weightsSheetOpen, setWeightsSheetOpen] = useState(false)
 
@@ -560,8 +845,74 @@ export default function App() {
         const w: Record<number, number> = {}
         d.criteria.forEach((c) => { w[c.id] = c.defaultWeight })
         setWeights(w)
+
+        const vs: Record<number, string> = {}
+        d.criteria.forEach((c) => {
+          if (c.variants && c.defaultVariant) vs[c.id] = c.defaultVariant
+        })
+        setVariantSelections(vs)
+
+        const sliderDefaults = {} as PricingInputs
+        Object.entries(d.pricing.sliders).forEach(([key, cfg]) => {
+          sliderDefaults[key as keyof PricingInputs] = cfg.default
+        })
+        setPricingInputs(sliderDefaults)
+
+        const params = new URLSearchParams(window.location.search)
+        d.criteria.forEach((c) => {
+          const wv = readIntParam(params, paramKey(c), 0, c.maxWeight)
+          if (wv !== null) w[c.id] = wv
+          const vv = params.get(paramKey(c))
+          if (c.variants && vv && c.variants.some((v) => v.id === vv)) vs[c.id] = vv
+        })
+        PRICING_KEYS.forEach((key) => {
+          const cfg = d.pricing.sliders[key]
+          const v = cfg ? readIntParam(params, key, cfg.min, cfg.max) : null
+          if (v !== null) sliderDefaults[key] = v
+        })
+        if (params.get('dq') === '0') setShowDisqualified(false)
+        const sortParam = params.get('sort')
+        const sortTarget = sortParam ? d.criteria.find((c) => paramKey(c) === sortParam) : undefined
+        if (sortTarget) setSortCriterion(sortTarget.id)
+        setWeights({ ...w })
+        setVariantSelections({ ...vs })
+        setPricingInputs({ ...sliderDefaults })
       })
   }, [])
+
+  // Keep the tab in sync with back/forward navigation between #pricing and #evaluation.
+  useEffect(() => {
+    const onHashChange = () => setActiveTab(tabFromHash())
+    window.addEventListener('hashchange', onHashChange)
+    return () => window.removeEventListener('hashchange', onHashChange)
+  }, [])
+
+  // Mirror non-default state into the URL so any view can be shared.
+  useEffect(() => {
+    if (!data) return
+    const params = new URLSearchParams()
+    data.criteria.forEach((c) => {
+      if (c.variants) {
+        const v = variantSelections[c.id]
+        if (v && v !== c.defaultVariant) params.set(paramKey(c), v)
+      } else if (weights[c.id] !== undefined && weights[c.id] !== c.defaultWeight) {
+        params.set(paramKey(c), String(weights[c.id]))
+      }
+    })
+    PRICING_KEYS.forEach((key) => {
+      const cfg = data.pricing.sliders[key]
+      if (cfg && pricingInputs[key] !== cfg.default) params.set(key, String(pricingInputs[key]))
+    })
+    if (!showDisqualified) params.set('dq', '0')
+    const sortTarget = data.criteria.find((c) => c.id === sortCriterion)
+    if (sortTarget) params.set('sort', paramKey(sortTarget))
+    const query = params.toString()
+    const hash = activeTab === 'pricing' ? '#pricing' : ''
+    const url = `${window.location.pathname}${query ? `?${query}` : ''}${hash}`
+    if (url !== `${window.location.pathname}${window.location.search}${window.location.hash}`) {
+      window.history.replaceState(null, '', url)
+    }
+  }, [data, weights, variantSelections, pricingInputs, showDisqualified, sortCriterion, activeTab])
 
   // Sync dark mode class
   useEffect(() => {
@@ -579,10 +930,47 @@ export default function App() {
     setWeights(w)
   }, [data])
 
+  const handleVariantChange = useCallback((criterionId: number, variantId: string) => {
+    setVariantSelections((prev) => ({ ...prev, [criterionId]: variantId }))
+  }, [])
+
+  const handlePricingInputChange = useCallback((key: keyof PricingInputs, value: number) => {
+    setPricingInputs((prev) => ({ ...prev, [key]: value }))
+  }, [])
+
+  // Pricing results at the current calculator inputs, shared between the Evaluation
+  // and Pricing tabs so criterion 8 (Pricing suitability) reflects live slider state.
+  const pricingResults = useMemo(() => {
+    if (!data) return []
+    return computeAllPricingResults(data.pricing, data.platforms, pricingInputs)
+  }, [data, pricingInputs])
+
+  const pricingResultByPlatform = useMemo(() => {
+    const map: Record<string, PricingResult> = {}
+    pricingResults.forEach((r) => { map[r.platformId] = r })
+    return map
+  }, [pricingResults])
+
+  const pricingScoreByPlatform = useMemo(() => {
+    if (!data) return {}
+    const map: Record<string, number> = {}
+    pricingResults.forEach((r) => { map[r.platformId] = computePricingScore(data.pricing.pricingScore, r) })
+    return map
+  }, [data, pricingResults])
+
   const ranked = useMemo(() => {
     if (!data) return []
-    return computeRankings(data.platforms, data.criteria, weights)
-  }, [data, weights])
+    return computeRankings(data.platforms, data.criteria, weights, variantSelections, pricingScoreByPlatform, sortCriterion)
+  }, [data, weights, variantSelections, pricingScoreByPlatform, sortCriterion])
+
+  const handleToggleSort = useCallback((id: number) => {
+    setSortCriterion((prev) => (prev === id ? null : id))
+  }, [])
+
+  const visibleRanked = useMemo(
+    () => ranked.filter((p) => showDisqualified || !p.disqualified),
+    [ranked, showDisqualified],
+  )
 
   if (!data) {
     return (
@@ -735,6 +1123,12 @@ export default function App() {
                 onHoverCriterion={setHoveredCriterion}
                 collapsed={false}
                 onToggleCollapse={() => setWeightsSheetOpen(false)}
+                variantSelections={variantSelections}
+                onVariantChange={handleVariantChange}
+                showDisqualified={showDisqualified}
+                onToggleShowDisqualified={() => setShowDisqualified((v) => !v)}
+                sortCriterion={sortCriterion}
+                onToggleSort={handleToggleSort}
                 isSheet
               />
             </div>
@@ -764,6 +1158,12 @@ export default function App() {
                 onHoverCriterion={setHoveredCriterion}
                 collapsed={sidebarCollapsed}
                 onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+                variantSelections={variantSelections}
+                onVariantChange={handleVariantChange}
+                showDisqualified={showDisqualified}
+                onToggleShowDisqualified={() => setShowDisqualified((v) => !v)}
+                sortCriterion={sortCriterion}
+                onToggleSort={handleToggleSort}
               />
             </div>
 
@@ -782,15 +1182,38 @@ export default function App() {
                   ))}
                 </div>
 
-                {ranked.map((platform, i) => (
+                {sortCriterion !== null && (
+                  <div className="flex items-center gap-2">
+                    <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-accent/10 dark:bg-accent-light/10 text-accent dark:text-accent-light">
+                      <ArrowDownWideNarrow size={12} />
+                      Sorted by: {data.criteria.find((c) => c.id === sortCriterion)?.name}
+                      <button
+                        type="button"
+                        onClick={() => setSortCriterion(null)}
+                        aria-label="Back to weighted ranking"
+                        title="Back to weighted ranking"
+                        className="ml-0.5 rounded-full hover:bg-accent/20 dark:hover:bg-accent-light/20 p-0.5"
+                      >
+                        <X size={12} />
+                      </button>
+                    </span>
+                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono">ties broken by weighted score</span>
+                  </div>
+                )}
+
+                {visibleRanked.map((platform, i) => (
                   <PlatformRow
                     key={platform.id}
                     platform={platform}
                     criteria={data.criteria}
                     weights={weights}
                     scoreLabels={data.scoreLabels}
+                    gates={data.gates}
+                    variantSelections={variantSelections}
+                    pricingResult={pricingResultByPlatform[platform.id]}
                     hoveredCriterion={hoveredCriterion}
                     onHoverCriterion={setHoveredCriterion}
+                    sortCriterion={sortCriterion}
                     animDelay={i * 50}
                     expanded={expandedPlatform === platform.id}
                     onToggle={() =>
@@ -799,10 +1222,41 @@ export default function App() {
                   />
                 ))}
 
+                {/* Excluded platforms */}
+                {data.excluded.length > 0 && (
+                  <p className="text-[10px] text-slate-400 dark:text-slate-500 text-center px-2">
+                    Also considered:{' '}
+                    {data.excluded.map((ex, i) => (
+                      <span key={ex.name}>
+                        {i > 0 && ', '}
+                        <a
+                          href={ex.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="hover:text-accent dark:hover:text-accent-light hover:underline"
+                        >
+                          {ex.name}
+                        </a>
+                        {' '}— excluded: {ex.reason}
+                      </span>
+                    ))}
+                  </p>
+                )}
+
                 {/* Footer */}
-                <div className="flex items-center justify-center gap-4 pt-6 pb-4">
+                <div className="flex flex-col md:flex-row items-center justify-center gap-2 md:gap-4 pt-6 pb-20 md:pb-4 text-center">
                   <p className="text-[10px] text-slate-400 dark:text-slate-500 font-mono">
-                    Data sourced from public vendor documentation — February 2026
+                    Data sourced from public vendor documentation — {formatResearched(data.researched)}
+                    {' · '}
+                    backed by{' '}
+                    <a
+                      href="https://cdktn.io"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:text-accent dark:hover:text-accent-light hover:underline"
+                    >
+                      cdktn.io
+                    </a>
                   </p>
                   <a
                     href={`${REPO_URL}/edit/main/public/evaluation.json`}
@@ -818,7 +1272,12 @@ export default function App() {
             </main>
           </>
         ) : (
-          <PricingCalculator data={data} />
+          <PricingCalculator
+            data={data}
+            inputs={pricingInputs}
+            onInputsChange={handlePricingInputChange}
+            results={pricingResults}
+          />
         )}
       </div>
 
