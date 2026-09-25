@@ -5,7 +5,7 @@ import {
   Sun, Moon, RotateCcw, Trophy, ChevronDown, ChevronRight,
   XCircle, AlertCircle, CheckCircle, CircleCheckBig,
   Info, TrendingUp, TrendingDown, Minus, ExternalLink, DollarSign, Github,
-  Menu, X, SlidersHorizontal, Ban, Link as LinkIcon, Eye, EyeOff,
+  Menu, X, SlidersHorizontal, Ban, Link as LinkIcon, Eye, EyeOff, ArrowUpDown, ArrowDownWideNarrow,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -102,6 +102,7 @@ function computeRankings(
   weights: Record<number, number>,
   variantSelections: Record<number, string>,
   pricingScores: Record<string, number>,
+  sortCriterionId: number | null = null,
 ): RankedPlatform[] {
   const scored = platforms.map((p) => {
     const effectiveScores = criteria.map((c, i) => getEffectiveScore(p, c, i, variantSelections, pricingScores))
@@ -140,6 +141,24 @@ function computeRankings(
     p.defaultRank = defaultRankMap[p.id]
     p.rankDelta = p.defaultRank - p.rank // positive = moved up
   })
+
+  // Sort-by-criterion view: order by that one score (weighted total breaks ties) and give
+  // equal scores the same rank. Rank deltas compare against the weighted ranking, so drop them.
+  const sortIndex = sortCriterionId === null ? -1 : criteria.findIndex((c) => c.id === sortCriterionId)
+  if (sortIndex >= 0) {
+    scored.sort((a, b) => {
+      if (!!a.disqualified !== !!b.disqualified) return a.disqualified ? 1 : -1
+      const diff = b.effectiveScores[sortIndex] - a.effectiveScores[sortIndex]
+      return diff !== 0 ? diff : b.weightedScore - a.weightedScore
+    })
+    scored.forEach((p, i) => {
+      const prev = scored[i - 1]
+      const tied = prev && !!prev.disqualified === !!p.disqualified
+        && prev.effectiveScores[sortIndex] === p.effectiveScores[sortIndex]
+      p.rank = tied ? prev.rank : i + 1
+      p.rankDelta = 0
+    })
+  }
 
   return scored
 }
@@ -201,6 +220,8 @@ function WeightSlider({
   isHovered,
   onHover,
   onLeave,
+  isSorted,
+  onToggleSort,
 }: {
   criterion: Criterion
   weight: number
@@ -208,6 +229,8 @@ function WeightSlider({
   isHovered: boolean
   onHover: () => void
   onLeave: () => void
+  isSorted: boolean
+  onToggleSort: () => void
 }) {
   const isChanged = weight !== criterion.defaultWeight
   const [showInfo, setShowInfo] = useState(false)
@@ -216,7 +239,7 @@ function WeightSlider({
     <div
       className={`
         px-3 py-2 rounded-lg transition-colors duration-150
-        ${isHovered ? 'bg-accent/10 dark:bg-accent-light/10' : 'hover:bg-surface-hover dark:hover:bg-surface-hover-dark'}
+        ${isHovered || isSorted ? 'bg-accent/10 dark:bg-accent-light/10' : 'hover:bg-surface-hover dark:hover:bg-surface-hover-dark'}
       `}
       onMouseEnter={onHover}
       onMouseLeave={onLeave}
@@ -235,6 +258,16 @@ function WeightSlider({
             className="shrink-0 text-slate-400 hover:text-accent dark:text-slate-500 dark:hover:text-accent-light"
           >
             <Info size={11} />
+          </button>
+          <button
+            type="button"
+            onClick={onToggleSort}
+            title={isSorted ? 'Back to weighted ranking' : `Rank platforms by ${criterion.short}`}
+            aria-label={isSorted ? 'Back to weighted ranking' : `Rank platforms by ${criterion.name}`}
+            aria-pressed={isSorted}
+            className={`shrink-0 ${isSorted ? 'text-accent dark:text-accent-light' : 'text-slate-400 hover:text-accent dark:text-slate-500 dark:hover:text-accent-light'}`}
+          >
+            {isSorted ? <ArrowDownWideNarrow size={11} /> : <ArrowUpDown size={11} />}
           </button>
         </span>
         <div className="flex items-center gap-1.5">
@@ -317,6 +350,8 @@ function Sidebar({
   onVariantChange,
   showDisqualified,
   onToggleShowDisqualified,
+  sortCriterion,
+  onToggleSort,
   isSheet = false,
 }: {
   data: EvalData
@@ -331,6 +366,8 @@ function Sidebar({
   onVariantChange: (criterionId: number, variantId: string) => void
   showDisqualified: boolean
   onToggleShowDisqualified: () => void
+  sortCriterion: number | null
+  onToggleSort: (id: number) => void
   isSheet?: boolean
 }) {
   const grouped = useMemo(() => {
@@ -467,6 +504,8 @@ function Sidebar({
                       isHovered={hoveredCriterion === c.id}
                       onHover={() => onHoverCriterion(c.id)}
                       onLeave={() => onHoverCriterion(null)}
+                      isSorted={sortCriterion === c.id}
+                      onToggleSort={() => onToggleSort(c.id)}
                     />
                   ))}
                 </div>
@@ -568,6 +607,7 @@ function PlatformRow({
   pricingResult,
   hoveredCriterion,
   onHoverCriterion,
+  sortCriterion,
   animDelay,
   expanded,
   onToggle,
@@ -581,6 +621,7 @@ function PlatformRow({
   pricingResult: PricingResult | undefined
   hoveredCriterion: number | null
   onHoverCriterion: (id: number | null) => void
+  sortCriterion: number | null
   animDelay: number
   expanded: boolean
   onToggle: () => void
@@ -646,7 +687,7 @@ function PlatformRow({
                       {Math.abs(platform.rankDelta)}
                     </span>
                   )}
-                  {platform.rankDelta === 0 && (
+                  {platform.rankDelta === 0 && sortCriterion === null && (
                     <span className="flex items-center text-[10px] text-slate-400">
                       <Minus size={10} />
                     </span>
@@ -710,7 +751,7 @@ function PlatformRow({
                   criterionName={c.name}
                   rationale={c.id === PRICING_CRITERION_ID ? (pricingRationale(pricingResult) ?? platform.rationales[i]) : platform.rationales[i]}
                   scoreLabel={scoreLabels[platform.effectiveScores[i]]}
-                  isHighlighted={hoveredCriterion === c.id}
+                  isHighlighted={hoveredCriterion === c.id || sortCriterion === c.id}
                 />
               </div>
             ))}
@@ -743,7 +784,7 @@ function PlatformRow({
                     key={c.id}
                     className={`
                       flex items-start gap-2 p-2 rounded-lg text-xs
-                      ${hoveredCriterion === c.id ? 'bg-accent/10 dark:bg-accent-light/10' : 'bg-slate-50 dark:bg-slate-800/50'}
+                      ${hoveredCriterion === c.id || sortCriterion === c.id ? 'bg-accent/10 dark:bg-accent-light/10' : 'bg-slate-50 dark:bg-slate-800/50'}
                     `}
                     onMouseEnter={() => onHoverCriterion(c.id)}
                     onMouseLeave={() => onHoverCriterion(null)}
@@ -788,6 +829,7 @@ export default function App() {
     window.matchMedia('(prefers-color-scheme: dark)').matches
   )
   const [hoveredCriterion, setHoveredCriterion] = useState<number | null>(null)
+  const [sortCriterion, setSortCriterion] = useState<number | null>(null)
   const [expandedPlatform, setExpandedPlatform] = useState<string | null>(null)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [activeTab, setActiveTab] = useState<'eval' | 'pricing'>(tabFromHash)
@@ -829,6 +871,9 @@ export default function App() {
           if (v !== null) sliderDefaults[key] = v
         })
         if (params.get('dq') === '0') setShowDisqualified(false)
+        const sortParam = params.get('sort')
+        const sortTarget = sortParam ? d.criteria.find((c) => paramKey(c) === sortParam) : undefined
+        if (sortTarget) setSortCriterion(sortTarget.id)
         setWeights({ ...w })
         setVariantSelections({ ...vs })
         setPricingInputs({ ...sliderDefaults })
@@ -859,13 +904,15 @@ export default function App() {
       if (cfg && pricingInputs[key] !== cfg.default) params.set(key, String(pricingInputs[key]))
     })
     if (!showDisqualified) params.set('dq', '0')
+    const sortTarget = data.criteria.find((c) => c.id === sortCriterion)
+    if (sortTarget) params.set('sort', paramKey(sortTarget))
     const query = params.toString()
     const hash = activeTab === 'pricing' ? '#pricing' : ''
     const url = `${window.location.pathname}${query ? `?${query}` : ''}${hash}`
     if (url !== `${window.location.pathname}${window.location.search}${window.location.hash}`) {
       window.history.replaceState(null, '', url)
     }
-  }, [data, weights, variantSelections, pricingInputs, showDisqualified, activeTab])
+  }, [data, weights, variantSelections, pricingInputs, showDisqualified, sortCriterion, activeTab])
 
   // Sync dark mode class
   useEffect(() => {
@@ -913,8 +960,12 @@ export default function App() {
 
   const ranked = useMemo(() => {
     if (!data) return []
-    return computeRankings(data.platforms, data.criteria, weights, variantSelections, pricingScoreByPlatform)
-  }, [data, weights, variantSelections, pricingScoreByPlatform])
+    return computeRankings(data.platforms, data.criteria, weights, variantSelections, pricingScoreByPlatform, sortCriterion)
+  }, [data, weights, variantSelections, pricingScoreByPlatform, sortCriterion])
+
+  const handleToggleSort = useCallback((id: number) => {
+    setSortCriterion((prev) => (prev === id ? null : id))
+  }, [])
 
   const visibleRanked = useMemo(
     () => ranked.filter((p) => showDisqualified || !p.disqualified),
@@ -1076,6 +1127,8 @@ export default function App() {
                 onVariantChange={handleVariantChange}
                 showDisqualified={showDisqualified}
                 onToggleShowDisqualified={() => setShowDisqualified((v) => !v)}
+                sortCriterion={sortCriterion}
+                onToggleSort={handleToggleSort}
                 isSheet
               />
             </div>
@@ -1109,6 +1162,8 @@ export default function App() {
                 onVariantChange={handleVariantChange}
                 showDisqualified={showDisqualified}
                 onToggleShowDisqualified={() => setShowDisqualified((v) => !v)}
+                sortCriterion={sortCriterion}
+                onToggleSort={handleToggleSort}
               />
             </div>
 
@@ -1127,6 +1182,25 @@ export default function App() {
                   ))}
                 </div>
 
+                {sortCriterion !== null && (
+                  <div className="flex items-center gap-2">
+                    <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-accent/10 dark:bg-accent-light/10 text-accent dark:text-accent-light">
+                      <ArrowDownWideNarrow size={12} />
+                      Sorted by: {data.criteria.find((c) => c.id === sortCriterion)?.name}
+                      <button
+                        type="button"
+                        onClick={() => setSortCriterion(null)}
+                        aria-label="Back to weighted ranking"
+                        title="Back to weighted ranking"
+                        className="ml-0.5 rounded-full hover:bg-accent/20 dark:hover:bg-accent-light/20 p-0.5"
+                      >
+                        <X size={12} />
+                      </button>
+                    </span>
+                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono">ties broken by weighted score</span>
+                  </div>
+                )}
+
                 {visibleRanked.map((platform, i) => (
                   <PlatformRow
                     key={platform.id}
@@ -1139,6 +1213,7 @@ export default function App() {
                     pricingResult={pricingResultByPlatform[platform.id]}
                     hoveredCriterion={hoveredCriterion}
                     onHoverCriterion={setHoveredCriterion}
+                    sortCriterion={sortCriterion}
                     animDelay={i * 50}
                     expanded={expandedPlatform === platform.id}
                     onToggle={() =>
