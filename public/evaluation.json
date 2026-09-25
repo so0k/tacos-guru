@@ -21,7 +21,7 @@
   },
   {
    "id": 3,
-   "name": "Self-hosted runners, no K8s",
+   "name": "Self-hosted runners (no K8s required)",
    "short": "Runners",
    "category": "critical",
    "defaultWeight": 5,
@@ -143,7 +143,7 @@
    "category": "medium",
    "defaultWeight": 3,
    "maxWeight": 5,
-   "description": "LLM reviews PR intent + plan; instructions from default branch; bring your own model"
+   "description": "Native LLM review of PR intent + plan; instructions from the default branch; bring your own model"
   },
   {
    "id": 17,
@@ -700,7 +700,7 @@
     0,
     3,
     3,
-    1,
+    0,
     1,
     3,
     2,
@@ -726,7 +726,7 @@
     "No private module registry. The indexer only maps module usage to trigger runs.",
     "Built-in Infracost cost estimates on PRs with approval thresholds. IaaD adds plan-time cost deltas and FOCUS billing reconciliation.",
     "OPA/Rego, Conftest and Checkov are built in and run on plan output. Policies are portable.",
-    "No native AI review. Docs show DIY LLM hooks over plan results (bring your own model); trusted-config loading not documented.",
+    "No native AI review. LLM steps are possible via custom workflow hooks, but self-built reviews are credited under Workflows, not here.",
     "No native Slack, Teams or Google Chat integration. Notifications only via curl webhooks in hooks or workflow steps.",
     "GitHub and GitLab: PR comments, per-dirspace status checks, apply requirements, automerge. No Bitbucket or Azure DevOps.",
     "Self-hosted Prometheus /metrics, a queryable audit trail, and hook webhooks. IaaD adds a transaction timeline and webhooks (Pro tier).",
@@ -1100,7 +1100,7 @@
     2,
     0,
     2,
-    2,
+    1,
     2,
     3,
     2,
@@ -1126,7 +1126,7 @@
     "Private Registry for Pulumi components/templates; components can be sourced from monorepo git paths; TF module registry also offered.",
     "No native PR cost estimation for Pulumi previews; Infracost does not natively support Pulumi.",
     "CrossGuard in TS/Python plus stable OPA/Rego analyzer over Pulumi resource inputs (not TF plan JSON); mandatory enforcement Pro+, remediation Enterprise.",
-    "Neo code reviews read preview output on GitHub, advisory; BYOK on Enterprise (Anthropic/Azure/custom endpoint); default-branch-only instructions unverified.",
+    "Neo reviews PRs natively, with BYO model on Enterprise only. PR-intent input and default-branch instructions are undocumented; would be 2 if intent is verified.",
     "Slack- and Teams-formatted webhooks for stack/deployment/drift events; notifications only, no interactive approvals in chat.",
     "GitHub app: PR preview comments, commit checks, review stacks, Neo reviews, policy results; GitLab/Azure DevOps/Bitbucket supported with fewer features.",
     "Audit log API and automated S3 export (Pro+), deployment/stack webhooks; no native Datadog or OTel integration.",
@@ -1300,7 +1300,7 @@
     1,
     2,
     2,
-    2,
+    1,
     1,
     3,
     2,
@@ -1326,7 +1326,7 @@
     "No private module registry; vendoring pulls modules from git/OCI/registries with lock files. Registry cache proxy for providers only.",
     "Built-in `infracost` hook kind on plan events; results in CI output rather than a native cost UI.",
     "Native OPA/JSON Schema validation of stack config; plan-level checks via checkov/trivy/kics hooks or a conftest command hook.",
-    "Pro posts vendor-model AI summaries on PRs (credits). OSS `atmos ai` supports Bedrock/BYO models so a trusted CI review can be built, not packaged.",
+    "Atmos Pro posts AI PR summaries from the vendor's model (credits). No native PR-intent review or trusted instruction source.",
     "Slack app with interactive approve/reject and drift alerts. No Microsoft Teams or Google Chat integration; only audit-log webhooks.",
     "GitHub App with status checks, PR summaries, merge-queue support, GHES. Other VCS: CLI only, no Pro orchestration.",
     "Audit log streaming as CloudEvents webhooks or Datadog-formatted logs, batched; native CI outputs; no OTel metrics export documented.",
@@ -1477,6 +1477,106 @@
    },
    "disqualified": false,
    "tagline": "Free MPL-2.0 open-source TFE clone (Go + Postgres), OpenTofu-ready; single-maintainer risk"
+  },
+  {
+   "id": "atlantis",
+   "name": "Atlantis",
+   "url": "https://www.runatlantis.io",
+   "icon": "GitBranch",
+   "color": "#2563EB",
+   "scores": [
+    2,
+    3,
+    2,
+    1,
+    2,
+    2,
+    2,
+    3,
+    1,
+    1,
+    3,
+    3,
+    0,
+    0,
+    3,
+    0,
+    1,
+    3,
+    2,
+    0,
+    0,
+    0,
+    0,
+    3
+   ],
+   "rationales": [
+    "Pre-workflow hook can synth before plan; per-project when_modified globs scope autoplan, but they are hand-kept, not dependency-aware; hook reruns per command.",
+    "OpenTofu is first-class: server default or per-project terraform_distribution, per-project terraform_version pinning, .tofu file support, bundled binary.",
+    "Runs on your own EC2/Docker/Fargate, no K8s; custom image supported. No separate runner pool: all runs execute on the server; no native container builds.",
+    "No SSO; web UI has basic auth only. Command authz via GitHub team allowlist or GitLab group allowlist, or an external authz script. No audit log.",
+    "depends_on + execution_order_group give ordered plan/apply in one PR; all plans are taken up front, so no auto re-plan on upstream outputs or unknowns.",
+    "Alpha drift detect/remediate APIs (v0.45+) with Slack/HTTP drift webhooks; no built-in scheduler, you trigger it (cron/CI). Remediation apply is opt-in.",
+    "No credential brokering or OIDC per stack. Uses the server's identity (e.g. EC2 instance role) plus provider assume_role per account; no static keys needed.",
+    "Self-hosted, business hours (TCO) ≈ $90/mo at the default calculator inputs",
+    "Project autodiscovery, per-project autoplan when_modified and a hook to load a generated atlantis.yaml; no backend/provider codegen of its own.",
+    "Does not manage state; uses your backend (e.g. S3) with isolation via IAM. No state RBAC, versioning UI, export or cross-state dependency tracking.",
+    "It is Atlantis: the baseline the other platforms migrate from.",
+    "Custom workflows with arbitrary run steps, pre/post workflow hooks, custom images, command requirements and custom gates before apply. All free.",
+    "No module registry. Modules come from Git, local paths or an external registry.",
+    "No native cost estimation. Infracost can be added as a custom workflow step.",
+    "Native Conftest/OPA policy_check on the plan JSON, portable Rego, owner users/teams approve failures, sticky approvals (v0.44+).",
+    "No native AI or LLM plan review.",
+    "Webhooks only for apply and drift events: native Slack messages, or generic HTTP JSON a Teams Workflows flow can consume. No interactivity or approvals.",
+    "PR-comment driven plan/apply, commit statuses, approved/mergeable/undiverged gates and automerge on GitHub and GitLab; Bitbucket, Azure DevOps and Gitea too.",
+    "Prometheus or StatsD metrics and structured logs; apply/drift HTTP webhooks. No audit stream, OpenTelemetry export or run-event feed.",
+    "Web UI shows locks and job log streams only; no resource, dependency or deployment graphs.",
+    "No MCP server or agentic features.",
+    "No ephemeral or preview environment feature.",
+    "No official Terraform provider; configuration is server flags, repos.yaml and atlantis.yaml.",
+    "Provider-agnostic: runs any Terraform/OpenTofu provider; deployment guides cover AWS, GCP and Azure."
+   ],
+   "variants": {
+    "17": {
+     "slack": 1,
+     "teams": 1
+    },
+    "18": {
+     "github": 3,
+     "gitlab": 3,
+     "bitbucket": 2,
+     "azure_devops": 2
+    }
+   },
+   "gates": {
+    "G1": {
+     "pass": true,
+     "evidence": "Single Go binary or official Docker image with no external database; runs on a VM, Docker, ECS/Fargate or GCE. Helm chart and K8s manifests are optional.",
+     "url": "https://www.runatlantis.io/docs/deployment"
+    },
+    "G2": {
+     "pass": true,
+     "evidence": "Fully self-hosted in your own cloud account; Terraform runs locally on the Atlantis server using its host credentials (instance role / assume_role).",
+     "url": "https://www.runatlantis.io/docs/provider-credentials"
+    },
+    "G3": {
+     "pass": true,
+     "evidence": "Server-side pre_workflow_hooks run arbitrary commands (e.g. pnpm install + synth) before plan, and can even generate atlantis.yaml dynamically.",
+     "url": "https://www.runatlantis.io/docs/pre-workflow-hooks"
+    },
+    "G4": {
+     "pass": true,
+     "evidence": "v0.48.0 released 2026-09-22; ~11 releases in the last six months (roughly monthly or faster).",
+     "url": "https://github.com/runatlantis/atlantis/releases"
+    },
+    "G5": {
+     "pass": true,
+     "evidence": "OpenTofu first-class: --tf-distribution / --default-tf-distribution server-wide and terraform_distribution: opentofu per project; full images bundle OpenTofu.",
+     "url": "https://www.runatlantis.io/docs/terraform-versions"
+    }
+   },
+   "disqualified": false,
+   "tagline": "Free, self-hosted PR-comment plan/apply with hooks, Conftest policy and OpenTofu"
   }
  ],
  "scoreLabels": [
@@ -2856,6 +2956,70 @@
       },
       "notes": "~$100–170/mo EC2 + RDS + ALB + agents; plus ~0.1–0.2 FTE ops; single maintainer",
       "source": "https://github.com/leg100/otf"
+     }
+    ]
+   },
+   "atlantis": {
+    "model": "Self-hosted (OSS)",
+    "description": "Free Apache-2.0; cost is one instance plus storage (no load balancer or NAT needed)",
+    "tiers": [
+     {
+      "name": "Self-hosted, business hours (TCO)",
+      "basePrice": 90,
+      "includedUsers": null,
+      "includedResources": null,
+      "includedRuns": null,
+      "includedStacks": null,
+      "perUser": 0,
+      "perResource": 0,
+      "perRun": 0,
+      "perStack": 0,
+      "maxUsers": null,
+      "maxResources": null,
+      "maxRuns": null,
+      "maxStacks": null,
+      "estimated": true,
+      "quoteOnly": false,
+      "autoSelect": true,
+      "features": {
+       "privateWorkers": true,
+       "opa": true,
+       "driftDetection": false,
+       "samlSso": false,
+       "auditLog": false,
+       "registry": false
+      },
+      "notes": "One t4g.xlarge–2xlarge on a weekday schedule (~$50–100) + ~160 GB gp3 and a public IP (~$20); no plans/applies out of hours; excludes engineering time",
+      "source": "https://www.runatlantis.io/docs/deployment"
+     },
+     {
+      "name": "Self-hosted, 24/7 (TCO)",
+      "basePrice": 190,
+      "includedUsers": null,
+      "includedResources": null,
+      "includedRuns": null,
+      "includedStacks": null,
+      "perUser": 0,
+      "perResource": 0,
+      "perRun": 0,
+      "perStack": 0,
+      "maxUsers": null,
+      "maxResources": null,
+      "maxRuns": null,
+      "maxStacks": null,
+      "estimated": true,
+      "quoteOnly": false,
+      "autoSelect": true,
+      "features": {
+       "privateWorkers": true,
+       "opa": true,
+       "driftDetection": false,
+       "samlSso": false,
+       "auditLog": false,
+       "registry": false
+      },
+      "notes": "Same instance always on (~$125–250) + storage/IP; DIY LLM plan review via hooks adds ~$0.06/review (Sonnet-class model)",
+      "source": "https://www.runatlantis.io/docs/deployment"
      }
     ]
    }
