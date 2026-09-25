@@ -1,610 +1,2880 @@
 {
-  "criteria": [
-    { "id": 1, "name": "CDKTF/CDK Terrain workflow support", "short": "CDKTF", "category": "critical", "defaultWeight": 5, "maxWeight": 5, "description": "pnpm/tsx synthesis in pre-plan hooks" },
-    { "id": 2, "name": "OpenTofu support", "short": "OpenTofu", "category": "critical", "defaultWeight": 5, "maxWeight": 5, "description": "Native, not just Terraform" },
-    { "id": 3, "name": "No Kubernetes requirement", "short": "No K8s", "category": "critical", "defaultWeight": 5, "maxWeight": 5, "description": "Docker/EC2 agents" },
-    { "id": 4, "name": "RBAC & SSO integration", "short": "RBAC/SSO", "category": "critical", "defaultWeight": 5, "maxWeight": 5, "description": "Enterprise identity management" },
-    { "id": 5, "name": "Dependency orchestration", "short": "Deps", "category": "high", "defaultWeight": 4, "maxWeight": 5, "description": "Cycle detection, ordered execution" },
-    { "id": 6, "name": "Drift detection", "short": "Drift", "category": "high", "defaultWeight": 4, "maxWeight": 5, "description": "Built-in, scheduled" },
-    { "id": 7, "name": "Secrets management", "short": "Secrets", "category": "high", "defaultWeight": 4, "maxWeight": 5, "description": "AWS OIDC, no static creds" },
-    { "id": 8, "name": "Pricing suitability", "short": "Pricing", "category": "high", "defaultWeight": 4, "maxWeight": 5, "description": "~250 modules, ~10 users, budget-conscious" },
-    { "id": 9, "name": "Golden paths / blueprints", "short": "Blueprints", "category": "medium", "defaultWeight": 3, "maxWeight": 5, "description": "Self-service templates" },
-    { "id": 10, "name": "Migration path from Atlantis", "short": "Migration", "category": "medium", "defaultWeight": 3, "maxWeight": 5, "description": "Documented Atlantis migration" },
-    { "id": 11, "name": "Custom workflows / hooks", "short": "Workflows", "category": "medium", "defaultWeight": 3, "maxWeight": 5, "description": "Pre-plan, post-apply hooks" },
-    { "id": 12, "name": "Private module registry", "short": "Registry", "category": "medium", "defaultWeight": 3, "maxWeight": 5, "description": "Monorepo-friendly" },
-    { "id": 13, "name": "InfraCost / cost estimation", "short": "Cost Est.", "category": "medium", "defaultWeight": 3, "maxWeight": 5, "description": "PR-level cost estimation" },
-    { "id": 14, "name": "Integrations (Teams, DataDog)", "short": "Integrations", "category": "medium", "defaultWeight": 3, "maxWeight": 5, "description": "MS Teams, DataDog" },
-    { "id": 15, "name": "Keep S3+DynamoDB state", "short": "S3 State", "category": "low", "defaultWeight": 2, "maxWeight": 5, "description": "Existing state backends" },
-    { "id": 16, "name": "AI features", "short": "AI", "category": "nice", "defaultWeight": 1, "maxWeight": 5, "description": "Plan summaries, error analysis" },
-    { "id": 17, "name": "Visualizations / graphs", "short": "Viz", "category": "low", "defaultWeight": 2, "maxWeight": 5, "description": "Resource graphs" },
-    { "id": 18, "name": "Ephemeral environments", "short": "Ephemeral", "category": "nice", "defaultWeight": 1, "maxWeight": 5, "description": "Short-lived environments" },
-    { "id": 19, "name": "Terraform provider", "short": "TF Provider", "category": "nice", "defaultWeight": 1, "maxWeight": 5, "description": "Platform management via TF" },
-    { "id": 20, "name": "Multi-cloud support", "short": "Multi-cloud", "category": "nice", "defaultWeight": 1, "maxWeight": 5, "description": "Future-proofing" },
-    { "id": 21, "name": "OPA / Conftest policies", "short": "OPA", "category": "medium", "defaultWeight": 3, "maxWeight": 5, "description": "Policy-as-code support" }
-  ],
-  "platforms": [
-    {
-      "id": "spacelift",
-      "name": "Spacelift",
-      "url": "https://spacelift.io",
-      "icon": "Rocket",
-      "color": "#4B6BFF",
-      "scores": [3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 3, 2, 2, 2, 1, 3, 3, 1, 3, 3, 3],
-      "rationales": [
-        "Documented CDKTF support. Custom runner Docker images, all languages.",
-        "Native first-class support. Toggle per-stack.",
-        "Docker-based worker pools on EC2. No K8s needed.",
-        "Granular space-based RBAC, SSO (SAML/OIDC).",
-        "Stack dependencies with trigger policies, visual DAG.",
-        "Built-in scheduled drift detection with reconciliation.",
-        "AWS OIDC, Vault, contexts, environment variables.",
-        "$399/mo Starter for up to 10 users, unlimited deploys.",
-        "Blueprints feature for self-service stack creation.",
-        "General migration docs. No Atlantis-specific kit.",
-        "Before/after init/plan/apply hooks, OPA/Rego policies.",
-        "Supports TF registry. Not monorepo-optimized.",
-        "InfraCost integration available.",
-        "Slack primary. MS Teams limited. DataDog via webhooks.",
-        "Managed state requires S3 migration. Can use own backend.",
-        "Saturnhead AI, Spacelift Intent NL provisioning.",
-        "Built-in resource visualization and dependency graphs.",
-        "Limited — can delete stacks on schedule.",
-        "Full Spacelift Terraform provider.",
-        "AWS, Azure, GCP, CloudFormation, Pulumi, K8s.",
-        "Native OPA/Rego plan policies. Strongest OPA story."
-      ],
-      "tagline": "Best technical fit — native CDKTF, dependency DAG, predictable pricing"
-    },
-    {
-      "id": "env0",
-      "name": "Env0",
-      "url": "https://www.env0.com",
-      "icon": "Leaf",
-      "color": "#00B389",
-      "scores": [2, 3, 3, 3, 3, 3, 3, 2, 3, 3, 3, 2, 3, 3, 3, 3, 1, 3, 3, 3, 3],
-      "rationales": [
-        "Custom flows (env0.yml). Arbitrary shell commands pre/post.",
-        "Native support. Founding member of OpenTofu.",
-        "Cloud-hosted or self-hosted Docker agents on EC2.",
-        "Comprehensive RBAC, SAML/OIDC SSO.",
-        "Workflow orchestration, variable hierarchy, ordered execution.",
-        "Built-in scheduled drift detection with notifications.",
-        "OIDC for AWS/Azure/GCP/Vault. No static creds.",
-        "Per-environment model. At ~250 envs, needs custom quote.",
-        "Templates with self-service catalog, approval workflows.",
-        "Dedicated video tutorial and migration guide.",
-        "Custom flows: before/after init/plan/apply, arbitrary shell.",
-        "Supports registry. Not monorepo-specific.",
-        "Built-in InfraCost + Terratag. PR-level cost estimates.",
-        "MS Teams, DataDog, OpsGenie, PagerDuty.",
-        "Supports existing S3 backends. Self-hosted remote state.",
-        "Cloud Analyst, AI PR summaries, MCP Server for IDE.",
-        "Limited visualization capabilities.",
-        "TTL policies, automated scale down/up.",
-        "Full env0 Terraform provider.",
-        "AWS, Azure, GCP via OIDC.",
-        "OPA natively + conftest in custom flows."
-      ],
-      "tagline": "Best operational fit — Teams+DD, Atlantis migration, InfraCost built-in"
-    },
-    {
-      "id": "scalr",
-      "name": "Scalr",
-      "url": "https://www.scalr.com",
-      "icon": "Scale",
-      "color": "#8B5CF6",
-      "scores": [1, 3, 3, 3, 2, 2, 3, 3, 3, 2, 1, 3, 2, 1, 2, 3, 1, 0, 3, 3, 3],
-      "rationales": [
-        "Community example only. No native CDKTF. Pro tier needed.",
-        "Native first-class support.",
-        "SaaS-hosted runners, agent pools on EC2/Docker.",
-        "Comprehensive RBAC. SSO free.",
-        "Variable hierarchy, remote state refs. No pipeline orchestration.",
-        "Available but less mature.",
-        "AWS OIDC, shell variables, variable hierarchy.",
-        "Run-based pricing. Free: 50 runs/mo. SSO+SCIM free.",
-        "Modules & blueprints, private registry as catalog.",
-        "TFC migration documented. No Atlantis guide.",
-        "Limited. Custom hooks only in Pro.",
-        "Monorepo-friendly, namespace support, comprehensive.",
-        "InfraCost integration available.",
-        "Limited. Backstage plugin. No Teams/DataDog.",
-        "Supports existing backends or hosted.",
-        "AI free on all plans. Plan summaries, error analysis.",
-        "Limited.",
-        "Not supported.",
-        "Full Scalr Terraform provider.",
-        "AWS, Azure, GCP.",
-        "OPA policies supported natively."
-      ],
-      "tagline": "Best free tier — AI included, monorepo registry, run-based pricing"
-    },
-    {
-      "id": "terramate",
-      "name": "Terramate Cloud",
-      "url": "https://terramate.io",
-      "icon": "Mountain",
-      "color": "#F97316",
-      "scores": [1, 3, 3, 2, 2, 3, 2, 3, 2, 1, 2, 1, 1, 2, 3, 1, 2, 0, 0, 3, 1],
-      "rationales": [
-        "No documented CDKTF support. Could work via terramate run.",
-        "Native first-class support.",
-        "Works with any CI/CD. No K8s needed.",
-        "RBAC exists. SSO via GitHub/GitLab/Google only.",
-        "Stack ordering, change detection. Not full orchestration.",
-        "Built-in, comprehensive, reconciliation workflows.",
-        "Delegates to CI/CD. No native secret store or OIDC.",
-        "Generous free tier. Per-stack pricing competitive.",
-        "Catalyst (scaffolding) in beta. Not production-ready.",
-        "No Atlantis-specific migration docs.",
-        "CLI terramate run any command. Requires own CI setup.",
-        "Not native. Relies on TF/OpenTofu registries.",
-        "Not built-in. Via custom scripts.",
-        "Slack notifications. Teams unclear.",
-        "Fully compatible — doesn't manage state.",
-        "Limited AI features.",
-        "Dashboard with stack views.",
-        "Not supported.",
-        "No Terraform provider.",
-        "Tool-agnostic, works with anything.",
-        "Delegates to CI/CD — run conftest yourself."
-      ],
-      "tagline": "Flexible OSS CLI — excellent drift detection, competitive pricing"
-    },
-    {
-      "id": "terrateam",
-      "name": "Terrateam",
-      "url": "https://terrateam.io",
-      "icon": "GitBranch",
-      "color": "#06B6D4",
-      "scores": [3, 3, 3, 2, 3, 3, 3, 3, 0, 3, 3, 1, 2, 1, 3, 0, 1, 0, 0, 3, 3],
-      "rationales": [
-        "Native CDKTF integration. Configure in .terrateam/config.yml.",
-        "Native first-class support.",
-        "Runs via GitHub Actions or GitLab CI/CD. Self-hosted Docker or K8s.",
-        "RBAC via GitHub/GitLab Teams + OPA/Rego. SSO via GitHub/GitLab only.",
-        "Layered runs for order of operations. Stacks for environment promotion.",
-        "Scheduled drift detection. GitHub issues, Slack alerts.",
-        "OIDC for AWS/GCP/Azure, GitHub Secrets, GitLab CI/CD variables.",
-        "Flat-rate, no per-user/run/resource billing. Free tier unlimited. Pro $249/mo.",
-        "No blueprint/template feature documented.",
-        "Direct drop-in Atlantis alternative. Same PR-comment workflow.",
-        "Full custom workflows in .terrateam/config.yml. Pre/post hooks.",
-        "No native registry. Relies on TF/OpenTofu registries.",
-        "Infracost integration, no API key required.",
-        "GitHub/GitLab native. Others via workflows/hooks (curl).",
-        "Works with existing S3+DynamoDB. Zero migration.",
-        "No AI features documented.",
-        "UI dashboard for runs and logs.",
-        "Not supported.",
-        "No Terraform provider.",
-        "AWS, GCP, Azure via OIDC.",
-        "OPA/Rego built-in. Tag + cost policies via conftest."
-      ],
-      "tagline": "Direct Atlantis replacement — multi-engine, OSS core, unlimited free tier"
-    },
-    {
-      "id": "hcp-terraform",
-      "name": "HCP Terraform",
-      "url": "https://www.hashicorp.com/products/terraform",
-      "icon": "Cloud",
-      "color": "#7C3AED",
-      "scores": [1, 0, 3, 3, 3, 3, 3, 1, 2, 1, 2, 3, 2, 2, 0, 1, 2, 1, 3, 3, 2],
-      "rationales": [
-        "CDKTF deprecated by HashiCorp. Can run synth via agent hooks.",
-        "No OpenTofu support. BSL-licensed only. Dealbreaker.",
-        "Cloud-hosted runners or agent pools on Docker/EC2.",
-        "Comprehensive RBAC. SSO (SAML/OIDC) included.",
-        "TF Stacks with orchestration rules, auto-approval. Run triggers.",
-        "Health assessments with scheduled drift detection.",
-        "Dynamic provider credentials, OIDC. Vault integration.",
-        "Per-RUM pricing. ~2,000 RUM ≈ $940/mo. Expensive.",
-        "No-code modules. Stacks for replication. Waypoint archived.",
-        "General workspace migration docs. No Atlantis tooling.",
-        "Run Tasks for hooks. Agent hooks. Less flexible.",
-        "Best-in-class private module registry. Monorepo-friendly.",
-        "Native cost estimation. AWS, Azure, GCP resources.",
-        "Slack, MS Teams via webhooks. ServiceNow.",
-        "Requires migration to HCP-managed state. No S3.",
-        "Limited AI features. Basic error context.",
-        "Workspace dashboards, resource views.",
-        "Can destroy workspaces programmatically.",
-        "Full tfe provider. Mature, widely used.",
-        "AWS, Azure, GCP. Full multi-cloud.",
-        "Sentinel (proprietary) primary. OPA via Run Tasks."
-      ],
-      "tagline": "Strong registry & Stacks — but no OpenTofu and expensive pricing"
-    },
-    {
-      "id": "opentaco",
-      "name": "OpenTaco",
-      "url": "https://opentaco.dev",
-      "icon": "Terminal",
-      "color": "#10B981",
-      "scores": [2, 3, 3, 2, 2, 2, 2, 3, 1, 3, 3, 1, 1, 1, 3, 0, 1, 0, 0, 2, 2],
-      "rationales": [
-        "CI-native: can run CDKTF synth as workflow step. Not native integration.",
-        "Native first-class OpenTofu support.",
-        "Self-hosted Docker or GitHub Actions runners. No K8s needed.",
-        "GitHub Teams RBAC + OPA. SSO via GitHub only. No enterprise SSO.",
-        "Basic dependency ordering via workflow config.",
-        "Available in Pro tier. Scheduled drift scans, GitHub issue creation.",
-        "GitHub Secrets, OIDC via CI. Self-hosted gives full control.",
-        "OSS free. Pro $49/user/mo. Very competitive for small teams.",
-        "No blueprint/template feature.",
-        "Direct Atlantis alternative. Same PR-comment workflow.",
-        "Full CI pipeline control. Arbitrary pre/post commands.",
-        "No native registry. Uses TF/OpenTofu registries.",
-        "Not built-in. Can add InfraCost to CI workflow.",
-        "GitHub-focused. No MS Teams/DataDog native integrations.",
-        "Works with existing S3+DynamoDB state. Zero migration.",
-        "No AI features.",
-        "Minimal — PR-based visibility only.",
-        "Not supported.",
-        "No Terraform provider.",
-        "AWS, Azure, GCP via CI OIDC.",
-        "OPA/Conftest via custom workflow hooks."
-      ],
-      "tagline": "Open-source Atlantis alternative — free self-hosted, per-user cloud pricing"
-    }
-  ],
-  "scoreLabels": ["None", "Limited", "Good", "Excellent"],
-  "categories": {
-    "critical": { "label": "Critical", "color": "#EF4444" },
-    "high": { "label": "High", "color": "#F59E0B" },
-    "medium": { "label": "Medium", "color": "#3B82F6" },
-    "low": { "label": "Low", "color": "#64748B" },
-    "nice": { "label": "Nice-to-have", "color": "#94A3B8" }
+ "researched": "2026-09",
+ "criteria": [
+  {
+   "id": 1,
+   "name": "CDK Terrain workflow",
+   "short": "CDK Terrain",
+   "category": "critical",
+   "defaultWeight": 5,
+   "maxWeight": 5,
+   "description": "Synth before plan; plan only stacks a TS change affects"
   },
-  "pricing": {
-    "sliders": {
-      "users": { "min": 1, "max": 100, "default": 20, "step": 1, "label": "Team Size", "unit": "users" },
-      "resources": { "min": 100, "max": 50000, "default": 23658, "step": 100, "label": "Resources Under Management", "unit": "RUM" },
-      "runs": { "min": 50, "max": 5000, "default": 250, "step": 50, "label": "Monthly Runs", "unit": "runs/mo" }
+  {
+   "id": 2,
+   "name": "OpenTofu support",
+   "short": "OpenTofu",
+   "category": "critical",
+   "defaultWeight": 5,
+   "maxWeight": 5,
+   "description": "First-class, version pinned per stack"
+  },
+  {
+   "id": 3,
+   "name": "Self-hosted runners, no K8s",
+   "short": "Runners",
+   "category": "critical",
+   "defaultWeight": 5,
+   "maxWeight": 5,
+   "description": "EC2/Docker runners in your account; rootless image builds"
+  },
+  {
+   "id": 4,
+   "name": "RBAC & SSO",
+   "short": "RBAC/SSO",
+   "category": "critical",
+   "defaultWeight": 5,
+   "maxWeight": 5,
+   "description": "SAML/OIDC SSO, team- and env-scoped roles"
+  },
+  {
+   "id": 5,
+   "name": "Linked-state orchestration",
+   "short": "Orchestration",
+   "category": "critical",
+   "defaultWeight": 5,
+   "maxWeight": 5,
+   "description": "Deploy linked states as one unit: DAG, real unknowns across states, ordered applies, progress UI & gates"
+  },
+  {
+   "id": 6,
+   "name": "Drift detection",
+   "short": "Drift",
+   "category": "high",
+   "defaultWeight": 4,
+   "maxWeight": 5,
+   "description": "Scheduled, per stack, with remediation"
+  },
+  {
+   "id": 7,
+   "name": "Cloud credentials (OIDC)",
+   "short": "OIDC",
+   "category": "high",
+   "defaultWeight": 4,
+   "maxWeight": 5,
+   "description": "Short-lived AWS/cloud creds per stack, no static keys"
+  },
+  {
+   "id": 8,
+   "name": "Pricing suitability",
+   "short": "Pricing",
+   "category": "high",
+   "defaultWeight": 4,
+   "maxWeight": 5,
+   "description": "Computed from the pricing calculator at your inputs"
+  },
+  {
+   "id": 9,
+   "name": "Repo scaffolding & codegen",
+   "short": "Scaffolding",
+   "category": "high",
+   "defaultWeight": 4,
+   "maxWeight": 5,
+   "description": "Generate backend/provider/workspace boilerplate from one declarative source"
+  },
+  {
+   "id": 10,
+   "name": "State governance & RBAC",
+   "short": "State",
+   "category": "high",
+   "defaultWeight": 4,
+   "maxWeight": 5,
+   "description": "Env-isolated state access, fine-grained RBAC, export, cross-state tracking"
+  },
+  {
+   "id": 11,
+   "name": "Migration from Atlantis",
+   "short": "Migration",
+   "category": "medium",
+   "defaultWeight": 3,
+   "maxWeight": 5,
+   "description": "Documented path, atlantis.yaml import or PR-comment compat"
+  },
+  {
+   "id": 12,
+   "name": "Custom workflows, hooks & gates",
+   "short": "Workflows",
+   "category": "medium",
+   "defaultWeight": 3,
+   "maxWeight": 5,
+   "description": "Arbitrary pre/post steps, custom images, blocking gates"
+  },
+  {
+   "id": 13,
+   "name": "Private module registry",
+   "short": "Registry",
+   "category": "medium",
+   "defaultWeight": 3,
+   "maxWeight": 5,
+   "description": "Monorepo-friendly TF/OpenTofu registry"
+  },
+  {
+   "id": 14,
+   "name": "Cost estimation",
+   "short": "Cost Est.",
+   "category": "medium",
+   "defaultWeight": 3,
+   "maxWeight": 5,
+   "description": "PR-level cost estimates"
+  },
+  {
+   "id": 15,
+   "name": "Policy as code",
+   "short": "Policy",
+   "category": "medium",
+   "defaultWeight": 3,
+   "maxWeight": 5,
+   "description": "Portable OPA/Rego on plans > proprietary policy languages"
+  },
+  {
+   "id": 16,
+   "name": "AI: trusted PR review",
+   "short": "AI Review",
+   "category": "medium",
+   "defaultWeight": 3,
+   "maxWeight": 5,
+   "description": "LLM reviews PR intent + plan; instructions from default branch; bring your own model"
+  },
+  {
+   "id": 17,
+   "name": "Chat integration",
+   "short": "Chat",
+   "category": "high",
+   "defaultWeight": 4,
+   "maxWeight": 5,
+   "description": "Interactive approvals > rich notifications > webhooks",
+   "variants": [
+    {
+     "id": "slack",
+     "label": "Slack"
     },
-    "featureLabels": {
-      "privateWorkers": "Private Workers",
-      "opa": "OPA Policies",
-      "driftDetection": "Drift Detection",
-      "samlSso": "SAML SSO",
-      "blueprints": "Blueprints",
-      "auditLog": "Audit Log",
-      "customFlows": "Custom Flows",
-      "aiCloudAnalyst": "AI Cloud Analyst",
-      "advancedDrift": "Advanced Drift",
-      "allFeatures": "All Features",
-      "sso": "SSO",
-      "ai": "AI Features",
-      "auditTrails": "Audit Trails",
-      "noCodeProvisioning": "No-Code Provisioning",
-      "privateVcs": "Private VCS",
-      "sentinel": "Sentinel Policies",
-      "scheduledConfig": "Scheduled Config",
-      "applyRequirements": "Apply Requirements",
-      "api": "API Access",
-      "rbac": "RBAC",
-      "codeowners": "CODEOWNERS",
-      "gatekeeper": "Gatekeeper",
-      "changesets": "Changesets",
-      "selfHosted": "Self-Hosted",
-      "managedHosting": "Managed Hosting",
-      "dedicatedInstance": "Dedicated Instance",
-      "support": "Priority Support"
+    {
+     "id": "teams",
+     "label": "MS Teams"
     },
-    "platforms": {
-      "spacelift": {
-        "model": "Concurrency-based",
-        "description": "Flat tiers gated by user count and worker type",
-        "tiers": [
-          {
-            "name": "Free",
-            "basePrice": 0,
-            "includedUsers": 2, "includedResources": null, "includedRuns": null,
-            "perUser": 0, "perResource": 0, "perRun": 0,
-            "maxUsers": 2, "maxResources": null, "maxRuns": null,
-            "estimated": false,
-            "features": { "opa": false, "driftDetection": false, "privateWorkers": false, "samlSso": false, "blueprints": false, "auditLog": false },
-            "notes": "1 shared worker, 2 users max"
-          },
-          {
-            "name": "Starter",
-            "basePrice": 399,
-            "includedUsers": 10, "includedResources": null, "includedRuns": null,
-            "perUser": 0, "perResource": 0, "perRun": 0,
-            "maxUsers": 10, "maxResources": null, "maxRuns": null,
-            "estimated": false,
-            "features": { "opa": false, "driftDetection": false, "privateWorkers": false, "samlSso": false, "blueprints": false, "auditLog": false },
-            "notes": "2 shared workers, up to 10 users"
-          },
-          {
-            "name": "Starter+",
-            "basePrice": 800,
-            "includedUsers": null, "includedResources": null, "includedRuns": null,
-            "perUser": 0, "perResource": 0, "perRun": 0,
-            "maxUsers": null, "maxResources": null, "maxRuns": null,
-            "estimated": true,
-            "features": { "opa": true, "driftDetection": true, "privateWorkers": true, "samlSso": false, "blueprints": false, "auditLog": false },
-            "notes": "Private workers, OPA policies, drift detection"
-          },
-          {
-            "name": "Business",
-            "basePrice": 1500,
-            "includedUsers": null, "includedResources": null, "includedRuns": null,
-            "perUser": 0, "perResource": 0, "perRun": 0,
-            "maxUsers": null, "maxResources": null, "maxRuns": null,
-            "estimated": true,
-            "features": { "opa": true, "driftDetection": true, "privateWorkers": true, "samlSso": false, "blueprints": true, "auditLog": true },
-            "notes": "3+ private workers, blueprints, audit log"
-          },
-          {
-            "name": "Enterprise",
-            "basePrice": 3000,
-            "includedUsers": null, "includedResources": null, "includedRuns": null,
-            "perUser": 0, "perResource": 0, "perRun": 0,
-            "maxUsers": null, "maxResources": null, "maxRuns": null,
-            "estimated": true,
-            "features": { "opa": true, "driftDetection": true, "privateWorkers": true, "samlSso": true, "blueprints": true, "auditLog": true },
-            "notes": "5+ private workers, SAML SSO, self-hosted option"
-          }
-        ]
-      },
-      "env0": {
-        "model": "Per-environment",
-        "description": "Flat tiers capped by active environments (~resources ÷ 20)",
-        "tiers": [
-          {
-            "name": "Cloud Compass",
-            "basePrice": 1500,
-            "includedUsers": null, "includedResources": 2000, "includedRuns": null,
-            "perUser": 0, "perResource": 0, "perRun": 0,
-            "maxUsers": null, "maxResources": 2000, "maxRuns": null,
-            "estimated": false,
-            "features": { "customFlows": true, "samlSso": true, "auditLog": true, "aiCloudAnalyst": false, "advancedDrift": false },
-            "notes": "≈100 active environments (resources ÷ 20)"
-          },
-          {
-            "name": "Cloud Navigator",
-            "basePrice": 2500,
-            "includedUsers": null, "includedResources": null, "includedRuns": null,
-            "perUser": 0, "perResource": 0, "perRun": 0,
-            "maxUsers": null, "maxResources": null, "maxRuns": null,
-            "estimated": true,
-            "features": { "customFlows": true, "samlSso": true, "auditLog": true, "aiCloudAnalyst": false, "advancedDrift": false },
-            "notes": "Unlimited environments, IaC automation, GitOps"
-          },
-          {
-            "name": "Cloud Pilot",
-            "basePrice": 4000,
-            "includedUsers": null, "includedResources": null, "includedRuns": null,
-            "perUser": 0, "perResource": 0, "perRun": 0,
-            "maxUsers": null, "maxResources": null, "maxRuns": null,
-            "estimated": true,
-            "features": { "customFlows": true, "samlSso": true, "auditLog": true, "aiCloudAnalyst": true, "advancedDrift": true },
-            "notes": "AI Cloud Analyst, advanced drift remediation, enterprise SLA"
-          }
-        ]
-      },
-      "scalr": {
-        "model": "Per-run",
-        "description": "Usage-based per qualifying run, all features on every tier",
-        "tiers": [
-          {
-            "name": "Free",
-            "basePrice": 0,
-            "includedUsers": null, "includedResources": null, "includedRuns": 50,
-            "perUser": 0, "perResource": 0, "perRun": 0,
-            "maxUsers": null, "maxResources": null, "maxRuns": 50,
-            "estimated": false,
-            "features": { "allFeatures": true, "sso": true, "opa": true, "ai": true },
-            "notes": "50 free runs/mo, ALL features included"
-          },
-          {
-            "name": "Pro 100",
-            "basePrice": 99,
-            "includedUsers": null, "includedResources": null, "includedRuns": 100,
-            "perUser": 0, "perResource": 0, "perRun": 0.99,
-            "maxUsers": null, "maxResources": null, "maxRuns": null,
-            "estimated": false,
-            "features": { "allFeatures": true, "sso": true, "opa": true, "ai": true },
-            "notes": "100 prepaid runs, $0.99/flex run overage"
-          },
-          {
-            "name": "Pro 500",
-            "basePrice": 485,
-            "includedUsers": null, "includedResources": null, "includedRuns": 500,
-            "perUser": 0, "perResource": 0, "perRun": 0.97,
-            "maxUsers": null, "maxResources": null, "maxRuns": null,
-            "estimated": false,
-            "features": { "allFeatures": true, "sso": true, "opa": true, "ai": true },
-            "notes": "500 prepaid runs, $0.97/flex run overage"
-          },
-          {
-            "name": "Pro 1000",
-            "basePrice": 954,
-            "includedUsers": null, "includedResources": null, "includedRuns": 1000,
-            "perUser": 0, "perResource": 0, "perRun": 0.95,
-            "maxUsers": null, "maxResources": null, "maxRuns": null,
-            "estimated": false,
-            "features": { "allFeatures": true, "sso": true, "opa": true, "ai": true },
-            "notes": "1000 prepaid runs, $0.95/flex run overage"
-          },
-          {
-            "name": "Pro 2000",
-            "basePrice": 1875,
-            "includedUsers": null, "includedResources": null, "includedRuns": 2000,
-            "perUser": 0, "perResource": 0, "perRun": 0.94,
-            "maxUsers": null, "maxResources": null, "maxRuns": null,
-            "estimated": false,
-            "features": { "allFeatures": true, "sso": true, "opa": true, "ai": true },
-            "notes": "2000 prepaid runs, $0.94/flex run overage"
-          }
-        ]
-      },
-      "hcp-terraform": {
-        "model": "Per-resource (RUM)",
-        "description": "Per Resources Under Management, features gated by tier",
-        "tiers": [
-          {
-            "name": "Free",
-            "basePrice": 0,
-            "includedUsers": null, "includedResources": 500, "includedRuns": null,
-            "perUser": 0, "perResource": 0, "perRun": 0,
-            "maxUsers": null, "maxResources": 500, "maxRuns": null,
-            "estimated": false,
-            "features": { "driftDetection": false, "auditTrails": false, "noCodeProvisioning": false, "privateVcs": false, "sentinel": false },
-            "notes": "500 free RUM, 1 concurrent run"
-          },
-          {
-            "name": "Essentials",
-            "basePrice": 0,
-            "includedUsers": null, "includedResources": 0, "includedRuns": null,
-            "perUser": 0, "perResource": 0.10, "perRun": 0,
-            "maxUsers": null, "maxResources": null, "maxRuns": null,
-            "estimated": false,
-            "features": { "driftDetection": false, "auditTrails": false, "noCodeProvisioning": false, "privateVcs": false, "sentinel": false },
-            "notes": "$0.10/RUM/month, 3 concurrent runs"
-          },
-          {
-            "name": "Standard",
-            "basePrice": 0,
-            "includedUsers": null, "includedResources": 0, "includedRuns": null,
-            "perUser": 0, "perResource": 0.47, "perRun": 0,
-            "maxUsers": null, "maxResources": null, "maxRuns": null,
-            "estimated": false,
-            "features": { "driftDetection": true, "auditTrails": true, "noCodeProvisioning": true, "privateVcs": false, "sentinel": true },
-            "notes": "$0.47/RUM/month, drift detection, 10 concurrent runs"
-          },
-          {
-            "name": "Premium",
-            "basePrice": 0,
-            "includedUsers": null, "includedResources": 0, "includedRuns": null,
-            "perUser": 0, "perResource": 0.99, "perRun": 0,
-            "maxUsers": null, "maxResources": null, "maxRuns": null,
-            "estimated": false,
-            "features": { "driftDetection": true, "auditTrails": true, "noCodeProvisioning": true, "privateVcs": true, "sentinel": true },
-            "notes": "$0.99/RUM/month, private VCS, 200 concurrent runs"
-          }
-        ]
-      },
-      "terrateam": {
-        "model": "Flat-rate",
-        "description": "Flat per-tier pricing, unlimited users/runs/resources",
-        "tiers": [
-          {
-            "name": "Free",
-            "basePrice": 0,
-            "includedUsers": null, "includedResources": null, "includedRuns": null,
-            "perUser": 0, "perResource": 0, "perRun": 0,
-            "maxUsers": null, "maxResources": null, "maxRuns": null,
-            "estimated": false,
-            "features": { "driftDetection": false, "scheduledConfig": false, "applyRequirements": false, "api": false, "rbac": false, "codeowners": false },
-            "notes": "All core features, unlimited everything, 30-day audit retention"
-          },
-          {
-            "name": "Pro",
-            "basePrice": 224,
-            "includedUsers": null, "includedResources": null, "includedRuns": null,
-            "perUser": 0, "perResource": 0, "perRun": 0,
-            "maxUsers": null, "maxResources": null, "maxRuns": null,
-            "estimated": false,
-            "features": { "driftDetection": true, "scheduledConfig": true, "applyRequirements": true, "api": false, "rbac": false, "codeowners": false },
-            "notes": "Drift detection, scheduled config, 90-day audit retention"
-          },
-          {
-            "name": "Enterprise",
-            "basePrice": 563,
-            "includedUsers": null, "includedResources": null, "includedRuns": null,
-            "perUser": 0, "perResource": 0, "perRun": 0,
-            "maxUsers": null, "maxResources": null, "maxRuns": null,
-            "estimated": false,
-            "features": { "driftDetection": true, "scheduledConfig": true, "applyRequirements": true, "api": true, "rbac": true, "codeowners": true },
-            "notes": "API, RBAC, CODEOWNERS, gatekeeper, 365-day audit retention"
-          },
-          {
-            "name": "Enterprise+",
-            "basePrice": 1088,
-            "includedUsers": null, "includedResources": null, "includedRuns": null,
-            "perUser": 0, "perResource": 0, "perRun": 0,
-            "maxUsers": null, "maxResources": null, "maxRuns": null,
-            "estimated": false,
-            "features": { "driftDetection": true, "scheduledConfig": true, "applyRequirements": true, "api": true, "rbac": true, "codeowners": true },
-            "notes": "MSA, security questionnaires, PO invoicing, architecture reviews"
-          }
-        ]
-      },
-      "terramate": {
-        "model": "Flat + caps",
-        "description": "Flat tiers with user and resource caps",
-        "tiers": [
-          {
-            "name": "Community",
-            "basePrice": 0,
-            "includedUsers": 2, "includedResources": 1000, "includedRuns": null,
-            "perUser": 0, "perResource": 0, "perRun": 0,
-            "maxUsers": 2, "maxResources": 1000, "maxRuns": null,
-            "estimated": false,
-            "features": { "driftDetection": true, "changesets": true, "rbac": false, "samlSso": false, "auditLog": false },
-            "notes": "2 users, 1000 resources, 30-day data retention"
-          },
-          {
-            "name": "Teams",
-            "basePrice": 449,
-            "includedUsers": null, "includedResources": 5000, "includedRuns": null,
-            "perUser": 0, "perResource": 0, "perRun": 0,
-            "maxUsers": null, "maxResources": 5000, "maxRuns": null,
-            "estimated": false,
-            "features": { "driftDetection": true, "changesets": true, "rbac": false, "samlSso": false, "auditLog": false },
-            "notes": "Unlimited users, 5000 resources, 90-day data retention"
-          },
-          {
-            "name": "Enterprise",
-            "basePrice": 1200,
-            "includedUsers": null, "includedResources": null, "includedRuns": null,
-            "perUser": 0, "perResource": 0, "perRun": 0,
-            "maxUsers": null, "maxResources": null, "maxRuns": null,
-            "estimated": true,
-            "features": { "driftDetection": true, "changesets": true, "rbac": true, "samlSso": true, "auditLog": true },
-            "notes": "Unlimited everything, RBAC, SAML, audit logs, 4hr SLA"
-          }
-        ]
-      },
-      "opentaco": {
-        "model": "Per-user",
-        "description": "Per-user pricing with free open-source self-hosted option",
-        "tiers": [
-          {
-            "name": "Open Source",
-            "basePrice": 0,
-            "includedUsers": null, "includedResources": null, "includedRuns": null,
-            "perUser": 0, "perResource": 0, "perRun": 0,
-            "maxUsers": null, "maxResources": null, "maxRuns": null,
-            "estimated": false,
-            "features": { "selfHosted": true, "managedHosting": false, "dedicatedInstance": false, "support": false },
-            "notes": "Self-hosted, all features, you manage the infrastructure"
-          },
-          {
-            "name": "Pro",
-            "basePrice": 0,
-            "includedUsers": 0, "includedResources": null, "includedRuns": null,
-            "perUser": 49, "perResource": 0, "perRun": 0,
-            "maxUsers": null, "maxResources": null, "maxRuns": null,
-            "minUsers": 5,
-            "estimated": false,
-            "features": { "selfHosted": false, "managedHosting": true, "dedicatedInstance": false, "support": true },
-            "notes": "$49/user/mo, minimum 5 users ($245/mo min)"
-          },
-          {
-            "name": "Enterprise",
-            "basePrice": 4000,
-            "includedUsers": null, "includedResources": null, "includedRuns": null,
-            "perUser": 0, "perResource": 0, "perRun": 0,
-            "maxUsers": null, "maxResources": null, "maxRuns": null,
-            "estimated": true,
-            "features": { "selfHosted": false, "managedHosting": true, "dedicatedInstance": true, "support": true },
-            "notes": "Dedicated VPC-peered instance, ~$3000-5000/mo estimated"
-          }
-        ]
-      }
+    {
+     "id": "google_chat",
+     "label": "Google Chat"
     }
+   ],
+   "defaultVariant": "teams"
+  },
+  {
+   "id": 18,
+   "name": "VCS integration",
+   "short": "VCS",
+   "category": "medium",
+   "defaultWeight": 3,
+   "maxWeight": 5,
+   "description": "PR comments/checks, merge gating, PR-driven ops",
+   "variants": [
+    {
+     "id": "github",
+     "label": "GitHub"
+    },
+    {
+     "id": "gitlab",
+     "label": "GitLab"
+    },
+    {
+     "id": "bitbucket",
+     "label": "Bitbucket"
+    },
+    {
+     "id": "azure_devops",
+     "label": "Azure DevOps"
+    }
+   ],
+   "defaultVariant": "github"
+  },
+  {
+   "id": 19,
+   "name": "Observability",
+   "short": "Observability",
+   "category": "medium",
+   "defaultWeight": 3,
+   "maxWeight": 5,
+   "description": "Run events, metrics & audit to Datadog/OTel/webhooks"
+  },
+  {
+   "id": 20,
+   "name": "Visualizations / graphs",
+   "short": "Viz",
+   "category": "low",
+   "defaultWeight": 2,
+   "maxWeight": 5,
+   "description": "Resource & dependency graphs, deployment views"
+  },
+  {
+   "id": 21,
+   "name": "AI: agentic ops & MCP",
+   "short": "AI Agents",
+   "category": "low",
+   "defaultWeight": 2,
+   "maxWeight": 5,
+   "description": "MCP server, state context, agents that act on drift"
+  },
+  {
+   "id": 22,
+   "name": "Ephemeral environments",
+   "short": "Ephemeral",
+   "category": "nice",
+   "defaultWeight": 1,
+   "maxWeight": 5,
+   "description": "Short-lived environments / TTL"
+  },
+  {
+   "id": 23,
+   "name": "Terraform provider",
+   "short": "TF Provider",
+   "category": "nice",
+   "defaultWeight": 1,
+   "maxWeight": 5,
+   "description": "Manage the platform via Terraform"
+  },
+  {
+   "id": 24,
+   "name": "Multi-cloud support",
+   "short": "Multi-cloud",
+   "category": "nice",
+   "defaultWeight": 1,
+   "maxWeight": 5,
+   "description": "Beyond AWS"
   }
+ ],
+ "gates": [
+  {
+   "id": "G1",
+   "label": "No Kubernetes required"
+  },
+  {
+   "id": "G2",
+   "label": "Self-hosted runners in your cloud account"
+  },
+  {
+   "id": "G3",
+   "label": "Can run a CDK Terrain synth step before plan"
+  },
+  {
+   "id": "G4",
+   "label": "Maintained (release in last 6 months)"
+  },
+  {
+   "id": "G5",
+   "label": "OpenTofu support"
+  }
+ ],
+ "excluded": [
+  {
+   "name": "Terrakube",
+   "url": "https://terrakube.io",
+   "reason": "Requires Kubernetes (G1)"
+  }
+ ],
+ "platforms": [
+  {
+   "id": "spacelift",
+   "name": "Spacelift",
+   "url": "https://spacelift.io",
+   "icon": "Rocket",
+   "color": "#4B6BFF",
+   "scores": [
+    2,
+    3,
+    2,
+    2,
+    2,
+    3,
+    3,
+    2,
+    2,
+    2,
+    2,
+    3,
+    2,
+    2,
+    3,
+    1,
+    1,
+    3,
+    2,
+    3,
+    2,
+    1,
+    3,
+    3
+   ],
+   "rationales": [
+    "Documented CDKTF via custom runner image + before_init synth hooks. Change triggers are path/glob or Rego push-policy based; no turbo-style affected detection.",
+    "OpenTofu and Terraform both first-class, selectable and version-pinned per stack and per module; dedicated OpenTofu runner image.",
+    "Docker workers on EC2 (official ASG module, HTTP long-poll). Custom images OK but runs are unprivileged containers; in-run container builds undocumented.",
+    "Space-scoped RBAC with IdP group bindings and login policies. OIDC SSO on paid plans; SAML SSO and audit trail are Enterprise-only.",
+    "Stack dependency DAG with output references, cycle rejection and ordered tracked runs. PR (proposed) runs ignore dependencies; no unknown-value planning.",
+    "Scheduled per-stack drift detection on private workers, with notifications and optional auto-reconcile; granular drift RBAC added 2026.",
+    "AWS integration assumes IAM roles per stack (read/write roles, external ID), optionally from the worker; OIDC tokens also available. No static keys.",
+    "At 21 users / 23.7k RUM / 1.5k runs / 255 stacks: Starter+ ≈ $1,667/mo",
+    "No repo codegen for backend/provider boilerplate. Stacks can be declared via TF provider; Blueprints/Templates are UI self-service (Business+).",
+    "Managed state with state import and external state access; space-level access, not resource-level; local dev plan/apply against managed state is limited.",
+    "Atlantis-specific guides and PR comment commands, but the migration kit only automates Terraform Cloud exports.",
+    "Before/after hooks for init, plan, apply, destroy; custom runner images; plan/approval policies can gate applies (e.g. a cosign verify hook).",
+    "Private module registry with monorepo project roots, OpenTofu, tests and space sharing, but gated to Business tier and above.",
+    "Infracost integration surfaces cost estimates in runs and PR feedback; no native pricing engine.",
+    "Native OPA/Rego policies on plan, push, approval, trigger, login and notification events; policy library and sampling.",
+    "AI run summaries and error explanation via Infra Assistant with BYOM (incl. Bedrock). No LLM PR-intent review or trusted-branch instructions found.",
+    "Slack is interactive (confirm/discard runs). MS Teams and other chat are notification-policy webhooks only, no actions from chat.",
+    "GitHub App with commit checks, PR plan comments, PR comment commands and push policies; GitLab similar; Bitbucket/Azure DevOps supported, thinner.",
+    "Datadog run metrics via notification-policy webhook module; generic webhooks; audit trail webhook (Enterprise). No native OTel export.",
+    "Resources view across stacks, stack dependency graph and run timelines built in.",
+    "Remote MCP server exposes full GraphQL API and Intent tools with read/write scopes; Infra Assistant build mode. No agentic drift-fix PRs.",
+    "No first-class ephemeral/TTL environments; scheduled stack deletion and example preview-env tooling only.",
+    "Official spacelift-io/spacelift Terraform provider, actively released, covers stacks, policies, contexts, integrations, workers.",
+    "Terraform, OpenTofu, Terragrunt, Pulumi, CloudFormation, Ansible, Kubernetes across AWS, Azure and GCP."
+   ],
+   "variants": {
+    "17": {
+     "slack": 3,
+     "teams": 1,
+     "google_chat": 1
+    },
+    "18": {
+     "github": 3,
+     "gitlab": 3,
+     "bitbucket": 2,
+     "azure_devops": 2
+    }
+   },
+   "gates": {
+    "G1": {
+     "pass": true,
+     "evidence": "Private workers run as Docker-based workers on EC2 VMs (official EC2 ASG module); Kubernetes workers are optional. SaaS control plane.",
+     "url": "https://docs.spacelift.io/concepts/worker-pools/docker-based-workers"
+    },
+    "G2": {
+     "pass": true,
+     "evidence": "Private worker pools in customer AWS account (EC2 ASG module, Docker launcher); credentials can be generated on the worker via instance role. Requires Starter+ or above.",
+     "url": "https://docs.spacelift.io/concepts/worker-pools"
+    },
+    "G3": {
+     "pass": true,
+     "evidence": "Documented CDKTF pattern: custom runner image with Node + before_init hooks running synth; arbitrary shell commands allowed in hooks.",
+     "url": "https://docs.spacelift.io/vendors/terraform/cdktf"
+    },
+    "G4": {
+     "pass": true,
+     "evidence": "Weekly runner releases (runner-opentofu v1.0.0 2026-09-21), TF provider v1.55.0 2026-09-10, EC2 worker module v9.0.0 2026-09-22, active changelog.",
+     "url": "https://docs.spacelift.io/product/changelog"
+    },
+    "G5": {
+     "pass": true,
+     "evidence": "OpenTofu is a first-class workflow tool per stack and module, with dedicated runner image.",
+     "url": "https://github.com/spacelift-io/runner-opentofu/releases"
+    }
+   },
+   "disqualified": false,
+   "tagline": "Mature, policy-rich TACOS with EC2 workers; key features gated behind $20k+/yr tiers"
+  },
+  {
+   "id": "env0",
+   "name": "env zero (formerly env0)",
+   "url": "https://www.envzero.com",
+   "icon": "Leaf",
+   "color": "#00B389",
+   "scores": [
+    2,
+    3,
+    2,
+    3,
+    2,
+    3,
+    3,
+    0,
+    2,
+    2,
+    2,
+    3,
+    3,
+    3,
+    3,
+    1,
+    2,
+    3,
+    3,
+    2,
+    3,
+    3,
+    3,
+    3
+   ],
+   "rationales": [
+    "Custom flows can run pnpm/turbo synth before plan. Affected detection is only per-env glob triggers, with no native cdktn or turbo --affected support.",
+    "OpenTofu is first-class and version-pinned per template; Terraform capped at MPL 1.5.x (BSL versions unsupported).",
+    "Standalone Docker agent on EC2/ECS, no K8s, custom image. One deploy per container, no autoscaler, rootless builds unverified.",
+    "SAML/OIDC SSO, SCIM, and custom roles scoped to org, project or environment, plus team sync and an audit log (audit on the top tier).",
+    "Workflows: YAML DAG (needs), output passing, per-node approvals, live graph. PR plans run per sub-env on deployed outputs, no unknown-value plan.",
+    "Per-environment cron drift detection with notifications, AI cause analysis, and auto-remediation that either redeploys or opens a PR.",
+    "Native OIDC for AWS, Azure, GCP and Vault (v2 per-provider audience). Project-scoped creds; agents can use their instance or task role.",
+    "At 21 users / 23.7k RUM / 1.5k runs / 255 stacks: Cloud Pilot ≈ $10,757/mo",
+    "env0-discovery.yml declares envs (triggers, PR plan, drift, remote backend) and auto-injects the backend. No provider/version codegen.",
+    "Managed remote backend: per-role Read/Write State, state download, S3 self-hosted option, remote plan. Access is per workspace, not per resource.",
+    "Atlantis-style PR comment commands (env0 plan/apply --all/--path), bulk import of existing TF dirs, and a migration blog/video. No atlantis.yaml import.",
+    "Hooks before and after every init/plan/apply step. Non-zero exit fails the run and ENV0_REQUIRES_APPROVAL forces a gate, so cosign verify fits.",
+    "Private module and provider registry backed by VCS tags, with monorepo tag-prefix support and module CI testing.",
+    "Built-in Infracost cost estimation on plans, feeding OPA policy input and PR summaries. Documented under the Cloud Pilot cost-management tier.",
+    "OPA/Rego approval policies on plan and cost input from a separate policy repo; Conftest in custom flows. Not enforced on PR plans.",
+    "AI plan/apply summaries and error insights use the vendor's model. There is no documented BYO model and no PR-intent review from trusted instructions.",
+    "Slack and MS Teams (via Teams Workflows webhook) get formatted event notifications, including drift. No interactive approvals in chat.",
+    "PR plan comments and checks, PR-comment plan/apply gated on branch protection, commenter RBAC. GitHub, GitLab, Bitbucket, Azure DevOps.",
+    "Native forwarding of deployment and audit logs to Datadog and 10 other sinks, signed CloudEvents webhooks, and an audit log API.",
+    "Workflow DAG graph with live status, dashboards, Cloud Compass IaC-coverage views and Cloud Analyst charts. No resource dependency graph.",
+    "Open-source MCP server (deploy/approve/logs/Compass), agent-ready CLI with skill install, Cloud Analyst chat, and drift remediation PRs.",
+    "TTL policies, schedules, and automatic environment creation and teardown per pull request.",
+    "Official env0/env0 Terraform/OpenTofu provider, actively released (v1.33.0, Sep 2026).",
+    "AWS, Azure, GCP (and OCI) credentials. Runs OpenTofu, Terraform <=1.5, Terragrunt, Pulumi, CloudFormation, Helm, K8s and Ansible."
+   ],
+   "variants": {
+    "17": {
+     "slack": 2,
+     "teams": 2,
+     "google_chat": 1
+    },
+    "18": {
+     "github": 3,
+     "gitlab": 3,
+     "bitbucket": 3,
+     "azure_devops": 3
+    }
+   },
+   "gates": {
+    "G1": {
+     "pass": true,
+     "evidence": "Two agent types documented: Kubernetes (Helm) and a standalone Docker agent (`docker run ghcr.io/env0/deployment-agent`), with ECS credential guidance. Kubernetes is not required; the old claim that s",
+     "url": "https://docs.envzero.com/guides/admin-guide/self-hosted-kubernetes-agent/standalone-docker-agent"
+    },
+    "G2": {
+     "pass": true,
+     "evidence": "Self-hosted Docker agent runs in our AWS account, needs outbound-only internet, and can use the ECS task role via ADDITIONAL_ENV_VARS. Subscription docs say the agent is on every plan (1 on Free, unli",
+     "url": "https://docs.envzero.com/guides/billing/subscription-tiers"
+    },
+    "G3": {
+     "pass": true,
+     "evidence": "Custom flows (env0.yml) run arbitrary sh/bash before or after init/plan/apply. The deployment image ships node 22/npm and allows sudo npm install, so pnpm/turbo cdktn synth can run before plan.",
+     "url": "https://docs.envzero.com/guides/admin-guide/custom-flows"
+    },
+    "G4": {
+     "pass": true,
+     "evidence": "Actively maintained: terraform-provider-env0 v1.33.0 (2026-09-23), Helm agent chart v5.5.4 (2026-09-20), MCP server 1.1.2 (2026-09-02), docs changelog entries through Aug 2026.",
+     "url": "https://docs.envzero.com/changelogs"
+    },
+    "G5": {
+     "pass": true,
+     "evidence": "OpenTofu is the default, first-class binary, with version pinning via template setting, ENV0_OPENTOFU_VERSION or .opentofu-version. env zero is an OpenTofu founding member.",
+     "url": "https://docs.envzero.com/guides/admin-guide/templates/iac-binaries-versions"
+    }
+   },
+   "disqualified": false,
+   "tagline": "Mature OpenTofu TACOS: Docker agents, Workflows DAG, OPA, drift; costly at 250 envs"
+  },
+  {
+   "id": "scalr",
+   "name": "Scalr",
+   "url": "https://scalr.com",
+   "icon": "Scale",
+   "color": "#8B5CF6",
+   "scores": [
+    1,
+    3,
+    2,
+    3,
+    1,
+    3,
+    3,
+    2,
+    1,
+    2,
+    2,
+    3,
+    3,
+    2,
+    3,
+    1,
+    3,
+    3,
+    3,
+    1,
+    2,
+    2,
+    3,
+    3
+   ],
+   "rationales": [
+    "No native CDKTF/cdktn. Synth possible via pre-init/pre-plan hook + custom runner image; affected-stack detection only via hand-set trigger globs.",
+    "OpenTofu is first-class and version-pinned per workspace; Terraform capped at MPL 1.5.x (BSL versions unsupported).",
+    "Docker agent on EC2, ECS Fargate or serverless Lambda+Fargate; custom runner image. Docker driver needs socket; rootless builds undocumented.",
+    "SAML SSO and SCIM on all plans, custom roles, access policies at account/env/workspace scope. Audit logs Enterprise-only.",
+    "Run triggers fire downstream after upstream success, cross-env via federation. No DAG, no in-change multi-apply (except Terragrunt run-all/stacks).",
+    "Scheduled per-env drift with tag/name filters and time windows, not billed; Teams/Slack alerts with Ignore/Sync/Revert actions.",
+    "Native AWS OIDC provider configurations per env/workspace; agents can also use EC2/ECS role. No static keys needed.",
+    "At 21 users / 23.7k RUM / 1.5k runs / 255 stacks: Business ≈ $1,485/mo",
+    "No codegen. No-code workspaces are UI deploys of registry modules; wiring can be declared via Scalr TF provider. Terragrunt stacks supported.",
+    "Managed state with version history & export; state-versions:read gates human access per scope. No resource-level RBAC; own-S3 storage is Enterprise.",
+    "Atlantis-style /scalr plan|apply PR comments and GitHub check actions; no atlantis.yaml import or dedicated migration guide.",
+    "Hooks at pre-init..post-apply, non-zero exit fails run; hook registry, agent-level hooks, custom runner images. Available on all plans.",
+    "Private module registry with monorepo tag prefixes, OCI sources, namespaces, module tests; plus private provider registry (2026).",
+    "Native Infracost integration as a run phase with cost data exposed to OPA; requires Infracost API key.",
+    "Native OPA/Rego pre-plan and post-plan checks, VCS-managed policy groups, advisory/soft/hard enforcement, impact analysis.",
+    "Scalr AI (vendor-hosted Claude) explains errors and summarises plans/approvals to PRs. Plan-only input, no BYO model, no trusted instructions.",
+    "Teams app: run approve/decline and drift remediation buttons with RBAC checks. Slack equivalent plus approval DMs. Google Chat via webhooks only.",
+    "GitHub: PR comments, checks with Apply/Restart actions, comment-driven runs, merge-error gating. GitLab/ADO comments; checks GitHub-only.",
+    "Datadog events, metrics integration and audit-log streaming; EventBridge and webhooks; agent OTel metrics/tracing. Audit streaming Enterprise.",
+    "Visual Plan diff, metrics/runs digest and reports; no resource or workspace dependency graph.",
+    "Remote MCP server (~50 RBAC tools, drift reports, run logs); writes limited to workspaces/variables. No agents opening remediation PRs.",
+    "Ephemeral workspaces with TTL (1-14 days) auto-destroy; no PR-preview environments.",
+    "Official Scalr Terraform provider (v3.19.0, Aug 2026) covering workspaces, triggers, hooks, policies, IAM, agent pools.",
+    "Provider configurations for AWS, Azure, GCP plus any Terraform/OpenTofu provider."
+   ],
+   "variants": {
+    "17": {
+     "slack": 3,
+     "teams": 3,
+     "google_chat": 1
+    },
+    "18": {
+     "github": 3,
+     "gitlab": 2,
+     "bitbucket": 2,
+     "azure_devops": 2
+    }
+   },
+   "gates": {
+    "G1": {
+     "pass": true,
+     "evidence": "Agent runs as a Docker service, on ECS Fargate/Cloud Run (local driver), or serverless via Lambda+Fargate; Kubernetes is optional.",
+     "url": "https://docs.scalr.io/docs/installation"
+    },
+    "G2": {
+     "pass": true,
+     "evidence": "Self-hosted agent pools on Docker/EC2/Fargate in customer account; agent can use EC2 instance/ECS task role for AWS credentials; mTLS option.",
+     "url": "https://docs.scalr.io/docs/agent-pools"
+    },
+    "G3": {
+     "pass": true,
+     "evidence": "pre-init/pre-plan hooks run arbitrary shell in the run container; custom runner image (SCALR_AGENT_CONTAINER_TASK_IMAGE) can bundle node/pnpm. No first-party CDKTF/cdktn docs; community example (hoo29",
+     "url": "https://docs.scalr.io/docs/hooks-1"
+    },
+    "G4": {
+     "pass": true,
+     "evidence": "Scalr Agent 1.7.0 released 2026-09-18; monthly SaaS release notes through September 2026; Terraform provider 3.19.0 (2026-08-21).",
+     "url": "https://docs.scalr.io/docs/changelog"
+    },
+    "G5": {
+     "pass": true,
+     "evidence": "OpenTofu is first-class (per-workspace IaC platform, versions incl. 1.12.x). Note: Terraform is only supported up to 1.5.7 (MPL); newer versions must use OpenTofu.",
+     "url": "https://docs.scalr.io/docs/iac-platform"
+    }
+   },
+   "disqualified": false,
+   "tagline": "Per-run TACO with OpenTofu, OPA, Teams approvals and hooks on every plan"
+  },
+  {
+   "id": "terramate",
+   "name": "Terramate (CLI + Terramate Cloud)",
+   "url": "https://terramate.io",
+   "icon": "Mountain",
+   "color": "#F97316",
+   "scores": [
+    2,
+    3,
+    3,
+    1,
+    2,
+    3,
+    2,
+    1,
+    3,
+    1,
+    1,
+    3,
+    0,
+    1,
+    1,
+    1,
+    0,
+    3,
+    1,
+    2,
+    2,
+    0,
+    0,
+    3
+   ],
+   "rationales": [
+    "No CDK docs. Synth runs as a CI/script step; git change detection per stack dir plus stack `watch` files, so shared-TS-package affected detection is DIY.",
+    "Terraform and OpenTofu both first-class incl. tofu plan files and .tofu files; binary/version per stack is set by you via codegen/scripts.",
+    "Runs entirely in your own CI (e.g. GitHub Actions self-hosted EC2 runners); you own image and tooling, so rootless builds are possible. You run the runners.",
+    "Cloud roles are admin/member only below Enterprise; RBAC, SAML 2.0 and audit logs are Enterprise-only. Apply rights live in your CI/GitHub settings.",
+    "Explicit DAG (after/before/wants), ordered runs in one CI job, dependency selection flags. Output sharing is experimental and plans against mock values.",
+    "Scheduled drift runs in your CI per stack/tag, synced to Cloud with alerts, AI explanations and reconciliation jobs. Alerts are Slack-only.",
+    "No credential brokering; AWS OIDC comes from your CI (e.g. GitHub OIDC) with per-stack roles wired via codegen. No static keys needed.",
+    "At 21 users / 23.7k RUM / 1.5k runs / 255 stacks: Enterprise — quote only",
+    "generate_hcl/generate_file with hierarchical globals is a true fogg-style generator; Catalyst bundles/components/environments now in the OSS CLI.",
+    "Does not manage state; keep your S3 backend with IAM isolation. No state RBAC, locking UI or export features; cross-state tracking only via outputs sharing.",
+    "No Atlantis migration guide or atlantis.yaml import; `terramate create --all-terraform` can adopt existing root modules as stacks.",
+    "Arbitrary commands in your CI plus Terramate Scripts with multi-job pre/post steps; custom gates (e.g. cosign verify) are straightforward.",
+    "No private module registry; use Git sources or a third-party registry. Catalyst bundles can be sourced remotely but are not a module registry.",
+    "No native cost estimation; Infracost can be run in your CI (docs list it as an integration).",
+    "Cloud ships 500+ built-in CIS policies on resources/drift; custom OPA/Conftest on plan is DIY in your CI with no Cloud gating.",
+    "AI Mate explains plans, failures and drift using vendor-chosen LLMs on all plans. No BYO model, no trusted instruction source.",
+    "Slack app with targeted DMs and alerts; Microsoft Teams claimed on the docs landing page but undocumented. No generic webhooks.",
+    "GitHub/GitLab first-class: PR previews, plan comments via your CI, conflict detection, safeguards. Bitbucket supported; Azure DevOps DIY only.",
+    "Cloud dashboards and DORA metrics; no documented Datadog, OTel, webhook or audit-stream export. Audit logs Enterprise-only.",
+    "Cloud stack/deployment/PR preview views and resource browser; CLI can print run order and dependency graphs.",
+    "Open-source MCP server (read-only, local Docker) over stacks, drift, deployments, resources; agent skills repo. Autonomous agents not documented.",
+    "No ephemeral environment lifecycle; environments/promote in Catalyst are long-lived.",
+    "No Terraform provider for Terramate Cloud (Go SDK and API only).",
+    "Tool-agnostic orchestrator: any cloud/provider Terraform, OpenTofu or Terragrunt can target."
+   ],
+   "variants": {
+    "17": {
+     "slack": 2,
+     "teams": 0,
+     "google_chat": 0
+    },
+    "18": {
+     "github": 3,
+     "gitlab": 3,
+     "bitbucket": 2,
+     "azure_devops": 1
+    }
+   },
+   "gates": {
+    "G1": {
+     "pass": true,
+     "evidence": "CLI is a single Go binary run inside your own CI (GitHub Actions/GitLab/Bitbucket); Cloud is SaaS. No Kubernetes anywhere.",
+     "url": "https://terramate.io/docs/how-it-works"
+    },
+    "G2": {
+     "pass": true,
+     "evidence": "Terramate has no runners of its own: all plan/apply runs in your CI, e.g. GitHub Actions self-hosted runners on EC2 in your AWS account. Terramate Cloud needs no cloud creds, state or source access; o",
+     "url": "https://terramate.io/docs/security/"
+    },
+    "G3": {
+     "pass": true,
+     "evidence": "Any command can run before plan via your CI workflow or Terramate Scripts (`terramate script run`), so pnpm/turbo cdktn synth is possible. No vendor docs or examples for CDKTF/cdktn.",
+     "url": "https://terramate.io/docs/cli/orchestration/scripts"
+    },
+    "G4": {
+     "pass": true,
+     "evidence": "CLI v0.17.3 released 2026-09-08; v0.17.0 2026-05-06; active monthly cadence.",
+     "url": "https://github.com/terramate-io/terramate/releases"
+    },
+    "G5": {
+     "pass": true,
+     "evidence": "OpenTofu first-class: --tofu-plan-file for Cloud sync, .tofu extension support (v0.15.4), OpenTofu stdlib functions, OpenTofu quickstart.",
+     "url": "https://terramate.io/docs/get-started/opentofu"
+    }
+   },
+   "disqualified": false,
+   "tagline": "OSS orchestrator + codegen in your own CI; fogg-grade generation, DIY pipelines"
+  },
+  {
+   "id": "stategraph",
+   "name": "Stategraph (Orchestration, formerly Terrateam + Infrastructure as a Database)",
+   "url": "https://stategraph.com",
+   "icon": "Network",
+   "color": "#06B6D4",
+   "scores": [
+    2,
+    3,
+    3,
+    2,
+    3,
+    3,
+    3,
+    2,
+    1,
+    3,
+    2,
+    3,
+    0,
+    3,
+    3,
+    1,
+    1,
+    3,
+    2,
+    3,
+    1,
+    0,
+    0,
+    3
+   ],
+   "rationales": [
+    "Native CDKTF engine plus custom pre-plan steps; affected detection via file_patterns/tree_builder scripts. IaaD: no terraform test, .tf.json support unverified.",
+    "OpenTofu first-class in Orchestration. The Stategraph CLI runs tofu by default (TF_CMD). Engine version pinnable per workflow.",
+    "Runs are GitHub Actions jobs; self-hosted EC2/Docker runners with custom images. No K8s. IaaD server never runs Terraform.",
+    "Orchestration RBAC by user/team/repo role with tag scopes; login via GitHub/GitLab only. IaaD: OIDC SSO, but RBAC is Enterprise-only.",
+    "Stacks and layered runs give in-PR apply_after ordering. IaaD mtx plans several states as one run with real unknowns and applies atomically.",
+    "Scheduled drift per tag query; opens a GitHub issue; optional auto-reconcile. More than one schedule per repo needs Enterprise (every hosted tier).",
+    "Documented AWS OIDC setup plus an OIDC hardening guide; per-workflow and per-environment role selection.",
+    "At 21 users / 23.7k RUM / 1.5k runs / 255 stacks: Orchestration Pro ≈ $1,000/mo",
+    "config_builder, tree_builder, indexer and centralized config generate orchestrator config only. No backend/provider codegen like fogg.",
+    "IaaD: Postgres state, per-state and per-subgraph plan/apply tokens, SQL across states, tfstate export. Orchestration alone: bring your own S3.",
+    "Same PR-comment plan/apply model as Atlantis. Stategraph docs cover running under Atlantis; no atlantis.yaml import.",
+    "Arbitrary pre/post hooks and workflow steps, custom engines, apply requirements. Gatekeeper approval gates (Enterprise, every hosted tier).",
+    "No private module registry. The indexer only maps module usage to trigger runs.",
+    "Built-in Infracost cost estimates on PRs with approval thresholds. IaaD adds plan-time cost deltas and FOCUS billing reconciliation.",
+    "OPA/Rego, Conftest and Checkov are built in and run on plan output. Policies are portable.",
+    "No native AI review. Docs show DIY LLM hooks over plan results (bring your own model); trusted-config loading not documented.",
+    "No native Slack, Teams or Google Chat integration. Notifications only via curl webhooks in hooks or workflow steps.",
+    "GitHub and GitLab: PR comments, per-dirspace status checks, apply requirements, automerge. No Bitbucket or Azure DevOps.",
+    "Self-hosted Prometheus /metrics, a queryable audit trail, and hook webhooks. IaaD adds a transaction timeline and webhooks (Pro tier).",
+    "IaaD Graph Explorer, blast-radius analysis and transaction timeline. The Orchestration UI shows runs and logs.",
+    "Stategraph ships agent skills (SKILL.md) for query/plan/import. No MCP server; no agent-driven drift remediation PRs.",
+    "No ephemeral environment feature.",
+    "No Terraform provider for Orchestration or Stategraph.",
+    "AWS, GCP and Azure OIDC guides. Engine-agnostic: works with any Terraform/OpenTofu provider."
+   ],
+   "variants": {
+    "17": {
+     "slack": 1,
+     "teams": 1,
+     "google_chat": 1
+    },
+    "18": {
+     "github": 3,
+     "gitlab": 3,
+     "bitbucket": 0,
+     "azure_devops": 0
+    }
+   },
+   "gates": {
+    "G1": {
+     "pass": true,
+     "evidence": "No Kubernetes required. The Orchestration server self-hosts via Docker Compose or the ECS/Fargate Terraform module. The IaaD server offers Compose, ECS, Cloud Run or K8s. Runs execute on GitHub Action",
+     "url": "https://docs.terrateam.io/quickstart/self-hosted/aws/"
+    },
+    "G2": {
+     "pass": true,
+     "evidence": "Plans and applies run as GitHub Actions jobs, which can use self-hosted runners on EC2 or Docker. The IaaD server never runs Terraform and never sees cloud credentials. The CLI runs where you run it.",
+     "url": "https://docs.terrateam.io/security/private-runners/"
+    },
+    "G3": {
+     "pass": true,
+     "evidence": "Custom workflow steps and hooks run arbitrary commands before init/plan, so a pnpm/turbo synth step works. There is a native CDKTF engine. The cdktn binary is not named in the docs, so it needs a cust",
+     "url": "https://docs.terrateam.io/integrations/iac-tools/cdktf/"
+    },
+    "G4": {
+     "pass": true,
+     "evidence": "Very active. stategraph/stategraph ships near-daily builds (latest 2026-09-24). The Stategraph CLI released 3.0.1 on 2026-09-23 and averaged 10-27 releases/month in 2026.",
+     "url": "https://github.com/stategraph/releases/releases"
+    },
+    "G5": {
+     "pass": true,
+     "evidence": "PASSES: the 'no OpenTofu' premise is wrong. The Stategraph CLI runs tofu by default (TF_CMD default: tofu; set TF_CMD=terraform to switch). Terrateam's stategraph engine accepts tf_cmd: tofu, and Orch",
+     "url": "https://stategraph.com/docs/cli/tf"
+    }
+   },
+   "disqualified": false,
+   "tagline": "Ex-Terrateam GitOps plus a paid graph state engine with atomic multi-state applies"
+  },
+  {
+   "id": "hcp-terraform",
+   "name": "HCP Terraform",
+   "url": "https://www.hashicorp.com/products/terraform",
+   "icon": "Cloud",
+   "color": "#7C3AED",
+   "scores": [
+    1,
+    0,
+    2,
+    3,
+    3,
+    3,
+    3,
+    0,
+    2,
+    2,
+    1,
+    2,
+    3,
+    2,
+    2,
+    0,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    3,
+    3
+   ],
+   "rationales": [
+    "CDKTF deprecated by HashiCorp. Workspaces can synth in agent pre-plan hooks or CI; Stacks cannot run hooks. Affected detection only via trigger patterns.",
+    "Terraform only. No OpenTofu version option for workspaces or Stacks as of Sep 2026.",
+    "Self-hosted agents on Docker/EC2, custom images. Hooks max 10 min, not for Stacks; agent concurrency tier-limited (Standard 10).",
+    "SAML SSO from Essentials, team/project permissions, SCIM, IP allowlists. Custom RBAC Premium-only.",
+    "Stacks GA: component DAG, planning with unknowns/deferred changes, linked Stacks, per-deployment approvals. Custom auto-approve groups Premium.",
+    "Health assessments (drift + continuous validation) on Standard/Premium, notifications on drift; remediation via new run.",
+    "Dynamic provider credentials (OIDC) for AWS per workspace/Stack, separate plan/apply roles, quick setup added 2026.",
+    "At 21 users / 23.7k RUM / 1.5k runs / 255 stacks: Standard ≈ $11,119/mo",
+    "No fogg-style codegen. Stacks declare providers/deployments once per stack; workspace wiring via tfe provider; no-code modules.",
+    "Managed state, per-team state read/write permissions, state download as standard tfstate, restore. No resource-level RBAC.",
+    "No Atlantis migration tooling; tf-migrate deprecated. Generic workspace and workspace-to-Stacks migration guides.",
+    "Run tasks at 4 stages (org/project scope), agent hooks can fail runs (e.g. cosign gate). No arbitrary pipeline steps; hooks not for Stacks.",
+    "Mature private registry with test-integrated and monorepo publishing, tagging. Terraform only; Essentials capped at 10 modules.",
+    "Native cost estimation for AWS/Azure/GCP on Standard+. No Infracost-style PR comment.",
+    "Native OPA/Rego and Sentinel policy sets, tfpolicy (HCL, beta, cloud-only). OPA input is HCP-specific; unlimited sets need Standard+.",
+    "No native LLM review of PRs or plans documented.",
+    "Teams and Slack formatted webhook notifications per workspace/project; no interactive approvals. Google Chat via generic webhook.",
+    "GitHub, GitLab, Bitbucket, Azure DevOps VCS: commit status checks, speculative plans. No PR-comment plans or comment-driven ops.",
+    "Official Datadog integration (audit logs, notification events, resource metadata), Metrics API. Audit trails need Premium.",
+    "Explorer, Stacks deployment/component views, published-outputs inspector; Infragraph graph explorer in LA (US only).",
+    "Terraform MCP server GA (self-run, OSS); Infragraph knowledge graph LA. No agents auto-opening drift remediation PRs.",
+    "Ephemeral workspaces with auto-destroy schedules; Stacks destroy_all. Not a full preview-env product.",
+    "Official hashicorp/tfe provider manages orgs, workspaces, Stacks, policies, teams.",
+    "Provider-agnostic: any Terraform provider; dynamic credentials for AWS, Azure, GCP, Vault."
+   ],
+   "variants": {
+    "17": {
+     "slack": 2,
+     "teams": 2,
+     "google_chat": 1
+    },
+    "18": {
+     "github": 2,
+     "gitlab": 2,
+     "bitbucket": 2,
+     "azure_devops": 2
+    }
+   },
+   "gates": {
+    "G1": {
+     "pass": true,
+     "evidence": "SaaS control plane; self-hosted agents run as a binary or Docker container on any Linux host (EC2 fine). K8s operator optional only.",
+     "url": "https://developer.hashicorp.com/terraform/cloud-docs/agents/requirements"
+    },
+    "G2": {
+     "pass": true,
+     "evidence": "HCP Terraform agents run in your own network/account (Docker/EC2); agent pools per workspace/Stack; AWS-IA module for EC2 agents. Note concurrency: Free/Essentials 1 agent run, Standard 10.",
+     "url": "https://developer.hashicorp.com/terraform/cloud-docs/agents"
+    },
+    "G3": {
+     "pass": true,
+     "evidence": "Workspaces: synth possible in agent pre-plan hook (arbitrary executable, non-zero exit fails run) or in CI with CLI-driven runs. Caveat: agent hooks do not support Stack workflows, so Stacks need synt",
+     "url": "https://developer.hashicorp.com/terraform/cloud-docs/agents/hooks"
+    },
+    "G4": {
+     "pass": true,
+     "evidence": "Actively developed: HCP Terraform changelog has entries through 2026-09-16; TFE 2.0.5 Aug 2026.",
+     "url": "https://developer.hashicorp.com/terraform/cloud-docs/changelog"
+    },
+    "G5": {
+     "pass": false,
+     "evidence": "Workspace/Stack settings only select Terraform (BSL) versions; no OpenTofu binary option announced or documented as of Sep 2026; OpenTofu cannot use HCP Terraform as a backend-runner platform.",
+     "url": "https://developer.hashicorp.com/terraform/cloud-docs/workspaces/settings"
+    }
+   },
+   "disqualified": true,
+   "tagline": "Best-in-class Stacks orchestration and registry, but Terraform-only and RUM-priced"
+  },
+  {
+   "id": "opentaco",
+   "name": "OpenTaco (formerly Digger)",
+   "url": "https://opentaco.dev",
+   "icon": "Terminal",
+   "color": "#10B981",
+   "scores": [
+    1,
+    2,
+    3,
+    1,
+    2,
+    3,
+    3,
+    3,
+    1,
+    2,
+    2,
+    3,
+    0,
+    2,
+    3,
+    1,
+    0,
+    3,
+    1,
+    1,
+    0,
+    0,
+    1,
+    3
+   ],
+   "rationales": [
+    "No CDKTF docs. You can add synth as a CI/run step, but generate_projects only finds .tf dirs, so cdktn stacks need hand-listed projects and include_patterns.",
+    "OpenTofu is first-class ('opentofu: true' per project). The version is set via action inputs, so pinning per stack is weaker.",
+    "Jobs run in your own GitHub Actions, on self-hosted EC2 runners with any image you like, so rootless builds work. No K8s and no vendor agent.",
+    "Apply RBAC comes from GitHub teams plus OPA access policies. Self-hosted UI login needs WorkOS. State RBAC and OIDC SSO are CLI-only. No platform audit log.",
+    "depends_on plus respect_layers gives layer-by-layer plan/apply in one PR. Statesman flags stale edges. No plan with unknowns; PR-comment UX only.",
+    "Scheduled per-project drift runs via the service or backendless GHA. Alerts go to Slack or GitHub Issues, with issue-driven apply to remediate.",
+    "Uses native GHA OIDC to AWS, with aws_role_to_assume per project for separate plan/apply roles. No static keys.",
+    "At 21 users / 23.7k RUM / 1.5k runs / 255 stacks: Pro ≈ $410/mo",
+    "generate_projects only builds the project list from dir globs. It does not generate backend/provider boilerplate, so it is no fogg replacement.",
+    "Self-hosted Statesman has TFE-compatible state, prefix-wildcard RBAC, versions/rollback, dependency edges. Dormant since Mar 2026; you run it.",
+    "Same PR-comment plan/apply model as Atlantis, but with no atlantis.yaml import and no migration guide.",
+    "Arbitrary run steps before/after init/plan/apply plus your own runner image. A failing step (e.g. cosign verify) blocks apply.",
+    "No private module registry.",
+    "Documented Infracost integration via a custom workflow step. Not native.",
+    "Rego/OPA access, plan and drift policies are evaluated in the CLI, and conftest works as an inline step. Portable, no proprietary DSL.",
+    "AI Summaries of multi-project plans are invite-only, vendor-run and undocumented beyond one page. No trusted-branch prompts, no bring-your-own model.",
+    "Slack gets drift webhook notifications only. No MS Teams or Google Chat integration, and no interactive approvals.",
+    "GitHub App: PR comments, checks, apply-before-merge, merge gating. GitLab/Bitbucket need an EE licence; Azure DevOps goes via an Azure Function.",
+    "Logs live in GHA runs. No Datadog/OTel export, audit stream or run-event webhooks beyond the drift webhook.",
+    "PR comments list impacted projects and layers. The basic UI lists projects and drift. No resource or dependency graph view.",
+    "No MCP server and no agentic ops.",
+    "No ephemeral environment feature.",
+    "The opentaco provider manages Statesman units and dependency edges only. It cannot manage PR automation, drift or orgs.",
+    "AWS, GCP and Azure are documented, each with OIDC and lock/plan storage."
+   ],
+   "variants": {
+    "17": {
+     "slack": 2,
+     "teams": 0,
+     "google_chat": 0
+    },
+    "18": {
+     "github": 3,
+     "gitlab": 2,
+     "bitbucket": 1,
+     "azure_devops": 1
+    }
+   },
+   "gates": {
+    "G1": {
+     "pass": true,
+     "evidence": "Orchestrator/UI/drift/statesman self-host via Docker Compose, single Docker image, binary or Railway; Helm is optional. Jobs run in your CI, so no cluster is needed.",
+     "url": "https://docs.opentaco.dev/self-hosting/docker-compose"
+    },
+    "G2": {
+     "pass": true,
+     "evidence": "Terraform runs inside your own GitHub Actions jobs. Docs recommend self-hosted GHA runners on EC2 (runs-on: my-selfhosted-runner). Cloud creds never leave the runner. Hosted orchestrator only dispatch",
+     "url": "https://docs.opentaco.dev/ce/features/private-runners"
+    },
+    "G3": {
+     "pass": true,
+     "evidence": "You own the GHA workflow, so you can add setup-node/pnpm/turbo synth steps before the digger action runs. digger.yml workflows also support arbitrary 'run:' steps before init/plan.",
+     "url": "https://docs.opentaco.dev/ce/howto/custom-commands"
+    },
+    "G4": {
+     "pass": true,
+     "evidence": "v0.6.151 was released on 2026-09-13 and releases are roughly monthly. Caveat: most releases are maintenance-only, the company is focused on OpenComputer, and the state backend has been dormant since M",
+     "url": "https://github.com/diggerhq/digger/releases"
+    },
+    "G5": {
+     "pass": true,
+     "evidence": "OpenTofu is first-class: set 'opentofu: true' per project and use the setup-opentofu/opentofu-version action inputs. There is a with-opentofu getting-started guide.",
+     "url": "https://docs.opentaco.dev/ce/getting-started/with-opentofu"
+    }
+   },
+   "disqualified": false,
+   "tagline": "MIT-licensed PR automation in your own GitHub Actions; vendor focus has moved to AI agents"
+  },
+  {
+   "id": "ops0",
+   "name": "ops0",
+   "url": "https://ops0.com",
+   "icon": "ShieldCheck",
+   "color": "#E11D48",
+   "scores": [
+    0,
+    2,
+    1,
+    2,
+    1,
+    2,
+    2,
+    1,
+    1,
+    2,
+    1,
+    1,
+    0,
+    2,
+    3,
+    1,
+    1,
+    2,
+    1,
+    2,
+    2,
+    1,
+    0,
+    3
+   ],
+   "rationales": [
+    "No CDK/cdktn support and no documented pre-plan build step. Projects are plain .tf directories synced from Git.",
+    "Terraform and OpenTofu are both first-class, switchable per project. Per-project binary version pinning is not documented.",
+    "Plan/apply runs in ops0-hosted containers. No customer runner agent or custom image. Full self-hosting is Enterprise-only and undocumented.",
+    "SAML/OIDC SSO (Entra, Google, Okta), org and project roles incl. Approver via OpenFGA, audit log. SSO needs Business tier. Custom roles are Enterprise.",
+    "Variable graph detects remote_state edges and blast radius. Workflows can chain IaC deploys by hand. No unknown-value planning or downstream re-plan.",
+    "Cron-scheduled discovery scans with session diffs and drift alerts. It compares cloud inventory, not a per-stack plan. Remediation from Pro tier.",
+    "AWS access via cross-account IAM role assumption, with no stored keys and short-lived credentials per run. The role is assumed from ops0's own environment.",
+    "At 21 users / 23.7k RUM / 1.5k runs / 255 stacks: Enterprise — quote only",
+    "Blueprints and a Developer Portal offer UI templates only. No declarative codegen for backend/provider boilerplate across many components.",
+    "State stays in your own S3/GCS/Azure backend (or the ops0 DB). Has state viewer, history/restore and download. Access control is per project only.",
+    "No Atlantis migration path. A generic per-project 'import existing Terraform project' guide only.",
+    "Workflow builder with script, HTTP, condition and approval steps. No hooks inside the GitOps plan/apply path and no custom runner images.",
+    "No private module registry is documented.",
+    "Native monthly cost estimate shown before apply and in PR plan comments. Accuracy method not documented.",
+    "OPA/Rego on plan JSON plus Checkov, with a policy editor, test panel and AI-assisted authoring. Can block deployments.",
+    "Kiwi assistant can review IaC on request. Bring your own Claude or OpenAI-compatible key. No documented automated PR-intent review from trusted config.",
+    "Slack Block Kit alerts and approval notifications. Approvals happen in the ops0 UI. Teams and Google Chat only via generic webhooks.",
+    "GitHub App: auto-plan on PR, plan comments, commit checks, apply on merge. GitLab equivalent. Bitbucket planned, Azure DevOps absent.",
+    "In-app audit logs (90d/1y). Plan, log and cost forwarding only to OpenObserve. Alert webhooks. No Datadog or audit-stream export documented.",
+    "Resource graph per state, cross-project variable DAG, CMDB rollup and deployment history. No multi-stack rollout view.",
+    "Kiwi chat over live platform context, AI incident analysis, and an MCP server via ops0-cli (policy tools). Auto-fix/remediation marked 'coming soon'.",
+    "Blueprint 'environment' requests and project duplication. No PR preview environments or TTL teardown.",
+    "No Terraform provider for managing ops0 itself.",
+    "AWS, GCP, Azure and OCI across discovery, IaC and drift."
+   ],
+   "variants": {
+    "17": {
+     "slack": 2,
+     "teams": 1,
+     "google_chat": 1
+    },
+    "18": {
+     "github": 2,
+     "gitlab": 2,
+     "bitbucket": 0,
+     "azure_devops": 0
+    }
+   },
+   "gates": {
+    "G1": {
+     "pass": true,
+     "evidence": "The SaaS runs plan/apply in ops0's own isolated containers, so you do not need Kubernetes for IaC. The in-cluster agent is only for the Kubernetes-ops features. What the Enterprise self-hosted install",
+     "url": "https://docs.ops0.com/docs/introduction/architecture"
+    },
+    "G2": {
+     "pass": false,
+     "evidence": "'Terraform plan and apply runs execute inside ops0's isolated execution environment' after assuming a cross-account IAM role. No customer-hosted runner or agent is documented. A self-hosted or air-gap",
+     "url": "https://docs.ops0.com/docs/security"
+    },
+    "G3": {
+     "pass": false,
+     "evidence": "An IaC project is a directory of .tf files synced from Git. The docs describe no pre-init or pre-plan hook, no custom image and no build step. Workflow 'Script' steps (bash/python/node) exist, but not",
+     "url": "https://docs.ops0.com/docs/how-to/setup-gitops"
+    },
+    "G4": {
+     "pass": true,
+     "evidence": "SaaS uses continuous deployment. Docs sitemap lastmod 2026-09-04. ops0-cli v0.5.24 released 2026-07-06, Oxid v0.4.4 released 2026-06-12.",
+     "url": "https://github.com/ops0-ai/ops0-cli/releases"
+    },
+    "G5": {
+     "pass": true,
+     "evidence": "OpenTofu is a first-class engine next to Terraform and Oxid. Each project can be switched between terraform and tofu.",
+     "url": "https://docs.ops0.com/docs/iac/migrate"
+    }
+   },
+   "disqualified": true,
+   "tagline": "AI-first cloud governance SaaS with basic TF/OpenTofu GitOps. No customer-hosted runners."
+  },
+  {
+   "id": "pulumi",
+   "name": "Pulumi Cloud (as Terraform/OpenTofu state backend + remote execution)",
+   "url": "https://www.pulumi.com",
+   "icon": "Layers",
+   "color": "#8A3391",
+   "scores": [
+    0,
+    2,
+    0,
+    3,
+    0,
+    0,
+    2,
+    1,
+    0,
+    2,
+    1,
+    0,
+    2,
+    0,
+    1,
+    1,
+    2,
+    2,
+    2,
+    1,
+    2,
+    0,
+    1,
+    3
+   ],
+   "rationales": [
+    "No synth/pre-run step in hosted TF execution; cdktn works only in local mode with your own CI doing synth and affected detection.",
+    "Backend works with Terraform and OpenTofu CLIs; hosted runs always use OpenTofu at a Pulumi-managed, unpinnable version.",
+    "TF remote execution is Pulumi-hosted only; customer-managed agents and custom images are Pulumi-program-only features.",
+    "SAML SSO and custom roles (Pro+), SCIM (Enterprise), team/tag-scoped stack permissions, audit logs; applies to TF stacks.",
+    "No DAG or dependency triggers for Terraform stacks; docs point to CI pipeline sequencing. Deployment triggers are Pulumi-only.",
+    "Drift detection is explicitly unavailable for Terraform stacks (requires a Pulumi program).",
+    "ESC issues AWS OIDC creds per stack env; automatic in hosted runs, via esc run wrapper in local mode. OIDC token exchange for CI.",
+    "At 21 users / 23.7k RUM / 1.5k runs / 255 stacks: Essentials ≈ $4,266/mo",
+    "No fogg-like codegen for Terraform; templates/IDP features target Pulumi programs.",
+    "Managed encrypted versioned state, locking, per-stack team RBAC, CI-only via team tokens, export via state pull; no resource-level RBAC.",
+    "Backend swap via terraform init -migrate-state keeps Atlantis working; no atlantis.yaml import or PR-comment compatibility.",
+    "Hosted TF runs allow no pre/post hooks, custom images or env vars; custom gates only possible in your own CI.",
+    "HCP-compatible TF/OpenTofu module registry at tf.pulumi.com; publishing needs Pro+; modules auto-converted to Pulumi packages.",
+    "No cost estimation for Terraform plans.",
+    "Policies in TS/Python/Rego over mapped Pulumi schemas, not raw plan JSON; blocking only in hosted runs, audit-only in local mode.",
+    "Neo code reviews (GitHub, advisory) cover TF/OpenTofu PRs; trusted default-branch instructions and BYO model not verified.",
+    "Slack- and Teams-formatted webhooks with stack/deployment events; notifications only, no interactive approvals.",
+    "Hosted TF runs: VCS push/PR plans on GitHub, GitLab, Bitbucket, Azure DevOps; policy results in PR checks. Unused in local mode.",
+    "Generic JSON webhooks, audit log API and continuous S3/Sentinel export; no native Datadog or OTel integration.",
+    "TF resources appear in resource search and dashboards; dependency graphs mainly for Pulumi programs.",
+    "Remote MCP server and Neo agent see TF-backed resources; no TF drift to remediate. Neo can open PRs.",
+    "Review stacks and TTL stacks are Pulumi-program features; nothing for Terraform stacks.",
+    "Official management provider is Pulumi-native (pulumiservice); TF only via community providers that read outputs.",
+    "Cloud-agnostic backend; ESC supports AWS, Azure and GCP dynamic credentials."
+   ],
+   "variants": {
+    "17": {
+     "slack": 2,
+     "teams": 2,
+     "google_chat": 1
+    },
+    "18": {
+     "github": 2,
+     "gitlab": 2,
+     "bitbucket": 1,
+     "azure_devops": 1
+    }
+   },
+   "gates": {
+    "G1": {
+     "pass": true,
+     "evidence": "SaaS by default; self-hosted Pulumi Cloud (Enterprise) and customer-managed agents run outside Kubernetes. Nothing in the TF-state path needs K8s.",
+     "url": "https://www.pulumi.com/docs/integrations/terraform/state-backend/"
+    },
+    "G2": {
+     "pass": false,
+     "evidence": "Terraform/OpenTofu remote execution runs only on Pulumi-hosted runners; docs list 'runner pools/customer-managed agents' and custom executor images as not applicable to TF stacks. Only escape is local",
+     "url": "https://www.pulumi.com/docs/integrations/terraform/remote-execution/"
+    },
+    "G3": {
+     "pass": false,
+     "evidence": "Pre-run commands, dependency install and custom images do not apply to TF remote-execution stacks, so no pnpm/cdktn synth before plan. Synth only possible in your own CI with local execution mode.",
+     "url": "https://www.pulumi.com/docs/integrations/terraform/remote-execution/"
+    },
+    "G4": {
+     "pass": true,
+     "evidence": "Very active: Aug 2026 TF/HCL release, Sep 2026 changelog entries, frequent CLI releases (v3.256+).",
+     "url": "https://www.pulumi.com/releases/changelog/"
+    },
+    "G5": {
+     "pass": true,
+     "evidence": "State backend documented for both Terraform and OpenTofu CLIs; remote execution engine is OpenTofu.",
+     "url": "https://www.pulumi.com/docs/integrations/terraform/state-backend/"
+    }
+   },
+   "disqualified": true,
+   "tagline": "Credible managed TF/OpenTofu state backend; hosted-only TF runs make it a poor TACOS"
+  },
+  {
+   "id": "terragrunt-scale",
+   "name": "Terragrunt Scale (Gruntwork Pipelines + Drift Detection + Patcher)",
+   "url": "https://terragrunt.com/terragrunt-scale",
+   "icon": "Blocks",
+   "color": "#5B21B6",
+   "scores": [
+    1,
+    3,
+    3,
+    1,
+    2,
+    2,
+    3,
+    1,
+    3,
+    2,
+    1,
+    2,
+    1,
+    2,
+    1,
+    0,
+    0,
+    2,
+    1,
+    1,
+    0,
+    1,
+    0,
+    2
+   ],
+   "rationales": [
+    "No CDK Terrain support; synth possible via Terragrunt before_hook or forked workflow step. Affected detection only if units declare the TS files they read.",
+    "OpenTofu is the Pipelines default; Terraform selectable. Versions pinned via .mise.toml; Terragrunt can pin binary/version per unit.",
+    "Runs entirely in your own GitHub Actions/GitLab runners (self-hosted EC2 OK, custom image, no K8s). Self-hosted needs the workflow forked into your org.",
+    "No platform RBAC: access control = GitHub repo permissions/branch protection + separate plan/apply IAM roles. SSO/audit for the Gruntwork app not documented.",
+    "Strong explicit DAG (dependency blocks, Stacks, cycle checks, ordered apply on merge), but plans across unapplied deps use mock_outputs; no downstream re-plan.",
+    "Scheduled drift detection GHA workflow with account/path filters; opens a remediation PR per run. Team tier and up; alerting is the PR itself.",
+    "Native AWS OIDC per environment/unit with separate read-only plan and read-write apply roles; no static credentials.",
+    "At 21 users / 23.7k RUM / 1.5k runs / 255 stacks: Enterprise — quote only",
+    "Terragrunt itself is the fogg-class tool: root.hcl includes, generate blocks for backend/provider, remote_state, Stacks codegen. No JS workspace wiring.",
+    "No managed state: you run S3 backends (Terragrunt can bootstrap them). Env isolation via IAM roles; standard tfstate; dependency blocks track cross-state links.",
+    "No Atlantis migration tooling or atlantis.yaml import; migration means restructuring the repo into Terragrunt units (Terralith-to-Terragrunt guides only).",
+    "OSS Terragrunt before/after/error hooks can gate any command (e.g. cosign verify before apply). Pipeline-level pass/warn/deny hooks are Enterprise only.",
+    "No private registry. Modules sourced via git/go-getter; Terragrunt catalog/scaffold browse module repos.",
+    "Infracost estimates in PR comments since Aug 2026, Enterprise tier only. OSS path: add Infracost yourself in the workflow.",
+    "No built-in policy engine. Conftest/OPA can be run from Terragrunt hooks or Enterprise Pipeline Hooks against plan files; nothing native.",
+    "No AI PR review.",
+    "No native chat integration documented for Slack, Teams or Google Chat; notifications are GitHub PR comments. DIY via hooks or workflow steps.",
+    "GitHub and GitLab (incl. GHES/self-managed): consolidated PR comments, status checks, plan on PR/apply on merge. No Bitbucket or Azure DevOps.",
+    "Terragrunt emits OpenTelemetry traces/metrics (OTLP, can go to Datadog); run reports JSON/CSV. No platform audit stream or webhooks.",
+    "Terragrunt DAG graph export (DOT) and an Infrastructure Dashboard in preview; no resource graph.",
+    "No ops MCP/agent. Gruntwork's MCP server only searches the Gruntwork module library.",
+    "No ephemeral environment feature; Stacks make cloning an environment easy but lifecycle is manual.",
+    "No Terraform provider for managing the platform; configuration lives in .gruntwork/*.hcl in the repo.",
+    "Terragrunt is cloud-agnostic; Pipelines has AWS, Azure and GCP OIDC plus custom auth. Free tier limited to AWS."
+   ],
+   "variants": {
+    "17": {
+     "slack": 0,
+     "teams": 0,
+     "google_chat": 0
+    },
+    "18": {
+     "github": 2,
+     "gitlab": 2,
+     "bitbucket": 0,
+     "azure_devops": 0
+    }
+   },
+   "gates": {
+    "G1": {
+     "pass": true,
+     "evidence": "Runs as GitHub Actions / GitLab CI jobs; no Kubernetes anywhere in the architecture.",
+     "url": "https://docs.terragrunt.com/terragrunt-scale/overview/"
+    },
+    "G2": {
+     "pass": true,
+     "evidence": "All plan/apply runs execute in the customer's own CI runners; the reusable workflow takes a `runner` input for self-hosted GitHub runners (workflow must be forked into your own org). Gruntwork 'never ",
+     "url": "https://github.com/gruntwork-io/pipelines-workflows/blob/main/.github/workflows/pipelines.yml"
+    },
+    "G3": {
+     "pass": true,
+     "evidence": "Conditional pass: arbitrary pre-plan steps possible via Terragrunt before_hook (e.g. `pnpm synth` on init/plan) or by adding custom actions to a forked pipelines-workflows. No native CDK Terrain suppo",
+     "url": "https://docs.gruntwork.io/2.0/docs/pipelines/guides/extending-pipelines/"
+    },
+    "G4": {
+     "pass": true,
+     "evidence": "Terragrunt v1.1.6 released 2026-09-21; pipelines-workflows pushed 2026-09-24; Pipelines changelog entries through 2026-08-27.",
+     "url": "https://github.com/gruntwork-io/terragrunt/releases"
+    },
+    "G5": {
+     "pass": true,
+     "evidence": "Gruntwork co-founded OpenTofu; Pipelines defaults to OpenTofu (tf-binary switchable to terraform); versions pinned via .mise.toml.",
+     "url": "https://docs.gruntwork.io/2.0/reference/pipelines/terragrunt-version-compatibility/"
+    }
+   },
+   "disqualified": false,
+   "tagline": "Terragrunt-native GitOps in your own CI; fogg-class codegen, but mock-output planning"
+  },
+  {
+   "id": "atmos",
+   "name": "Atmos + Atmos Pro (Cloud Posse)",
+   "url": "https://atmos.tools",
+   "icon": "Atom",
+   "color": "#0EA5E9",
+   "scores": [
+    2,
+    3,
+    3,
+    1,
+    2,
+    3,
+    3,
+    2,
+    3,
+    2,
+    2,
+    3,
+    1,
+    2,
+    2,
+    2,
+    1,
+    3,
+    2,
+    1,
+    2,
+    1,
+    0,
+    3
+   ],
+   "rationales": [
+    "No native CDK Terrain type. Synth via hooks/custom commands; affected detection via dependencies.folders is manual; custom types skip describe affected.",
+    "Terraform and OpenTofu both first-class; per-component command/version pinning, toolchain auto-install, OpenTofu-only features supported.",
+    "Runs entirely in your own GitHub Actions (self-hosted EC2 runners OK), no K8s; custom images; built-in container/buildx build component type.",
+    "Atmos Pro login is GitHub OAuth only; workspace-level roles (Viewer/Auditor/Member/Admin/Owner); no SAML/OIDC SSO or per-stack scoping documented.",
+    "Explicit component DAG, dependency-ordered apply on merge, stack locking; PR plans mock unknown upstream outputs via yq defaults; GitHub Env approvals.",
+    "Atmos Pro: daily + post-merge per-instance drift plans, optional auto-remediate apply, post-apply verification, Slack alerts; available on all tiers.",
+    "GitHub OIDC to AWS/Azure/GCP via Atmos Auth identities per stack; no static credentials; Pro API also authenticated via GitHub OIDC.",
+    "At 21 users / 23.7k RUM / 1.5k runs / 255 stacks: Pro Team ≈ $2,100/mo",
+    "Reference-class fogg equivalent: YAML stacks with imports/inheritance generate backend, provider, required_providers and arbitrary files per component.",
+    "State stays in your own backend (e.g. S3), access governed by your IAM; Pro stores no state. No resource-level RBAC; standard tfstate.",
+    "Generates atlantis.yaml from stacks (`atmos atlantis generate repo-config`), allowing incremental migration; migration skills for Terragrunt/Terramate.",
+    "Workflows, custom commands, and lifecycle hooks (kind: command, on_failure: fail) before/after init/plan/apply; can block apply on e.g. cosign verify.",
+    "No private module registry; vendoring pulls modules from git/OCI/registries with lock files. Registry cache proxy for providers only.",
+    "Built-in `infracost` hook kind on plan events; results in CI output rather than a native cost UI.",
+    "Native OPA/JSON Schema validation of stack config; plan-level checks via checkov/trivy/kics hooks or a conftest command hook.",
+    "Pro posts vendor-model AI summaries on PRs (credits). OSS `atmos ai` supports Bedrock/BYO models so a trusted CI review can be built, not packaged.",
+    "Slack app with interactive approve/reject and drift alerts. No Microsoft Teams or Google Chat integration; only audit-log webhooks.",
+    "GitHub App with status checks, PR summaries, merge-queue support, GHES. Other VCS: CLI only, no Pro orchestration.",
+    "Audit log streaming as CloudEvents webhooks or Datadog-formatted logs, batched; native CI outputs; no OTel metrics export documented.",
+    "Pro dashboards for deployments/drift and a streaming plan UI; no documented resource or dependency graph visualization.",
+    "Atmos MCP server plus Atmos Pro MCP (runs, failures, drift analytics); agent write tools and remediation PRs not yet shipped.",
+    "Stacks can be templated per env, but no native PR preview/ephemeral environment lifecycle.",
+    "No Terraform provider to manage Atmos Pro; configuration is GitOps YAML in the repo (cloudposse/utils provider only reads stack config).",
+    "Cloud-agnostic: any Terraform/OpenTofu provider; Atmos Auth covers AWS, Azure and GCP identities."
+   ],
+   "variants": {
+    "17": {
+     "slack": 3,
+     "teams": 1,
+     "google_chat": 1
+    },
+    "18": {
+     "github": 3,
+     "gitlab": 1,
+     "bitbucket": 1,
+     "azure_devops": 1
+    }
+   },
+   "gates": {
+    "G1": {
+     "pass": true,
+     "evidence": "Atmos is a single Go CLI; Atmos Pro is SaaS that dispatches your own GitHub Actions workflows. No Kubernetes needed.",
+     "url": "https://atmos-pro.com/docs"
+    },
+    "G2": {
+     "pass": true,
+     "evidence": "All plans/applies run in the customer's GitHub Actions workflows (workflow_dispatch from Atmos Pro); self-hosted EC2 runners work; cloud creds via GitHub OIDC -> AWS, never held by Atmos Pro.",
+     "url": "https://atmos-pro.com/docs/learn/ordered-deployments"
+    },
+    "G3": {
+     "pass": true,
+     "evidence": "Steps are your own GHA workflow plus Atmos hooks (before.terraform.init/plan kind: command), custom commands and workflows, so pnpm/turbo synth can run pre-plan. No first-class CDK Terrain support.",
+     "url": "https://atmos.tools/stacks/hooks"
+    },
+    "G4": {
+     "pass": true,
+     "evidence": "v1.229.0 released 2026-09-17; RCs 2026-09-25; 20+ minor releases since Feb 2026.",
+     "url": "https://github.com/cloudposse/atmos/releases"
+    },
+    "G5": {
+     "pass": true,
+     "evidence": "OpenTofu first-class: per-component `command: tofu`, toolchain installs pinned tofu versions, OpenTofu-specific features (OCI module packages, module source interpolation) supported.",
+     "url": "https://atmos.tools/cli/commands/terraform/usage"
+    }
+   },
+   "disqualified": false,
+   "tagline": "YAML stack framework (fogg-class codegen) + SaaS that orchestrates your own GitHub Actions"
+  },
+  {
+   "id": "otf",
+   "name": "OTF",
+   "url": "https://github.com/leg100/otf",
+   "icon": "Server",
+   "color": "#64748B",
+   "scores": [
+    1,
+    3,
+    2,
+    2,
+    1,
+    0,
+    2,
+    3,
+    0,
+    2,
+    0,
+    1,
+    2,
+    0,
+    0,
+    0,
+    0,
+    2,
+    1,
+    0,
+    1,
+    0,
+    2,
+    2
+   ],
+   "rationales": [
+    "No pre-plan hooks. CDK only via CLI-driven runs after CI synth (TFC pattern); no affected-stack detection beyond VCS trigger path patterns.",
+    "terraform and tofu are both first-class engines, with engine and version selectable per workspace.",
+    "otf-agent binary/Docker image on EC2 with no K8s; custom image possible; no documented hook or asset-build support.",
+    "OIDC/GitHub/GitLab/IAP SSO in the free OSS build; TFC-style teams with org and workspace permissions. No SAML, no IdP group sync, no audit log.",
+    "TFC-style run triggers (Apr 2026) queue downstream runs after upstream apply; no DAG, no in-change sequencing, no stacks.",
+    "No drift detection or health assessments. Would need scheduled runs driven externally via the API.",
+    "TFC-compatible dynamic provider credentials for AWS, but docs say only GCP is fully tested; EC2 agent instance roles are an alternative.",
+    "At 21 users / 23.7k RUM / 1.5k runs / 255 stacks: Self-hosted (TCO) ≈ $135/mo",
+    "No codegen or scaffolding. Workspaces can be managed with the tfe provider/API instead.",
+    "State in own Postgres, per-workspace read/plan/write/admin, remote-state sharing toggle, standard state pull; no resource-level RBAC.",
+    "No Atlantis migration docs or atlantis.yaml import; only a TFC/local-state migration guide.",
+    "No pre/post hooks, run tasks or custom gates. Only a custom agent image and CI-side steps in CLI-driven workflows.",
+    "Private module registry publishes from VCS semver tags, one module per repo; not monorepo-friendly.",
+    "No cost estimation. The org setting exists only for TFE API compatibility.",
+    "No policy-as-code (no Sentinel/OPA). It would have to run in CI before a CLI-driven apply.",
+    "No AI features.",
+    "Notifications are generic webhook, Slack and GCP Pub/Sub, API-only (no UI). No Microsoft Teams destination.",
+    "GitHub App/PAT, GitLab and Forgejo; speculative PR plans with commit status checks, no PR comments; no Bitbucket or Azure DevOps.",
+    "Generic webhook notifications and some Prometheus metrics; no audit stream or OTel export.",
+    "No resource or dependency graphs.",
+    "No MCP. The maintainer suggests using HashiCorp's terraform-mcp-server through TFE API compatibility (untested).",
+    "No ephemeral environment feature.",
+    "Much of the TFE API is implemented, so hashicorp/tfe provider works for many resources, with documented gaps and bugs.",
+    "Provider-agnostic TF/tofu runner; dynamic creds support AWS, GCP and Azure (only GCP fully tested)."
+   ],
+   "variants": {
+    "17": {
+     "slack": 1,
+     "teams": 0,
+     "google_chat": 0
+    },
+    "18": {
+     "github": 2,
+     "gitlab": 2,
+     "bitbucket": 0,
+     "azure_devops": 0
+    }
+   },
+   "gates": {
+    "G1": {
+     "pass": true,
+     "evidence": "Single Go binary otfd + PostgreSQL; docker compose and plain binary installs documented. The default fork executor runs terraform/tofu as child processes. Kubernetes is only used by the optional kuber",
+     "url": "https://github.com/leg100/otf/blob/master/docs/docs/install.md"
+    },
+    "G2": {
+     "pass": true,
+     "evidence": "otf-agent (binary or leg100/otf-agent Docker image) joins an agent pool with a pool token and runs plans/applies in agent execution mode. Works like TFC agents and can run on EC2 in our own account.",
+     "url": "https://github.com/leg100/otf/blob/master/docs/docs/runners.md"
+    },
+    "G3": {
+     "pass": true,
+     "evidence": "No pre-plan hooks in the runner, so VCS-driven runs cannot synth. The CLI-driven workflow works: CI runs pnpm/turbo synth, then terraform plan/apply with the cloud/remote backend uploads cdktf.out sta",
+     "url": "https://github.com/leg100/otf/blob/master/docs/docs/tfc_migration.md"
+    },
+    "G4": {
+     "pass": true,
+     "evidence": "Last release v0.6.3 on 2026-06-11 (3.5 months ago, inside the 6-month window). Warning signs: one maintainer (leg100 has ~1200 of ~1350 commits), no maintainer activity since mid-July 2026, and commun",
+     "url": "https://github.com/leg100/otf/releases"
+    },
+    "G5": {
+     "pass": true,
+     "evidence": "First-class engines are terraform and tofu. The default is set per install and can be overridden per workspace along with the engine version.",
+     "url": "https://github.com/leg100/otf/blob/master/docs/docs/engines.md"
+    }
+   },
+   "disqualified": false,
+   "tagline": "Free MPL-2.0 open-source TFE clone (Go + Postgres), OpenTofu-ready; single-maintainer risk"
+  }
+ ],
+ "scoreLabels": [
+  "None",
+  "Limited",
+  "Good",
+  "Excellent"
+ ],
+ "categories": {
+  "critical": {
+   "label": "Critical",
+   "color": "#EF4444"
+  },
+  "high": {
+   "label": "High",
+   "color": "#F59E0B"
+  },
+  "medium": {
+   "label": "Medium",
+   "color": "#3B82F6"
+  },
+  "low": {
+   "label": "Low",
+   "color": "#64748B"
+  },
+  "nice": {
+   "label": "Nice-to-have",
+   "color": "#94A3B8"
+  }
+ },
+ "pricing": {
+  "sliders": {
+   "users": {
+    "min": 1,
+    "max": 100,
+    "default": 21,
+    "step": 1,
+    "label": "Team Size",
+    "unit": "users"
+   },
+   "resources": {
+    "min": 100,
+    "max": 50000,
+    "default": 23658,
+    "step": 100,
+    "label": "Resources Under Management",
+    "unit": "RUM"
+   },
+   "runs": {
+    "min": 50,
+    "max": 5000,
+    "default": 1500,
+    "step": 50,
+    "label": "Monthly Runs (per-stack plans + applies)",
+    "unit": "runs/mo"
+   },
+   "stacks": {
+    "min": 1,
+    "max": 1000,
+    "default": 255,
+    "step": 1,
+    "label": "Stacks / Workspaces",
+    "unit": "stacks"
+   }
+  },
+  "featureLabels": {
+   "privateWorkers": "Self-hosted runners",
+   "opa": "Policy enforcement",
+   "driftDetection": "Drift detection",
+   "samlSso": "SAML SSO",
+   "auditLog": "Audit log",
+   "registry": "Module registry"
+  },
+  "pricingScore": {
+   "bands": [
+    {
+     "max": 750,
+     "score": 3
+    },
+    {
+     "max": 2500,
+     "score": 2
+    },
+    {
+     "max": 7500,
+     "score": 1
+    }
+   ],
+   "above": 0,
+   "quoteOnly": 1
+  },
+  "platforms": {
+   "spacelift": {
+    "model": "Annual subscription, worker-gated",
+    "description": "Flat annual tiers; private workers (runners in your account) start at Starter+",
+    "tiers": [
+     {
+      "name": "Free",
+      "basePrice": 0,
+      "includedUsers": null,
+      "includedResources": null,
+      "includedRuns": null,
+      "includedStacks": null,
+      "perUser": 0,
+      "perResource": 0,
+      "perRun": 0,
+      "perStack": 0,
+      "maxUsers": 2,
+      "maxResources": null,
+      "maxRuns": null,
+      "maxStacks": null,
+      "estimated": false,
+      "quoteOnly": false,
+      "autoSelect": false,
+      "features": {
+       "privateWorkers": false,
+       "opa": true,
+       "driftDetection": false,
+       "samlSso": false,
+       "auditLog": false,
+       "registry": false
+      },
+      "notes": "2 users, 1 public worker, no private workers — not usable for a team",
+      "source": "https://spacelift.io/pricing"
+     },
+     {
+      "name": "Starter+",
+      "basePrice": 1667,
+      "includedUsers": null,
+      "includedResources": null,
+      "includedRuns": null,
+      "includedStacks": null,
+      "perUser": 0,
+      "perResource": 0,
+      "perRun": 0,
+      "perStack": 0,
+      "maxUsers": null,
+      "maxResources": null,
+      "maxRuns": null,
+      "maxStacks": null,
+      "estimated": false,
+      "quoteOnly": false,
+      "autoSelect": true,
+      "features": {
+       "privateWorkers": true,
+       "opa": true,
+       "driftDetection": true,
+       "samlSso": false,
+       "auditLog": false,
+       "registry": false
+      },
+      "notes": "$20,000/yr; unlimited users; 1–2 private workers; OIDC SSO; no registry/Blueprints",
+      "source": "https://spacelift.io/pricing"
+     },
+     {
+      "name": "Business",
+      "basePrice": 0,
+      "includedUsers": null,
+      "includedResources": null,
+      "includedRuns": null,
+      "includedStacks": null,
+      "perUser": 0,
+      "perResource": 0,
+      "perRun": 0,
+      "perStack": 0,
+      "maxUsers": null,
+      "maxResources": null,
+      "maxRuns": null,
+      "maxStacks": null,
+      "estimated": false,
+      "quoteOnly": true,
+      "autoSelect": true,
+      "features": {
+       "privateWorkers": true,
+       "opa": true,
+       "driftDetection": true,
+       "samlSso": false,
+       "auditLog": false,
+       "registry": true
+      },
+      "notes": "Quote only; 3 private workers, Blueprints/Templates, module registry",
+      "source": "https://spacelift.io/pricing"
+     },
+     {
+      "name": "Enterprise",
+      "basePrice": 0,
+      "includedUsers": null,
+      "includedResources": null,
+      "includedRuns": null,
+      "includedStacks": null,
+      "perUser": 0,
+      "perResource": 0,
+      "perRun": 0,
+      "perStack": 0,
+      "maxUsers": null,
+      "maxResources": null,
+      "maxRuns": null,
+      "maxStacks": null,
+      "estimated": false,
+      "quoteOnly": true,
+      "autoSelect": true,
+      "features": {
+       "privateWorkers": true,
+       "opa": true,
+       "driftDetection": true,
+       "samlSso": true,
+       "auditLog": true,
+       "registry": true
+      },
+      "notes": "Quote only; 5–30 private workers, SAML SSO, audit trail",
+      "source": "https://spacelift.io/pricing"
+     }
+    ]
+   },
+   "env0": {
+    "model": "Platform fee + active environments",
+    "description": "Tiers capped by active environments (≈ stacks); list prices from AWS Marketplace",
+    "tiers": [
+     {
+      "name": "Free",
+      "basePrice": 0,
+      "includedUsers": null,
+      "includedResources": null,
+      "includedRuns": 250,
+      "includedStacks": null,
+      "perUser": 0,
+      "perResource": 0,
+      "perRun": 0,
+      "perStack": 0,
+      "maxUsers": null,
+      "maxResources": null,
+      "maxRuns": 250,
+      "maxStacks": 30,
+      "estimated": false,
+      "quoteOnly": false,
+      "autoSelect": false,
+      "features": {
+       "privateWorkers": true,
+       "opa": true,
+       "driftDetection": true,
+       "samlSso": true,
+       "auditLog": false,
+       "registry": true
+      },
+      "notes": "30 active environments, 250 runs, 1 concurrent run",
+      "source": "https://docs.envzero.com/guides/billing/subscription-tiers"
+     },
+     {
+      "name": "Cloud Navigator",
+      "basePrice": 1500,
+      "includedUsers": null,
+      "includedResources": null,
+      "includedRuns": null,
+      "includedStacks": null,
+      "perUser": 0,
+      "perResource": 0,
+      "perRun": 0,
+      "perStack": 0,
+      "maxUsers": null,
+      "maxResources": null,
+      "maxRuns": null,
+      "maxStacks": 100,
+      "estimated": true,
+      "quoteOnly": false,
+      "autoSelect": true,
+      "features": {
+       "privateWorkers": true,
+       "opa": true,
+       "driftDetection": true,
+       "samlSso": true,
+       "auditLog": false,
+       "registry": true
+      },
+      "notes": "Marketplace list $18k/yr platform fee; up to 100 active environments; quote-based",
+      "source": "https://aws.amazon.com/marketplace/pp/prodview-t2j5oberppp7e"
+     },
+     {
+      "name": "Cloud Pilot",
+      "basePrice": 3000,
+      "includedUsers": null,
+      "includedResources": null,
+      "includedRuns": null,
+      "includedStacks": null,
+      "perUser": 0,
+      "perResource": 0,
+      "perRun": 0,
+      "perStack": 30.42,
+      "maxUsers": null,
+      "maxResources": null,
+      "maxRuns": null,
+      "maxStacks": null,
+      "estimated": true,
+      "quoteOnly": false,
+      "autoSelect": true,
+      "features": {
+       "privateWorkers": true,
+       "opa": true,
+       "driftDetection": true,
+       "samlSso": true,
+       "auditLog": true,
+       "registry": true
+      },
+      "notes": "Marketplace list $36k/yr + $365/yr per active env (worst case, bundling unpublished)",
+      "source": "https://aws.amazon.com/marketplace/pp/prodview-t2j5oberppp7e"
+     }
+    ]
+   },
+   "scalr": {
+    "model": "Per run",
+    "description": "Same features on Free and Business; billed per run (PR dry runs count, drift runs don't)",
+    "tiers": [
+     {
+      "name": "Free",
+      "basePrice": 0,
+      "includedUsers": null,
+      "includedResources": null,
+      "includedRuns": 50,
+      "includedStacks": null,
+      "perUser": 0,
+      "perResource": 0,
+      "perRun": 0,
+      "perStack": 0,
+      "maxUsers": null,
+      "maxResources": null,
+      "maxRuns": 50,
+      "maxStacks": null,
+      "estimated": false,
+      "quoteOnly": false,
+      "autoSelect": true,
+      "features": {
+       "privateWorkers": true,
+       "opa": true,
+       "driftDetection": true,
+       "samlSso": true,
+       "auditLog": false,
+       "registry": true
+      },
+      "notes": "50 runs/month",
+      "source": "https://scalr.com/pricing"
+     },
+     {
+      "name": "Business",
+      "basePrice": 0,
+      "includedUsers": null,
+      "includedResources": null,
+      "includedRuns": null,
+      "includedStacks": null,
+      "perUser": 0,
+      "perResource": 0,
+      "perRun": 0.99,
+      "perStack": 0,
+      "maxUsers": null,
+      "maxResources": null,
+      "maxRuns": null,
+      "maxStacks": null,
+      "estimated": false,
+      "quoteOnly": false,
+      "autoSelect": true,
+      "features": {
+       "privateWorkers": true,
+       "opa": true,
+       "driftDetection": true,
+       "samlSso": true,
+       "auditLog": false,
+       "registry": true
+      },
+      "notes": "$0.99/run, volume discounts",
+      "source": "https://docs.scalr.io/docs/pricing-faq"
+     },
+     {
+      "name": "Enterprise",
+      "basePrice": 1650,
+      "includedUsers": null,
+      "includedResources": null,
+      "includedRuns": 1667,
+      "includedStacks": null,
+      "perUser": 0,
+      "perResource": 0,
+      "perRun": 0.99,
+      "perStack": 0,
+      "maxUsers": null,
+      "maxResources": null,
+      "maxRuns": null,
+      "maxStacks": null,
+      "estimated": true,
+      "quoteOnly": false,
+      "autoSelect": true,
+      "features": {
+       "privateWorkers": true,
+       "opa": true,
+       "driftDetection": true,
+       "samlSso": true,
+       "auditLog": true,
+       "registry": true
+      },
+      "notes": "From 20,000 runs/yr commit; audit log streaming, own-bucket state, BYOK; quote-based",
+      "source": "https://scalr.com/pricing"
+     }
+    ]
+   },
+   "terramate": {
+    "model": "Resources under management",
+    "description": "Flat tiers capped by managed resources; runs in your own CI",
+    "tiers": [
+     {
+      "name": "Community",
+      "basePrice": 0,
+      "includedUsers": null,
+      "includedResources": null,
+      "includedRuns": null,
+      "includedStacks": null,
+      "perUser": 0,
+      "perResource": 0,
+      "perRun": 0,
+      "perStack": 0,
+      "maxUsers": 2,
+      "maxResources": 1000,
+      "maxRuns": null,
+      "maxStacks": null,
+      "estimated": false,
+      "quoteOnly": false,
+      "autoSelect": true,
+      "features": {
+       "privateWorkers": true,
+       "opa": true,
+       "driftDetection": true,
+       "samlSso": false,
+       "auditLog": false,
+       "registry": false
+      },
+      "notes": "2 users, 1,000 resources",
+      "source": "https://terramate.io/pricing"
+     },
+     {
+      "name": "Teams",
+      "basePrice": 449,
+      "includedUsers": null,
+      "includedResources": null,
+      "includedRuns": null,
+      "includedStacks": null,
+      "perUser": 0,
+      "perResource": 0,
+      "perRun": 0,
+      "perStack": 0,
+      "maxUsers": null,
+      "maxResources": 5000,
+      "maxRuns": null,
+      "maxStacks": null,
+      "estimated": false,
+      "quoteOnly": false,
+      "autoSelect": true,
+      "features": {
+       "privateWorkers": true,
+       "opa": true,
+       "driftDetection": true,
+       "samlSso": false,
+       "auditLog": false,
+       "registry": false
+      },
+      "notes": "Unlimited users, 5,000 resources; no RBAC/SAML/audit",
+      "source": "https://terramate.io/pricing"
+     },
+     {
+      "name": "Enterprise",
+      "basePrice": 0,
+      "includedUsers": null,
+      "includedResources": null,
+      "includedRuns": null,
+      "includedStacks": null,
+      "perUser": 0,
+      "perResource": 0,
+      "perRun": 0,
+      "perStack": 0,
+      "maxUsers": null,
+      "maxResources": null,
+      "maxRuns": null,
+      "maxStacks": null,
+      "estimated": false,
+      "quoteOnly": true,
+      "autoSelect": true,
+      "features": {
+       "privateWorkers": true,
+       "opa": true,
+       "driftDetection": true,
+       "samlSso": true,
+       "auditLog": true,
+       "registry": false
+      },
+      "notes": "Quote only; RBAC, SAML, audit logs, custom resource limits",
+      "source": "https://terramate.io/pricing"
+     }
+    ]
+   },
+   "stategraph": {
+    "model": "Flat annual (orchestration) + BIUs (state engine)",
+    "description": "Terrateam orchestration is flat; Stategraph IaaD is billed by BIUs",
+    "tiers": [
+     {
+      "name": "OSS self-hosted",
+      "basePrice": 0,
+      "includedUsers": null,
+      "includedResources": null,
+      "includedRuns": null,
+      "includedStacks": null,
+      "perUser": 0,
+      "perResource": 0,
+      "perRun": 0,
+      "perStack": 0,
+      "maxUsers": 3,
+      "maxResources": null,
+      "maxRuns": null,
+      "maxStacks": null,
+      "estimated": false,
+      "quoteOnly": false,
+      "autoSelect": false,
+      "features": {
+       "privateWorkers": true,
+       "opa": true,
+       "driftDetection": true,
+       "samlSso": false,
+       "auditLog": true,
+       "registry": false
+      },
+      "notes": "MPL-2.0; capped at 3 monthly active users since 2026-09-14",
+      "source": "https://docs.terrateam.io/editions/"
+     },
+     {
+      "name": "Orchestration Free",
+      "basePrice": 0,
+      "includedUsers": null,
+      "includedResources": null,
+      "includedRuns": null,
+      "includedStacks": null,
+      "perUser": 0,
+      "perResource": 0,
+      "perRun": 0,
+      "perStack": 0,
+      "maxUsers": 3,
+      "maxResources": null,
+      "maxRuns": 50,
+      "maxStacks": null,
+      "estimated": false,
+      "quoteOnly": false,
+      "autoSelect": true,
+      "features": {
+       "privateWorkers": true,
+       "opa": true,
+       "driftDetection": true,
+       "samlSso": true,
+       "auditLog": true,
+       "registry": false
+      },
+      "notes": "3 users, 50 runs/month, 1 private runner",
+      "source": "https://terrateam.io/pricing"
+     },
+     {
+      "name": "Orchestration Pro",
+      "basePrice": 1000,
+      "includedUsers": null,
+      "includedResources": null,
+      "includedRuns": null,
+      "includedStacks": null,
+      "perUser": 0,
+      "perResource": 0,
+      "perRun": 0,
+      "perStack": 0,
+      "maxUsers": null,
+      "maxResources": null,
+      "maxRuns": null,
+      "maxStacks": null,
+      "estimated": false,
+      "quoteOnly": false,
+      "autoSelect": true,
+      "features": {
+       "privateWorkers": true,
+       "opa": true,
+       "driftDetection": true,
+       "samlSso": true,
+       "auditLog": true,
+       "registry": false
+      },
+      "notes": "$12k/yr; unlimited users/runs/runners; self-hosting included; state stays in your backend",
+      "source": "https://terrateam.io/pricing"
+     },
+     {
+      "name": "Pro + Stategraph Enterprise",
+      "basePrice": 3083,
+      "includedUsers": null,
+      "includedResources": 10000,
+      "includedRuns": null,
+      "includedStacks": null,
+      "perUser": 0,
+      "perResource": 0,
+      "perRun": 0,
+      "perStack": 0,
+      "maxUsers": null,
+      "maxResources": null,
+      "maxRuns": null,
+      "maxStacks": null,
+      "estimated": true,
+      "quoteOnly": false,
+      "autoSelect": true,
+      "features": {
+       "privateWorkers": true,
+       "opa": true,
+       "driftDetection": true,
+       "samlSso": true,
+       "auditLog": true,
+       "registry": false
+      },
+      "notes": "Adds self-hosted Stategraph state engine ($25k/yr), 10k BIUs included; BIU packs above that unpublished",
+      "source": "https://stategraph.com/pricing"
+     }
+    ]
+   },
+   "hcp-terraform": {
+    "model": "Resources under management",
+    "description": "Billed per peak managed resource per hour",
+    "tiers": [
+     {
+      "name": "Free",
+      "basePrice": 0,
+      "includedUsers": null,
+      "includedResources": null,
+      "includedRuns": null,
+      "includedStacks": null,
+      "perUser": 0,
+      "perResource": 0,
+      "perRun": 0,
+      "perStack": 0,
+      "maxUsers": null,
+      "maxResources": 500,
+      "maxRuns": null,
+      "maxStacks": null,
+      "estimated": false,
+      "quoteOnly": false,
+      "autoSelect": true,
+      "features": {
+       "privateWorkers": true,
+       "opa": true,
+       "driftDetection": false,
+       "samlSso": false,
+       "auditLog": false,
+       "registry": true
+      },
+      "notes": "500 resources, 1 concurrent run, no SSO",
+      "source": "https://developer.hashicorp.com/terraform/cloud-docs/overview"
+     },
+     {
+      "name": "Essentials",
+      "basePrice": 0,
+      "includedUsers": null,
+      "includedResources": null,
+      "includedRuns": null,
+      "includedStacks": null,
+      "perUser": 0,
+      "perResource": 0.1,
+      "perRun": 0,
+      "perStack": 0,
+      "maxUsers": null,
+      "maxResources": null,
+      "maxRuns": null,
+      "maxStacks": null,
+      "estimated": false,
+      "quoteOnly": false,
+      "autoSelect": false,
+      "features": {
+       "privateWorkers": true,
+       "opa": false,
+       "driftDetection": false,
+       "samlSso": true,
+       "auditLog": false,
+       "registry": true
+      },
+      "notes": "$0.10/resource/mo; 1 concurrent agent run, no drift or policy enforcement",
+      "source": "https://www.hashicorp.com/en/pricing"
+     },
+     {
+      "name": "Standard",
+      "basePrice": 0,
+      "includedUsers": null,
+      "includedResources": null,
+      "includedRuns": null,
+      "includedStacks": null,
+      "perUser": 0,
+      "perResource": 0.47,
+      "perRun": 0,
+      "perStack": 0,
+      "maxUsers": null,
+      "maxResources": null,
+      "maxRuns": null,
+      "maxStacks": null,
+      "estimated": false,
+      "quoteOnly": false,
+      "autoSelect": true,
+      "features": {
+       "privateWorkers": true,
+       "opa": true,
+       "driftDetection": true,
+       "samlSso": true,
+       "auditLog": false,
+       "registry": true
+      },
+      "notes": "$0.47/resource/mo; 10 agent runs, drift, policy, Stacks",
+      "source": "https://www.hashicorp.com/en/pricing"
+     },
+     {
+      "name": "Premium",
+      "basePrice": 0,
+      "includedUsers": null,
+      "includedResources": null,
+      "includedRuns": null,
+      "includedStacks": null,
+      "perUser": 0,
+      "perResource": 0.99,
+      "perRun": 0,
+      "perStack": 0,
+      "maxUsers": null,
+      "maxResources": null,
+      "maxRuns": null,
+      "maxStacks": null,
+      "estimated": false,
+      "quoteOnly": false,
+      "autoSelect": true,
+      "features": {
+       "privateWorkers": true,
+       "opa": true,
+       "driftDetection": true,
+       "samlSso": true,
+       "auditLog": true,
+       "registry": true
+      },
+      "notes": "$0.99/resource/mo; audit logging, custom RBAC, Stack auto-approve groups",
+      "source": "https://www.hashicorp.com/en/pricing"
+     }
+    ]
+   },
+   "opentaco": {
+    "model": "Per user (hosted) / self-hosted",
+    "description": "'Free' options lack UI/drift at team scale; hosted Pro is the realistic entry",
+    "tiers": [
+     {
+      "name": "Backendless (OSS action)",
+      "basePrice": 0,
+      "includedUsers": null,
+      "includedResources": null,
+      "includedRuns": null,
+      "includedStacks": null,
+      "perUser": 0,
+      "perResource": 0,
+      "perRun": 0,
+      "perStack": 0,
+      "maxUsers": null,
+      "maxResources": null,
+      "maxRuns": null,
+      "maxStacks": null,
+      "estimated": false,
+      "quoteOnly": false,
+      "autoSelect": false,
+      "features": {
+       "privateWorkers": true,
+       "opa": false,
+       "driftDetection": false,
+       "samlSso": false,
+       "auditLog": false,
+       "registry": false
+      },
+      "notes": "No UI, policy store or drift service — demo scale only",
+      "source": "https://docs.opentaco.dev/ce/howto/backendless-mode"
+     },
+     {
+      "name": "Cloud Free",
+      "basePrice": 0,
+      "includedUsers": null,
+      "includedResources": null,
+      "includedRuns": null,
+      "includedStacks": null,
+      "perUser": 0,
+      "perResource": 0,
+      "perRun": 0,
+      "perStack": 0,
+      "maxUsers": null,
+      "maxResources": null,
+      "maxRuns": null,
+      "maxStacks": 3,
+      "estimated": false,
+      "quoteOnly": false,
+      "autoSelect": false,
+      "features": {
+       "privateWorkers": true,
+       "opa": true,
+       "driftDetection": true,
+       "samlSso": false,
+       "auditLog": false,
+       "registry": false
+      },
+      "notes": "Hard-capped at 3 drift-monitored projects",
+      "source": "https://github.com/diggerhq/digger/blob/develop/backend/models/orgs.go"
+     },
+     {
+      "name": "Self-hosted CE (TCO)",
+      "basePrice": 300,
+      "includedUsers": null,
+      "includedResources": null,
+      "includedRuns": null,
+      "includedStacks": null,
+      "perUser": 0,
+      "perResource": 0,
+      "perRun": 0,
+      "perStack": 0,
+      "maxUsers": null,
+      "maxResources": null,
+      "maxRuns": null,
+      "maxStacks": null,
+      "estimated": true,
+      "quoteOnly": false,
+      "autoSelect": false,
+      "features": {
+       "privateWorkers": true,
+       "opa": true,
+       "driftDetection": true,
+       "samlSso": true,
+       "auditLog": false,
+       "registry": false
+      },
+      "notes": "MIT; ~$150–250 AWS + WorkOS SSO $125/connection; excludes engineering time, no vendor support",
+      "source": "https://github.com/diggerhq/digger"
+     },
+     {
+      "name": "Pro",
+      "basePrice": 250,
+      "includedUsers": 5,
+      "includedResources": null,
+      "includedRuns": null,
+      "includedStacks": null,
+      "perUser": 10,
+      "perResource": 0,
+      "perRun": 0,
+      "perStack": 0,
+      "maxUsers": null,
+      "maxResources": null,
+      "maxRuns": null,
+      "maxStacks": null,
+      "estimated": true,
+      "quoteOnly": false,
+      "autoSelect": true,
+      "features": {
+       "privateWorkers": true,
+       "opa": true,
+       "driftDetection": true,
+       "samlSso": false,
+       "auditLog": false,
+       "registry": false
+      },
+      "notes": "Third-party figure ($250 for 5 users + $10/user); vendor pricing page removed",
+      "source": "https://toolradar.com/tools/digger"
+     },
+     {
+      "name": "Enterprise",
+      "basePrice": 0,
+      "includedUsers": null,
+      "includedResources": null,
+      "includedRuns": null,
+      "includedStacks": null,
+      "perUser": 0,
+      "perResource": 0,
+      "perRun": 0,
+      "perStack": 0,
+      "maxUsers": null,
+      "maxResources": null,
+      "maxRuns": null,
+      "maxStacks": null,
+      "estimated": false,
+      "quoteOnly": true,
+      "autoSelect": true,
+      "features": {
+       "privateWorkers": true,
+       "opa": true,
+       "driftDetection": true,
+       "samlSso": true,
+       "auditLog": true,
+       "registry": false
+      },
+      "notes": "Quote only (third-party $3–5k/mo)",
+      "source": "https://toolradar.com/tools/digger"
+     }
+    ]
+   },
+   "ops0": {
+    "model": "Governed resources",
+    "description": "Flat per-org tiers capped by cloud accounts and governed resources",
+    "tiers": [
+     {
+      "name": "Free",
+      "basePrice": 0,
+      "includedUsers": null,
+      "includedResources": null,
+      "includedRuns": null,
+      "includedStacks": null,
+      "perUser": 0,
+      "perResource": 0,
+      "perRun": 0,
+      "perStack": 0,
+      "maxUsers": null,
+      "maxResources": 250,
+      "maxRuns": null,
+      "maxStacks": null,
+      "estimated": false,
+      "quoteOnly": false,
+      "autoSelect": false,
+      "features": {
+       "privateWorkers": false,
+       "opa": true,
+       "driftDetection": true,
+       "samlSso": false,
+       "auditLog": false,
+       "registry": false
+      },
+      "notes": "250 resources; 30-day trial per billing docs",
+      "source": "https://ops0.com/pricing"
+     },
+     {
+      "name": "Pro",
+      "basePrice": 449,
+      "includedUsers": null,
+      "includedResources": null,
+      "includedRuns": null,
+      "includedStacks": null,
+      "perUser": 0,
+      "perResource": 0,
+      "perRun": 0,
+      "perStack": 0,
+      "maxUsers": null,
+      "maxResources": 1500,
+      "maxRuns": null,
+      "maxStacks": null,
+      "estimated": false,
+      "quoteOnly": false,
+      "autoSelect": true,
+      "features": {
+       "privateWorkers": false,
+       "opa": true,
+       "driftDetection": true,
+       "samlSso": false,
+       "auditLog": false,
+       "registry": false
+      },
+      "notes": "1,500 resources; 'limited time' price",
+      "source": "https://ops0.com/pricing"
+     },
+     {
+      "name": "Business",
+      "basePrice": 949,
+      "includedUsers": null,
+      "includedResources": null,
+      "includedRuns": null,
+      "includedStacks": null,
+      "perUser": 0,
+      "perResource": 0,
+      "perRun": 0,
+      "perStack": 0,
+      "maxUsers": null,
+      "maxResources": 5000,
+      "maxRuns": null,
+      "maxStacks": null,
+      "estimated": false,
+      "quoteOnly": false,
+      "autoSelect": true,
+      "features": {
+       "privateWorkers": false,
+       "opa": true,
+       "driftDetection": true,
+       "samlSso": true,
+       "auditLog": false,
+       "registry": false
+      },
+      "notes": "5,000 resources, SSO; 'limited time' price",
+      "source": "https://ops0.com/pricing"
+     },
+     {
+      "name": "Enterprise",
+      "basePrice": 0,
+      "includedUsers": null,
+      "includedResources": null,
+      "includedRuns": null,
+      "includedStacks": null,
+      "perUser": 0,
+      "perResource": 0,
+      "perRun": 0,
+      "perStack": 0,
+      "maxUsers": null,
+      "maxResources": null,
+      "maxRuns": null,
+      "maxStacks": null,
+      "estimated": false,
+      "quoteOnly": true,
+      "autoSelect": true,
+      "features": {
+       "privateWorkers": false,
+       "opa": true,
+       "driftDetection": true,
+       "samlSso": true,
+       "auditLog": true,
+       "registry": false
+      },
+      "notes": "Quote only; self-hosted option",
+      "source": "https://ops0.com/pricing"
+     }
+    ]
+   },
+   "pulumi": {
+    "model": "Resources under management (hourly)",
+    "description": "Every Terraform resource and stack stored counts; volume discounts via sales",
+    "tiers": [
+     {
+      "name": "Free",
+      "basePrice": 0,
+      "includedUsers": null,
+      "includedResources": null,
+      "includedRuns": null,
+      "includedStacks": null,
+      "perUser": 0,
+      "perResource": 0,
+      "perRun": 0,
+      "perStack": 0,
+      "maxUsers": 1,
+      "maxResources": null,
+      "maxRuns": null,
+      "maxStacks": null,
+      "estimated": false,
+      "quoteOnly": false,
+      "autoSelect": true,
+      "features": {
+       "privateWorkers": false,
+       "opa": true,
+       "driftDetection": false,
+       "samlSso": false,
+       "auditLog": false,
+       "registry": false
+      },
+      "notes": "1 user",
+      "source": "https://www.pulumi.com/pricing/"
+     },
+     {
+      "name": "Essentials",
+      "basePrice": 40,
+      "includedUsers": null,
+      "includedResources": 500,
+      "includedRuns": null,
+      "includedStacks": null,
+      "perUser": 0,
+      "perResource": 0.1825,
+      "perRun": 0,
+      "perStack": 0,
+      "maxUsers": null,
+      "maxResources": null,
+      "maxRuns": null,
+      "maxStacks": null,
+      "estimated": false,
+      "quoteOnly": false,
+      "autoSelect": true,
+      "features": {
+       "privateWorkers": false,
+       "opa": false,
+       "driftDetection": false,
+       "samlSso": false,
+       "auditLog": false,
+       "registry": false
+      },
+      "notes": "~500 resources included; advisory policies only, no SAML",
+      "source": "https://www.pulumi.com/pricing/"
+     },
+     {
+      "name": "Pro",
+      "basePrice": 400,
+      "includedUsers": null,
+      "includedResources": 2000,
+      "includedRuns": null,
+      "includedStacks": null,
+      "perUser": 0,
+      "perResource": 0.365,
+      "perRun": 0,
+      "perStack": 0,
+      "maxUsers": null,
+      "maxResources": null,
+      "maxRuns": null,
+      "maxStacks": null,
+      "estimated": false,
+      "quoteOnly": false,
+      "autoSelect": true,
+      "features": {
+       "privateWorkers": false,
+       "opa": true,
+       "driftDetection": false,
+       "samlSso": true,
+       "auditLog": true,
+       "registry": true
+      },
+      "notes": "~2,000 resources included; SAML, enforced policies, audit export",
+      "source": "https://www.pulumi.com/pricing/"
+     },
+     {
+      "name": "Enterprise",
+      "basePrice": 2000,
+      "includedUsers": null,
+      "includedResources": 4750,
+      "includedRuns": null,
+      "includedStacks": null,
+      "perUser": 0,
+      "perResource": 0.5475,
+      "perRun": 0,
+      "perStack": 0,
+      "maxUsers": null,
+      "maxResources": null,
+      "maxRuns": null,
+      "maxStacks": null,
+      "estimated": true,
+      "quoteOnly": false,
+      "autoSelect": true,
+      "features": {
+       "privateWorkers": false,
+       "opa": true,
+       "driftDetection": false,
+       "samlSso": true,
+       "auditLog": true,
+       "registry": true
+      },
+      "notes": "List-rate ceiling; volume-priced via sales above ~4,750 resources",
+      "source": "https://www.pulumi.com/pricing/"
+     }
+    ]
+   },
+   "terragrunt-scale": {
+    "model": "Units (stacks)",
+    "description": "Billed by units — each directory with a terragrunt.hcl",
+    "tiers": [
+     {
+      "name": "Free",
+      "basePrice": 0,
+      "includedUsers": null,
+      "includedResources": null,
+      "includedRuns": null,
+      "includedStacks": null,
+      "perUser": 0,
+      "perResource": 0,
+      "perRun": 0,
+      "perStack": 0,
+      "maxUsers": null,
+      "maxResources": null,
+      "maxRuns": null,
+      "maxStacks": 25,
+      "estimated": false,
+      "quoteOnly": false,
+      "autoSelect": false,
+      "features": {
+       "privateWorkers": true,
+       "opa": false,
+       "driftDetection": false,
+       "samlSso": false,
+       "auditLog": false,
+       "registry": false
+      },
+      "notes": "25 units; personal/small commercial use",
+      "source": "https://terragrunt.com/terragrunt-scale"
+     },
+     {
+      "name": "Team",
+      "basePrice": 500,
+      "includedUsers": null,
+      "includedResources": null,
+      "includedRuns": null,
+      "includedStacks": null,
+      "perUser": 0,
+      "perResource": 0,
+      "perRun": 0,
+      "perStack": 0,
+      "maxUsers": null,
+      "maxResources": null,
+      "maxRuns": null,
+      "maxStacks": 200,
+      "estimated": false,
+      "quoteOnly": false,
+      "autoSelect": true,
+      "features": {
+       "privateWorkers": true,
+       "opa": false,
+       "driftDetection": true,
+       "samlSso": false,
+       "auditLog": false,
+       "registry": false
+      },
+      "notes": "200 units; Patcher + drift; annual billing (~$600 month-to-month)",
+      "source": "https://terragrunt.com/terragrunt-scale"
+     },
+     {
+      "name": "Enterprise",
+      "basePrice": 0,
+      "includedUsers": null,
+      "includedResources": null,
+      "includedRuns": null,
+      "includedStacks": null,
+      "perUser": 0,
+      "perResource": 0,
+      "perRun": 0,
+      "perStack": 0,
+      "maxUsers": null,
+      "maxResources": null,
+      "maxRuns": null,
+      "maxStacks": null,
+      "estimated": false,
+      "quoteOnly": true,
+      "autoSelect": true,
+      "features": {
+       "privateWorkers": true,
+       "opa": false,
+       "driftDetection": true,
+       "samlSso": false,
+       "auditLog": false,
+       "registry": false
+      },
+      "notes": "Quote only; unlimited units, pipeline hooks, Infracost",
+      "source": "https://terragrunt.com/terragrunt-scale"
+     }
+    ]
+   },
+   "atmos": {
+    "model": "Licensed users",
+    "description": "Atmos CLI is free; Atmos Pro billed per licensed user (viewers free)",
+    "tiers": [
+     {
+      "name": "Pro Free",
+      "basePrice": 0,
+      "includedUsers": null,
+      "includedResources": null,
+      "includedRuns": null,
+      "includedStacks": null,
+      "perUser": 0,
+      "perResource": 0,
+      "perRun": 0,
+      "perStack": 0,
+      "maxUsers": 3,
+      "maxResources": null,
+      "maxRuns": null,
+      "maxStacks": 100,
+      "estimated": false,
+      "quoteOnly": false,
+      "autoSelect": true,
+      "features": {
+       "privateWorkers": true,
+       "opa": true,
+       "driftDetection": true,
+       "samlSso": false,
+       "auditLog": false,
+       "registry": false
+      },
+      "notes": "3 licensed users, 100 component instances",
+      "source": "https://atmos-pro.com/pricing"
+     },
+     {
+      "name": "Pro Team",
+      "basePrice": 500,
+      "includedUsers": 5,
+      "includedResources": null,
+      "includedRuns": null,
+      "includedStacks": null,
+      "perUser": 100,
+      "perResource": 0,
+      "perRun": 0,
+      "perStack": 0,
+      "maxUsers": null,
+      "maxResources": null,
+      "maxRuns": null,
+      "maxStacks": null,
+      "estimated": false,
+      "quoteOnly": false,
+      "autoSelect": true,
+      "features": {
+       "privateWorkers": true,
+       "opa": true,
+       "driftDetection": true,
+       "samlSso": false,
+       "auditLog": false,
+       "registry": false
+      },
+      "notes": "5 users + $100/user; approvals may be Business-only",
+      "source": "https://atmos-pro.com/pricing"
+     },
+     {
+      "name": "Pro Business",
+      "basePrice": 3000,
+      "includedUsers": 25,
+      "includedResources": null,
+      "includedRuns": null,
+      "includedStacks": null,
+      "perUser": 0,
+      "perResource": 0,
+      "perRun": 0,
+      "perStack": 0,
+      "maxUsers": 25,
+      "maxResources": null,
+      "maxRuns": null,
+      "maxStacks": null,
+      "estimated": false,
+      "quoteOnly": false,
+      "autoSelect": true,
+      "features": {
+       "privateWorkers": true,
+       "opa": true,
+       "driftDetection": true,
+       "samlSso": false,
+       "auditLog": true,
+       "registry": false
+      },
+      "notes": "From $36k/yr, 25 users; governance/approvals, SLA",
+      "source": "https://atmos-pro.com/pricing"
+     },
+     {
+      "name": "Pro Enterprise",
+      "basePrice": 0,
+      "includedUsers": null,
+      "includedResources": null,
+      "includedRuns": null,
+      "includedStacks": null,
+      "perUser": 0,
+      "perResource": 0,
+      "perRun": 0,
+      "perStack": 0,
+      "maxUsers": null,
+      "maxResources": null,
+      "maxRuns": null,
+      "maxStacks": null,
+      "estimated": false,
+      "quoteOnly": true,
+      "autoSelect": true,
+      "features": {
+       "privateWorkers": true,
+       "opa": true,
+       "driftDetection": true,
+       "samlSso": false,
+       "auditLog": true,
+       "registry": false
+      },
+      "notes": "Quote only",
+      "source": "https://atmos-pro.com/pricing"
+     }
+    ]
+   },
+   "otf": {
+    "model": "Self-hosted (OSS)",
+    "description": "Free MPL-2.0; cost is hosting plus operations",
+    "tiers": [
+     {
+      "name": "Self-hosted (TCO)",
+      "basePrice": 135,
+      "includedUsers": null,
+      "includedResources": null,
+      "includedRuns": null,
+      "includedStacks": null,
+      "perUser": 0,
+      "perResource": 0,
+      "perRun": 0,
+      "perStack": 0,
+      "maxUsers": null,
+      "maxResources": null,
+      "maxRuns": null,
+      "maxStacks": null,
+      "estimated": true,
+      "quoteOnly": false,
+      "autoSelect": true,
+      "features": {
+       "privateWorkers": true,
+       "opa": false,
+       "driftDetection": false,
+       "samlSso": true,
+       "auditLog": false,
+       "registry": true
+      },
+      "notes": "~$100–170/mo EC2 + RDS + ALB + agents; plus ~0.1–0.2 FTE ops; single maintainer",
+      "source": "https://github.com/leg100/otf"
+     }
+    ]
+   }
+  }
+ }
 }
