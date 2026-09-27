@@ -275,6 +275,11 @@
    "name": "Terrakube",
    "url": "https://terrakube.io",
    "reason": "Requires Kubernetes (G1)"
+  },
+  {
+   "name": "ops0",
+   "url": "https://ops0.com",
+   "reason": "Not a TACOS: cloud-security/governance SaaS with a thin Terraform run layer, no self-hosted runners"
   }
  ],
  "platforms": [
@@ -977,106 +982,6 @@
    },
    "disqualified": true,
    "tagline": "Formerly Digger. MIT-licensed PR automation in your own GitHub Actions; vendor focus has moved to AI agents"
-  },
-  {
-   "id": "ops0",
-   "name": "ops0",
-   "url": "https://ops0.com",
-   "icon": "ShieldCheck",
-   "color": "#E11D48",
-   "scores": [
-    0,
-    2,
-    1,
-    2,
-    1,
-    2,
-    2,
-    1,
-    1,
-    2,
-    1,
-    1,
-    0,
-    2,
-    3,
-    1,
-    1,
-    2,
-    1,
-    2,
-    2,
-    1,
-    0,
-    3
-   ],
-   "rationales": [
-    "No CDK/cdktn support and no documented pre-plan build step. Projects are plain .tf directories synced from Git.",
-    "Terraform and OpenTofu are both first-class, switchable per project. Per-project binary version pinning is not documented.",
-    "Plan/apply runs in ops0-hosted containers. No customer runner agent or custom image. Full self-hosting is Enterprise-only and undocumented.",
-    "SAML/OIDC SSO (Entra, Google, Okta), org and project roles incl. Approver via OpenFGA, audit log. SSO needs Business tier. Custom roles are Enterprise.",
-    "Variable graph detects remote_state edges and blast radius. Workflows can chain IaC deploys by hand. No unknown-value planning or downstream re-plan.",
-    "Cron-scheduled discovery scans with session diffs and drift alerts. It compares cloud inventory, not a per-stack plan. Remediation from Pro tier.",
-    "AWS access via cross-account IAM role assumption, with no stored keys and short-lived credentials per run. The role is assumed from ops0's own environment.",
-    "Enterprise — contact sales at the default calculator inputs",
-    "Blueprints and a Developer Portal offer UI templates only. No declarative codegen for backend/provider boilerplate across many components.",
-    "State stays in your own S3/GCS/Azure backend (or the ops0 DB). Has state viewer, history/restore and download. Access control is per project only.",
-    "No Atlantis migration path. A generic per-project 'import existing Terraform project' guide only.",
-    "Workflow builder with script, HTTP, condition and approval steps. No hooks inside the GitOps plan/apply path and no custom runner images.",
-    "No private module registry is documented.",
-    "Native monthly cost estimate shown before apply and in PR plan comments. Accuracy method not documented.",
-    "OPA/Rego on plan JSON plus Checkov, with a policy editor, test panel and AI-assisted authoring. Can block deployments.",
-    "Kiwi assistant can review IaC on request. Bring your own Claude or OpenAI-compatible key. No documented automated PR-intent review from trusted config.",
-    "Slack Block Kit alerts and approval notifications. Approvals happen in the ops0 UI. Teams and Google Chat only via generic webhooks.",
-    "GitHub App: auto-plan on PR, plan comments, commit checks, apply on merge. GitLab equivalent. Bitbucket planned, Azure DevOps absent.",
-    "In-app audit logs (90d/1y). Plan, log and cost forwarding only to OpenObserve. Alert webhooks. No Datadog or audit-stream export documented.",
-    "Resource graph per state, cross-project variable DAG, CMDB rollup and deployment history. No multi-stack rollout view.",
-    "Kiwi chat over live platform context, AI incident analysis, and an MCP server via ops0-cli (policy tools). Auto-fix/remediation marked 'coming soon'.",
-    "Blueprint 'environment' requests and project duplication. No PR preview environments or TTL teardown.",
-    "No Terraform provider for managing ops0 itself.",
-    "AWS, GCP, Azure and OCI across discovery, IaC and drift."
-   ],
-   "variants": {
-    "17": {
-     "slack": 2,
-     "teams": 1
-    },
-    "18": {
-     "github": 2,
-     "gitlab": 2,
-     "bitbucket": 0,
-     "azure_devops": 0
-    }
-   },
-   "gates": {
-    "G1": {
-     "pass": true,
-     "evidence": "The SaaS runs plan/apply in ops0's own isolated containers, so you do not need Kubernetes for IaC. The in-cluster agent is only for the Kubernetes-ops features. What the Enterprise self-hosted install needs is not documented.",
-     "url": "https://docs.ops0.com/docs/introduction/architecture"
-    },
-    "G2": {
-     "pass": false,
-     "evidence": "'Terraform plan and apply runs execute inside ops0's isolated execution environment' after assuming a cross-account IAM role. No customer-hosted runner or agent is documented.",
-     "url": "https://docs.ops0.com/docs/security"
-    },
-    "G3": {
-     "pass": false,
-     "evidence": "An IaC project is a directory of .tf files synced from Git. The docs describe no pre-init or pre-plan hook, no custom image and no build step. Workflow 'Script' steps (bash/python/node) exist, but nothing documented feeds their output into an IaC Deploy step.",
-     "url": "https://docs.ops0.com/docs/how-to/setup-gitops"
-    },
-    "G4": {
-     "pass": true,
-     "evidence": "SaaS uses continuous deployment. Docs sitemap lastmod 2026-09-04. ops0-cli v0.5.24 released 2026-07-06, Oxid v0.4.4 released 2026-06-12.",
-     "url": "https://github.com/ops0-ai/ops0-cli/releases"
-    },
-    "G5": {
-     "pass": true,
-     "evidence": "OpenTofu is a first-class engine next to Terraform and Oxid. Each project can be switched between terraform and tofu.",
-     "url": "https://docs.ops0.com/docs/iac/migrate"
-    }
-   },
-   "disqualified": true,
-   "tagline": "AI-first cloud governance SaaS with basic TF/OpenTofu GitOps. No customer-hosted runners."
   },
   {
    "id": "pulumi",
@@ -2462,128 +2367,6 @@
       },
       "notes": "Quote only (third-party $3–5k/mo)",
       "source": "https://toolradar.com/tools/digger"
-     }
-    ]
-   },
-   "ops0": {
-    "model": "Governed resources",
-    "description": "Flat per-org tiers capped by cloud accounts and governed resources",
-    "tiers": [
-     {
-      "name": "Free",
-      "basePrice": 0,
-      "includedUsers": null,
-      "includedResources": null,
-      "includedRuns": null,
-      "includedStacks": null,
-      "perUser": 0,
-      "perResource": 0,
-      "perRun": 0,
-      "perStack": 0,
-      "maxUsers": null,
-      "maxResources": 250,
-      "maxRuns": null,
-      "maxStacks": null,
-      "estimated": false,
-      "quoteOnly": false,
-      "autoSelect": false,
-      "features": {
-       "privateWorkers": false,
-       "opa": true,
-       "driftDetection": true,
-       "samlSso": false,
-       "auditLog": false,
-       "registry": false
-      },
-      "notes": "250 resources; 30-day trial per billing docs",
-      "source": "https://ops0.com/pricing"
-     },
-     {
-      "name": "Pro",
-      "basePrice": 449,
-      "includedUsers": null,
-      "includedResources": null,
-      "includedRuns": null,
-      "includedStacks": null,
-      "perUser": 0,
-      "perResource": 0,
-      "perRun": 0,
-      "perStack": 0,
-      "maxUsers": null,
-      "maxResources": 1500,
-      "maxRuns": null,
-      "maxStacks": null,
-      "estimated": false,
-      "quoteOnly": false,
-      "autoSelect": true,
-      "features": {
-       "privateWorkers": false,
-       "opa": true,
-       "driftDetection": true,
-       "samlSso": false,
-       "auditLog": false,
-       "registry": false
-      },
-      "notes": "1,500 resources; 'limited time' price",
-      "source": "https://ops0.com/pricing"
-     },
-     {
-      "name": "Business",
-      "basePrice": 949,
-      "includedUsers": null,
-      "includedResources": null,
-      "includedRuns": null,
-      "includedStacks": null,
-      "perUser": 0,
-      "perResource": 0,
-      "perRun": 0,
-      "perStack": 0,
-      "maxUsers": null,
-      "maxResources": 5000,
-      "maxRuns": null,
-      "maxStacks": null,
-      "estimated": false,
-      "quoteOnly": false,
-      "autoSelect": true,
-      "features": {
-       "privateWorkers": false,
-       "opa": true,
-       "driftDetection": true,
-       "samlSso": true,
-       "auditLog": false,
-       "registry": false
-      },
-      "notes": "5,000 resources, SSO; 'limited time' price",
-      "source": "https://ops0.com/pricing"
-     },
-     {
-      "name": "Enterprise",
-      "basePrice": 0,
-      "includedUsers": null,
-      "includedResources": null,
-      "includedRuns": null,
-      "includedStacks": null,
-      "perUser": 0,
-      "perResource": 0,
-      "perRun": 0,
-      "perStack": 0,
-      "maxUsers": null,
-      "maxResources": null,
-      "maxRuns": null,
-      "maxStacks": null,
-      "estimated": false,
-      "quoteOnly": true,
-      "autoSelect": true,
-      "features": {
-       "privateWorkers": false,
-       "opa": true,
-       "driftDetection": true,
-       "samlSso": true,
-       "auditLog": true,
-       "registry": false
-      },
-      "notes": "Quote only; self-hosted option",
-      "source": "https://ops0.com/pricing"
      }
     ]
    },
