@@ -1,6 +1,6 @@
 # tacos.guru
 
-An interactive evaluation tool for comparing TACOS (Terraform Automation & Collaboration Software) platforms. Compare Atlantis, Spacelift, env0, Scalr, Terramate, Stategraph (formerly Terrateam), HCP Terraform, OpenTaco (formerly Digger), Pulumi Cloud, Terragrunt Scale, Atmos, and OTF across 24 weighted criteria — plus 4 hard gates that can disqualify a platform outright and 1 advisory gate — and estimate monthly costs based on your team size, resources, run volume, and stack count.
+An interactive evaluation tool for comparing TACOS (Terraform Automation & Collaboration Software) platforms. Compare Atlantis, Spacelift, env0, Scalr, Terramate, Stategraph (formerly Terrateam), HCP Terraform, OpenTaco (formerly Digger), Pulumi Cloud, Terragrunt Scale, Atmos, and OTF across 24 weighted criteria — plus 4 hard gates that can disqualify a platform outright and 1 advisory gate — and estimate monthly costs based on your team size, resources, run volume, and number of Terraform states.
 
 **Live site:** [tacos.guru](https://tacos.guru)
 
@@ -8,7 +8,7 @@ An interactive evaluation tool for comparing TACOS (Terraform Automation & Colla
 
 - **Evaluation tab** — 24 criteria with adjustable weight sliders. Changing weights recalculates and re-sorts platform scores in real time. Two criteria (Collaboration integration, VCS integration) are scored per-variant — pick your collaboration tool and VCS provider from the sidebar selects and the weighted total updates to match. Expand any platform row to see per-criterion rationales, the gates (pass/fail with evidence + source link), and — for disqualified platforms — which gates failed.
 - **Gates** — G1–G4 are hard gates (no Kubernetes required, self-hosted runners in your cloud account, can run a CDK Terrain synth step, actively maintained). G5 (OpenTofu support) is advisory: it's shown, but missing OpenTofu is penalised through criterion 2 instead of disqualifying. A platform that fails any hard gate is marked **Disqualified**, sorted after qualified platforms, and can be hidden entirely with the "Show disqualified" toggle.
-- **Pricing tab** — 4 input sliders (users, resources under management, monthly runs, stacks/workspaces). Auto-selects the cheapest usable tier per platform; quote-only tiers show "Contact sales" instead of a price, and tiers not viable at team scale are labelled accordingly. Override tiers manually by clicking them in the expanded card. The Evaluation tab's "Pricing suitability" criterion is computed live from these same slider inputs, so changing them re-scores every platform.
+- **Pricing tab** — 4 input sliders (users, resources under management, monthly runs, Terraform states/workspaces). Auto-selects the cheapest usable tier per platform; quote-only tiers show "Contact sales" instead of a price, and tiers not viable at team scale are labelled accordingly. Override tiers manually by clicking them in the expanded card. The Evaluation tab's "Pricing suitability" criterion is computed live from these same slider inputs, so changing them re-scores every platform.
 
 ## Running locally
 

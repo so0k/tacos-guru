@@ -138,7 +138,7 @@ function TierMiniCard({
     const stackCost = tier.includedStacks !== null
       ? Math.max(0, inputs.stacks - tier.includedStacks) * tier.perStack
       : inputs.stacks * tier.perStack
-    if (stackCost > 0) breakdown.push(`Stacks: $${Math.round(stackCost)}`)
+    if (stackCost > 0) breakdown.push(`States: $${Math.round(stackCost)}`)
   }
 
   return (

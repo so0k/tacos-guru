@@ -1535,7 +1535,7 @@
     "max": 5000,
     "default": 1900,
     "step": 50,
-    "label": "Monthly Runs (per-stack plans + applies)",
+    "label": "Monthly Runs (per-state plans + applies)",
     "unit": "runs/mo"
    },
    "stacks": {
@@ -1543,8 +1543,8 @@
     "max": 1000,
     "default": 277,
     "step": 1,
-    "label": "Stacks / Workspaces",
-    "unit": "stacks"
+    "label": "Terraform States (workspaces)",
+    "unit": "states"
    }
   },
   "featureLabels": {
@@ -1698,7 +1698,7 @@
    },
    "env0": {
     "model": "Platform fee + active environments",
-    "description": "Tiers capped by active environments (≈ stacks); list prices from AWS Marketplace",
+    "description": "Tiers capped by active environments (one Terraform state each); list prices from AWS Marketplace",
     "tiers": [
      {
       "name": "Free",
@@ -2493,8 +2493,8 @@
     ]
    },
    "terragrunt-scale": {
-    "model": "Units (stacks)",
-    "description": "Billed by units — each directory with a terragrunt.hcl",
+    "model": "Units (one state each)",
+    "description": "Billed by units: each directory with a terragrunt.hcl, i.e. one Terraform state (a Terragrunt stack is a group of units)",
     "tiers": [
      {
       "name": "Free",
