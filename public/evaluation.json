@@ -263,11 +263,11 @@
   },
   {
    "id": "G4",
-   "label": "Maintained (release in last 6 months)"
+   "label": "Actively maintained (recent releases, ≥3 active committers, core team still on it)"
   },
   {
    "id": "G5",
-   "label": "OpenTofu support"
+   "label": "OpenTofu support (advisory: scored under criterion 2, does not disqualify)"
   }
  ],
  "excluded": [
@@ -665,8 +665,8 @@
      "url": "https://terramate.io/docs/cli/orchestration/scripts"
     },
     "G4": {
-     "pass": true,
-     "evidence": "CLI v0.17.3 released 2026-09-08; v0.17.0 2026-05-06; active monthly cadence.",
+     "pass": false,
+     "evidence": "Fails. One engineer made every commit in the last 90 days; the founders now build to11 (an LLM platform); no maintainer reply on sampled issues opened Jun–Sep 2026.",
      "url": "https://github.com/terramate-io/terramate/releases"
     },
     "G5": {
@@ -675,7 +675,7 @@
      "url": "https://terramate.io/docs/get-started/opentofu"
     }
    },
-   "disqualified": false,
+   "disqualified": true,
    "tagline": "OSS orchestrator + codegen in your own CI; fogg-grade generation, DIY pipelines"
   },
   {
@@ -700,12 +700,12 @@
     0,
     3,
     3,
-    0,
+    1,
     1,
     3,
     2,
     3,
-    1,
+    2,
     0,
     0,
     3
@@ -714,24 +714,24 @@
     "Native CDKTF engine plus custom pre-plan steps; affected detection via file_patterns/tree_builder scripts. IaaD: no terraform test, .tf.json support unverified.",
     "OpenTofu first-class in Orchestration. The Stategraph CLI runs tofu by default (TF_CMD). Engine version pinnable per workflow.",
     "Runs are GitHub Actions jobs; self-hosted EC2/Docker runners with custom images. No K8s. IaaD server never runs Terraform.",
-    "Orchestration RBAC by user/team/repo role with tag scopes; login via GitHub/GitLab only. IaaD: OIDC SSO, but RBAC is Enterprise-only.",
+    "Orchestration: GitHub/GitLab login, tag-scoped RBAC. Unified console adds OIDC sign-in (Sep 2026 changelog). SAML on pricing only; IaaD RBAC Enterprise.",
     "Stacks and layered runs give in-PR apply_after ordering. IaaD mtx plans several states as one run with real unknowns and applies atomically.",
     "Scheduled drift per tag query; opens a GitHub issue; optional auto-reconcile. More than one schedule per repo needs Enterprise (every hosted tier).",
     "Documented AWS OIDC setup plus an OIDC hardening guide; per-workflow and per-environment role selection.",
     "Orchestration Pro ≈ $1,000/mo at the default calculator inputs",
     "config_builder, tree_builder, indexer and centralized config generate orchestrator config only. No backend/provider codegen like fogg.",
-    "IaaD: Postgres state, per-state and per-subgraph plan/apply tokens, SQL across states, tfstate export. Orchestration alone: bring your own S3.",
+    "IaaD: Postgres state, plan/apply tokens scoped per state and resource pattern, OIDC group rules, SQL, tfstate export. RBAC is Enterprise-tier.",
     "Same PR-comment plan/apply model as Atlantis. Stategraph docs cover running under Atlantis; no atlantis.yaml import.",
     "Arbitrary pre/post hooks and workflow steps, custom engines, apply requirements. Gatekeeper approval gates (Enterprise, every hosted tier).",
     "No private module registry. The indexer only maps module usage to trigger runs.",
-    "Built-in Infracost cost estimates on PRs with approval thresholds. IaaD adds plan-time cost deltas and FOCUS billing reconciliation.",
+    "Built-in cost estimates on PRs with approval thresholds, incl. OpenInfraQuote (MPL-2.0, runs in CI, AWS-only). IaaD adds plan-time cost deltas.",
     "OPA/Rego, Conftest and Checkov are built in and run on plan output. Policies are portable.",
-    "No native AI review. LLM steps are possible via custom workflow hooks, but self-built reviews are credited under Workflows, not here.",
+    "Native agent skills summarise state, blast radius and plan-time cost deltas with your own model, but on demand; no automated PR review.",
     "No native Slack, Teams or Google Chat integration. Notifications only via curl webhooks in hooks or workflow steps.",
     "GitHub and GitLab: PR comments, per-dirspace status checks, apply requirements, automerge. No Bitbucket or Azure DevOps.",
-    "Self-hosted Prometheus /metrics, a queryable audit trail, and hook webhooks. IaaD adds a transaction timeline and webhooks (Pro tier).",
-    "IaaD Graph Explorer, blast-radius analysis and transaction timeline. The Orchestration UI shows runs and logs.",
-    "Stategraph ships agent skills (SKILL.md) for query/plan/import. No MCP server; no agent-driven drift remediation PRs.",
+    "Self-hosted Prometheus /metrics, queryable audit trail and console audit view, hook webhooks. IaaD webhooks (Pro). No native Datadog/OTel export.",
+    "IaaD Graph Explorer, blast radius and transaction timeline; console Stacks view shows apply order with live plan/apply state (Sep 2026).",
+    "Documented SKILL.md skills drive the CLI/SQL API, with plan-only, resource-scoped agent tokens. No MCP server; no agent drift fixes or PRs.",
     "No ephemeral environment feature.",
     "No Terraform provider for Orchestration or Stategraph.",
     "AWS, GCP and Azure OIDC guides. Engine-agnostic: works with any Terraform/OpenTofu provider."
@@ -766,17 +766,17 @@
     },
     "G4": {
      "pass": true,
-     "evidence": "Very active. stategraph/stategraph ships near-daily builds (latest 2026-09-24). The Stategraph CLI released 3.0.1 on 2026-09-23 and averaged 10-27 releases/month in 2026.",
+     "evidence": "Releases 3.0.0-3.0.3 between 2026-09-21 and 2026-09-27. Three humans visible committing in the last 90 days (Josh Pollara, Malcolm, Tamiya). The OSS repo is a Copybara export of a private monorepo, so the real count is likely higher.",
      "url": "https://github.com/stategraph/releases/releases"
     },
     "G5": {
      "pass": true,
-     "evidence": "PASSES: the 'no OpenTofu' premise is wrong. The Stategraph CLI runs tofu by default (TF_CMD default: tofu; set TF_CMD=terraform to switch). Terrateam's stategraph engine accepts tf_cmd: tofu, and Orchestration supports OpenTofu natively.",
+     "evidence": "Advisory: pass. The Stategraph CLI runs tofu by default (TF_CMD, default tofu), and Orchestration supports OpenTofu natively. The IaaD engine is closed source, and self-hosting it needs Enterprise and a licence key, but the 'no OpenTofu' premise does not hold.",
      "url": "https://stategraph.com/docs/cli/tf"
     }
    },
    "disqualified": false,
-   "tagline": "Formerly Terrateam. Ex-Terrateam GitOps plus a paid graph state engine with atomic multi-state applies"
+   "tagline": "Formerly Terrateam. Ex-Terrateam GitOps plus a graph state engine; agent-ready via skills and scoped tokens"
   },
   {
    "id": "hcp-terraform",
@@ -875,7 +875,7 @@
      "url": "https://developer.hashicorp.com/terraform/cloud-docs/workspaces/settings"
     }
    },
-   "disqualified": true,
+   "disqualified": false,
    "tagline": "Best-in-class Stacks orchestration and registry, but Terraform-only and RUM-priced"
   },
   {
@@ -965,8 +965,8 @@
      "url": "https://docs.opentaco.dev/ce/howto/custom-commands"
     },
     "G4": {
-     "pass": true,
-     "evidence": "v0.6.151 was released on 2026-09-13 and releases are roughly monthly. Caveat: most releases are maintenance-only, the company is focused on OpenComputer, and the state backend has been dormant since Mar 2026.",
+     "pass": false,
+     "evidence": "Fails. 7 commits in the last 90 days (0 in Aug 2026); the founders now build OpenComputer; 16 of 22 issues since April have no reply. Releases continue but are maintenance-only.",
      "url": "https://github.com/diggerhq/digger/releases"
     },
     "G5": {
@@ -975,7 +975,7 @@
      "url": "https://docs.opentaco.dev/ce/getting-started/with-opentofu"
     }
    },
-   "disqualified": false,
+   "disqualified": true,
    "tagline": "Formerly Digger. MIT-licensed PR automation in your own GitHub Actions; vendor focus has moved to AI agents"
   },
   {
@@ -1170,8 +1170,8 @@
      "url": "https://github.com/pulumi/pulumi/releases"
     },
     "G5": {
-     "pass": true,
-     "evidence": "Waived: Pulumi's own engine is Apache-2.0 with self-managed state backends, so no licence lock-in, but returning to OpenTofu would mean a second migration.",
+     "pass": false,
+     "evidence": "Pulumi programs never run Terraform or OpenTofu. TF providers are reused via the bridge, but going back to OpenTofu would mean a second full migration. The engine is Apache-2.0 with self-managed state backends, so there's no licence lock-in.",
      "url": "https://www.pulumi.com/docs/iac/guides/migration/migrating-to-pulumi/from-terraform/"
     }
    },
@@ -1465,8 +1465,8 @@
      "url": "https://github.com/leg100/otf/blob/master/docs/docs/tfc_migration.md"
     },
     "G4": {
-     "pass": true,
-     "evidence": "Last release v0.6.3 on 2026-06-11 (3.5 months ago, inside the 6-month window). Warning signs: one maintainer (leg100 has ~1200 of ~1350 commits), no maintainer activity since mid-July 2026, and community PRs left unreviewed.",
+     "pass": false,
+     "evidence": "Fails. 1 commit and 0 releases in the last 90 days; single maintainer silent since Jul 2026.",
      "url": "https://github.com/leg100/otf/releases"
     },
     "G5": {
@@ -1475,7 +1475,7 @@
      "url": "https://github.com/leg100/otf/blob/master/docs/docs/engines.md"
     }
    },
-   "disqualified": false,
+   "disqualified": true,
    "tagline": "Free MPL-2.0 open-source TFE clone (Go + Postgres), OpenTofu-ready; single-maintainer risk"
   },
   {
@@ -1566,7 +1566,7 @@
     },
     "G4": {
      "pass": true,
-     "evidence": "v0.48.0 released 2026-09-22; ~11 releases in the last six months (roughly monthly or faster).",
+     "evidence": "Passes. 146 commits from 14 people in 90 days and 5 releases; security fixes ship within days. Issue triage is slow (~10% of new issues get a maintainer reply within 14 days).",
      "url": "https://github.com/runatlantis/atlantis/releases"
     },
     "G5": {

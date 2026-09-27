@@ -557,7 +557,7 @@ function GatesSection({ platform, gates }: { platform: RankedPlatform; gates: Ga
   return (
     <div className="mb-3">
       <div className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">
-        Hard gates
+        Gates
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
         {gates.map((g) => {
