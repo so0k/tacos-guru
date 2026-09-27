@@ -897,7 +897,7 @@
     2,
     3,
     3,
-    3,
+    1,
     1,
     2,
     2,
@@ -923,7 +923,7 @@
     "depends_on plus respect_layers gives layer-by-layer plan/apply in one PR. Statesman flags stale edges. No plan with unknowns; PR-comment UX only.",
     "Scheduled per-project drift runs via the service or backendless GHA. Alerts go to Slack or GitHub Issues, with issue-driven apply to remediate.",
     "Uses native GHA OIDC to AWS, with aws_role_to_assume per project for separate plan/apply roles. No static keys.",
-    "Pro ≈ $440/mo at the default calculator inputs",
+    "Pro — contact sales at the default calculator inputs",
     "generate_projects only builds the project list from dir globs. It does not generate backend/provider boilerplate, so it is no fogg replacement.",
     "Self-hosted Statesman has TFE-compatible state, prefix-wildcard RBAC, versions/rollback, dependency edges. Dormant since Mar 2026; you run it.",
     "Same PR-comment plan/apply model as Atlantis, but with no atlantis.yaml import and no migration guide.",
@@ -2312,12 +2312,12 @@
      },
      {
       "name": "Pro",
-      "basePrice": 250,
-      "includedUsers": 5,
+      "basePrice": 0,
+      "includedUsers": null,
       "includedResources": null,
       "includedRuns": null,
       "includedStacks": null,
-      "perUser": 10,
+      "perUser": 0,
       "perResource": 0,
       "perRun": 0,
       "perStack": 0,
@@ -2325,8 +2325,8 @@
       "maxResources": null,
       "maxRuns": null,
       "maxStacks": null,
-      "estimated": true,
-      "quoteOnly": false,
+      "estimated": false,
+      "quoteOnly": true,
       "autoSelect": true,
       "features": {
        "privateWorkers": true,
@@ -2336,7 +2336,7 @@
        "auditLog": false,
        "registry": false
       },
-      "notes": "Third-party figure ($250 for 5 users + $10/user); vendor pricing page removed",
+      "notes": "Quote only; vendor pricing page removed (an unverified third-party listing shows ~$250 for 5 users + $10/user)",
       "source": "https://toolradar.com/tools/digger"
      },
      {
