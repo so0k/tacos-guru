@@ -1,14 +1,14 @@
 # tacos.guru
 
-An interactive evaluation tool for comparing TACOS (Terraform Automation & Collaboration Software) platforms. Compare Atlantis, Spacelift, env0, Scalr, Terramate, Stategraph (formerly Terrateam), HCP Terraform, OpenTaco (formerly Digger), ops0, Pulumi Cloud, Terragrunt Scale, Atmos, and OTF across 24 weighted criteria — plus 5 hard gates that can disqualify a platform outright — and estimate monthly costs based on your team size, resources, run volume, and stack count.
+An interactive evaluation tool for comparing TACOS (Terraform Automation & Collaboration Software) platforms. Compare Atlantis, Spacelift, env0, Scalr, Terramate, Stategraph (formerly Terrateam), HCP Terraform, OpenTaco (formerly Digger), Pulumi Cloud, Terragrunt Scale, Atmos, and OTF across 24 weighted criteria — plus 4 hard gates that can disqualify a platform outright and 1 advisory gate — and estimate monthly costs based on your team size, resources, run volume, and number of Terraform states.
 
 **Live site:** [tacos.guru](https://tacos.guru)
 
 ## Features
 
-- **Evaluation tab** — 24 criteria with adjustable weight sliders. Changing weights recalculates and re-sorts platform scores in real time. Two criteria (Collaboration integration, VCS integration) are scored per-variant — pick your collaboration tool and VCS provider from the sidebar selects and the weighted total updates to match. Expand any platform row to see per-criterion rationales, the 5 hard gates (pass/fail with evidence + source link), and — for disqualified platforms — which gates failed.
-- **Hard gates** — G1–G5 (no Kubernetes required, self-hosted runners in your cloud account, can run a CDK Terrain synth step, maintained within 6 months, OpenTofu support) are shown per platform. A platform that fails any gate is marked **Disqualified**, sorted after qualified platforms, and can be hidden entirely with the "Show disqualified" toggle.
-- **Pricing tab** — 4 input sliders (users, resources under management, monthly runs, stacks/workspaces). Auto-selects the cheapest usable tier per platform; quote-only tiers show "Contact sales" instead of a price, and tiers not viable at team scale are labelled accordingly. Override tiers manually by clicking them in the expanded card. The Evaluation tab's "Pricing suitability" criterion is computed live from these same slider inputs, so changing them re-scores every platform.
+- **Evaluation tab** — 24 criteria with adjustable weight sliders. Changing weights recalculates and re-sorts platform scores in real time. Two criteria (Collaboration integration, VCS integration) are scored per-variant — pick your collaboration tool and VCS provider from the sidebar selects and the weighted total updates to match. Expand any platform row to see per-criterion rationales, the gates (pass/fail with evidence + source link), and — for disqualified platforms — which gates failed.
+- **Gates** — G1–G4 are hard gates (no Kubernetes required, self-hosted runners in your cloud account, can run a CDK Terrain synth step, actively maintained). G5 (OpenTofu support) is advisory: it's shown, but missing OpenTofu is penalised through criterion 2 instead of disqualifying. A platform that fails any hard gate is marked **Disqualified**, sorted after qualified platforms, and can be hidden entirely with the "Show disqualified" toggle.
+- **Pricing tab** — 4 input sliders (users, resources under management, monthly runs, Terraform states/workspaces). Auto-selects the cheapest usable tier per platform; quote-only tiers show "Contact sales" instead of a price, and tiers not viable at team scale are labelled accordingly. Override tiers manually by clicking them in the expanded card. The Evaluation tab's "Pricing suitability" criterion is computed live from these same slider inputs, so changing them re-scores every platform.
 
 ## Running locally
 
@@ -38,9 +38,9 @@ All evaluation data lives in a single file: [`public/evaluation.json`](public/ev
 
 It contains:
 - **`criteria`** — 24 evaluation criteria with default weights (1–5) and categories (Critical / High / Medium / Low / Nice-to-have). Two criteria carry `variants` (Collaboration integration: Slack / MS Teams; VCS integration: GitHub / GitLab / Bitbucket / Azure DevOps) with a `defaultVariant`.
-- **`gates`** — the 5 hard gates (G1–G5) shown on every platform, each with a pass/fail result, evidence text, and a source link.
+- **`gates`** — the 5 gates (G1–G4 hard, G5 advisory) shown on every platform, each with a pass/fail result, evidence text, and a source link.
 - **`excluded`** — platforms considered but excluded before scoring (e.g. Terrakube — requires Kubernetes), shown as a subtle note below the platform list.
-- **`platforms`** — 13 platforms, each with scores (0–3) per criterion, per-variant scores for the two variant criteria, gate results, a `disqualified` flag, rationale text, and metadata.
+- **`platforms`** — 12 platforms, each with scores (0–3) per criterion, per-variant scores for the two variant criteria, gate results, a `disqualified` flag, rationale text, and metadata.
 - **`pricing`** — tier definitions for each platform including base prices, per-unit costs (including per-stack), feature gates, quote-only/auto-select flags, a source link, and a `pricingScore` mapping (cost bands → 0–3) used to derive the "Pricing suitability" criterion live from the calculator.
 
 Scores and pricing were researched from public vendor documentation in September 2026.
@@ -52,8 +52,8 @@ Scores and pricing were researched from public vendor documentation in September
 | G1 | No Kubernetes required |
 | G2 | Self-hosted runners in your cloud account |
 | G3 | Can run a CDK Terrain synth step before plan |
-| G4 | Maintained (release in last 6 months) |
-| G5 | OpenTofu support |
+| G4 | Actively maintained: a release in the last 6 months, ≥3 people committing in the last 90 days, and the core team still working on the product |
+| G5 | OpenTofu support (advisory: penalised via criterion 2, never disqualifies) |
 
 A platform failing any gate is disqualified — still shown and scored, but ranked after every qualified platform.
 

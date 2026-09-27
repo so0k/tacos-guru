@@ -79,7 +79,12 @@ export interface PricingTier {
   features: Record<string, boolean>
   notes: string
   source: string
+  // 'annual' = price shown is the annual-commitment rate; monthlyBasePrice is the published month-to-month base, if any
+  billing?: 'annual' | 'monthly' | 'usage' | null
+  monthlyBasePrice?: number | null
 }
+
+export type BillingMode = 'annual' | 'monthly'
 
 export interface PlatformPricing {
   model: string

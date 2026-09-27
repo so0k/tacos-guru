@@ -5,15 +5,15 @@ const W = 1200
 const H = 630
 
 const platforms = [
+  { name: 'Atlantis',         color: '#2563EB' },
   { name: 'Spacelift',        color: '#4B6BFF' },
-  { name: 'env0',             color: '#00B389' },
+  { name: 'env zero',             color: '#00B389' },
   { name: 'Scalr',            color: '#8B5CF6' },
   { name: 'Terramate',        color: '#F97316' },
   { name: 'Stategraph',       color: '#06B6D4' },
   { name: 'HCP Terraform',    color: '#7C3AED' },
   { name: 'OpenTaco',         color: '#10B981' },
-  { name: 'ops0',             color: '#E11D48' },
-  { name: 'Pulumi',           color: '#8A3391' },
+  { name: 'Pulumi Cloud',           color: '#8A3391' },
   { name: 'Terragrunt Scale', color: '#5B21B6' },
   { name: 'Atmos',            color: '#0EA5E9' },
   { name: 'OTF',              color: '#64748B' },
@@ -104,7 +104,7 @@ const svg = `<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">
   <!-- Footer: left — stats -->
   <text x="60" y="${H - 20}"
     font-family="Ubuntu, Liberation Sans, Arial, sans-serif"
-    font-size="16" font-weight="600" fill="#22D3EE">13 platforms</text>
+    font-size="16" font-weight="600" fill="#22D3EE">12 platforms</text>
   <text x="195" y="${H - 20}"
     font-family="Ubuntu, Liberation Sans, Arial, sans-serif"
     font-size="16" fill="#334155">·</text>

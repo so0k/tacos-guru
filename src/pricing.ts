@@ -1,4 +1,4 @@
-import type { PricingTier, PricingInputs, PricingResult, PricingData, Platform, PricingScoreConfig } from './types'
+import type { PricingTier, PricingInputs, PricingResult, PricingData, Platform, PricingScoreConfig, BillingMode } from './types'
 
 export function canTierHandle(tier: PricingTier, inputs: PricingInputs): boolean {
   if (tier.maxUsers !== null && inputs.users > tier.maxUsers) return false
@@ -8,7 +8,14 @@ export function canTierHandle(tier: PricingTier, inputs: PricingInputs): boolean
   return true
 }
 
-export function computeTierCost(tier: PricingTier, inputs: PricingInputs): number {
+// Month-to-month mode swaps in the vendor's published month-to-month base; annual-only tiers keep their annual rate.
+export function effectiveBasePrice(tier: PricingTier, mode: BillingMode): number {
+  return mode === 'monthly' && tier.billing === 'annual' && tier.monthlyBasePrice != null
+    ? tier.monthlyBasePrice
+    : tier.basePrice
+}
+
+export function computeTierCost(tier: PricingTier, inputs: PricingInputs, mode: BillingMode = 'annual'): number {
   const effectiveUsers = tier.minUsers
     ? Math.max(inputs.users, tier.minUsers)
     : inputs.users
@@ -29,7 +36,7 @@ export function computeTierCost(tier: PricingTier, inputs: PricingInputs): numbe
     ? Math.max(0, inputs.stacks - tier.includedStacks)
     : tier.perStack > 0 ? inputs.stacks : 0
 
-  return tier.basePrice
+  return effectiveBasePrice(tier, mode)
     + userOverage * tier.perUser
     + resourceOverage * tier.perResource
     + runOverage * tier.perRun
@@ -44,6 +51,7 @@ export function computeTierCost(tier: PricingTier, inputs: PricingInputs): numbe
 export function selectBestTier(
   tiers: PricingTier[],
   inputs: PricingInputs,
+  mode: BillingMode = 'annual',
 ): { tier: PricingTier; cost: number; exceeds: boolean; quoteOnly: boolean } {
   let bestTier: PricingTier | null = null
   let bestCost = Infinity
@@ -51,7 +59,7 @@ export function selectBestTier(
   for (const tier of tiers) {
     if (tier.autoSelect === false || tier.quoteOnly) continue
     if (!canTierHandle(tier, inputs)) continue
-    const cost = computeTierCost(tier, inputs)
+    const cost = computeTierCost(tier, inputs, mode)
     if (cost < bestCost) {
       bestCost = cost
       bestTier = tier
@@ -66,13 +74,13 @@ export function selectBestTier(
     (tier) => tier.autoSelect !== false && tier.quoteOnly && canTierHandle(tier, inputs),
   )
   if (quoteOnlyTier) {
-    return { tier: quoteOnlyTier, cost: computeTierCost(quoteOnlyTier, inputs), exceeds: false, quoteOnly: true }
+    return { tier: quoteOnlyTier, cost: computeTierCost(quoteOnlyTier, inputs, mode), exceeds: false, quoteOnly: true }
   }
 
   const lastTier = tiers[tiers.length - 1]
   return {
     tier: lastTier,
-    cost: computeTierCost(lastTier, inputs),
+    cost: computeTierCost(lastTier, inputs, mode),
     exceeds: true,
     quoteOnly: lastTier.quoteOnly,
   }
@@ -82,6 +90,7 @@ export function computeAllPricingResults(
   pricingData: PricingData,
   platforms: Platform[],
   inputs: PricingInputs,
+  mode: BillingMode = 'annual',
 ): PricingResult[] {
   const results: PricingResult[] = []
 
@@ -89,11 +98,11 @@ export function computeAllPricingResults(
     const pricing = pricingData.platforms[platform.id]
     if (!pricing) continue
 
-    const { tier, cost, exceeds, quoteOnly } = selectBestTier(pricing.tiers, inputs)
+    const { tier, cost, exceeds, quoteOnly } = selectBestTier(pricing.tiers, inputs, mode)
 
     const allTiers = pricing.tiers.map((t) => ({
       tier: t,
-      cost: computeTierCost(t, inputs),
+      cost: computeTierCost(t, inputs, mode),
       canHandle: canTierHandle(t, inputs),
     }))
 

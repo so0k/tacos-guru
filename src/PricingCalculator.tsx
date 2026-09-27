@@ -6,7 +6,8 @@ import {
   Check, X, Trophy, AlertTriangle, Github,
   type LucideIcon,
 } from 'lucide-react'
-import type { EvalData, PricingInputs, PricingResult, PricingTier } from './types'
+import type { EvalData, PricingInputs, PricingResult, PricingTier, BillingMode } from './types'
+import { effectiveBasePrice } from './pricing'
 
 const ICON_MAP: Record<string, LucideIcon> = {
   Rocket, Leaf, Scale, Mountain, GitBranch, Cloud, Terminal,
@@ -26,20 +27,54 @@ function formatCost(cost: number): string {
   return `$${cost.toLocaleString()}`
 }
 
+function BillingToggle({ mode, onChange }: { mode: BillingMode; onChange: (m: BillingMode) => void }) {
+  const opts: Array<{ id: BillingMode; label: string }> = [
+    { id: 'annual', label: 'Annual commitment' },
+    { id: 'monthly', label: 'Month-to-month' },
+  ]
+  return (
+    <div role="radiogroup" aria-label="Billing" className="inline-flex rounded-lg border border-border dark:border-border-dark p-0.5 text-[11px] font-semibold">
+      {opts.map((o) => (
+        <button
+          key={o.id}
+          type="button"
+          role="radio"
+          aria-checked={mode === o.id}
+          onClick={() => onChange(o.id)}
+          className={`px-2.5 py-1 rounded-md transition-colors ${
+            mode === o.id
+              ? 'bg-accent/10 dark:bg-accent-light/10 text-accent dark:text-accent-light'
+              : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+          }`}
+        >
+          {o.label}
+        </button>
+      ))}
+    </div>
+  )
+}
+
 function PricingSliders({
   data,
   inputs,
   onChange,
+  billingMode,
+  onBillingModeChange,
 }: {
   data: EvalData
   inputs: PricingInputs
   onChange: (key: keyof PricingInputs, value: number) => void
+  billingMode: BillingMode
+  onBillingModeChange: (m: BillingMode) => void
 }) {
   return (
     <div className="bg-surface-raised dark:bg-surface-raised-dark rounded-xl border border-border dark:border-border-dark p-6">
-      <h2 className="font-display font-bold text-sm text-slate-900 dark:text-white tracking-wide uppercase mb-4">
-        Configure Your Usage
-      </h2>
+      <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
+        <h2 className="font-display font-bold text-sm text-slate-900 dark:text-white tracking-wide uppercase">
+          Configure Your Usage
+        </h2>
+        <BillingToggle mode={billingMode} onChange={onBillingModeChange} />
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {(Object.keys(data.pricing.sliders) as Array<keyof PricingInputs>).map((key) => {
           const config = data.pricing.sliders[key]
@@ -104,6 +139,7 @@ function TierMiniCard({
   selected,
   canHandle,
   inputs,
+  billingMode,
   onSelect,
 }: {
   tier: PricingTier
@@ -111,10 +147,21 @@ function TierMiniCard({
   selected: boolean
   canHandle: boolean
   inputs: PricingInputs
+  billingMode: BillingMode
   onSelect: (tierName: string) => void
 }) {
   const breakdown: string[] = []
-  if (tier.basePrice > 0) breakdown.push(`Base: $${tier.basePrice}`)
+  const base = effectiveBasePrice(tier, billingMode)
+  if (base > 0) breakdown.push(`Base: $${base}`)
+  const billingNote = tier.quoteOnly || !tier.billing
+    ? null
+    : tier.billing === 'usage'
+      ? 'Usage-based'
+      : tier.billing === 'monthly'
+        ? 'Billed monthly'
+        : billingMode === 'monthly'
+          ? (tier.monthlyBasePrice != null ? 'Month-to-month rate' : 'Annual contract only')
+          : 'Billed annually'
   if (tier.perUser > 0) {
     const effectiveUsers = tier.minUsers ? Math.max(inputs.users, tier.minUsers) : inputs.users
     const userCost = tier.includedUsers !== null
@@ -138,7 +185,7 @@ function TierMiniCard({
     const stackCost = tier.includedStacks !== null
       ? Math.max(0, inputs.stacks - tier.includedStacks) * tier.perStack
       : inputs.stacks * tier.perStack
-    if (stackCost > 0) breakdown.push(`Stacks: $${Math.round(stackCost)}`)
+    if (stackCost > 0) breakdown.push(`States: $${Math.round(stackCost)}`)
   }
 
   return (
@@ -173,6 +220,9 @@ function TierMiniCard({
           ${Math.round(cost).toLocaleString()}<span className="text-[10px] font-normal text-slate-400">/mo</span>
         </div>
       )}
+      {billingNote && (
+        <div className={`text-[10px] mt-0.5 ${billingNote === 'Annual contract only' ? 'text-amber-600 dark:text-amber-400' : 'text-slate-400'}`}>{billingNote}</div>
+      )}
       {!canHandle && (
         <div className="text-[10px] text-score-0 mt-0.5">Exceeds limits</div>
       )}
@@ -203,6 +253,7 @@ function PricingCard({
   rank,
   featureLabels,
   inputs,
+  billingMode,
   overrideTier,
   onOverrideTier,
 }: {
@@ -210,6 +261,7 @@ function PricingCard({
   rank: number
   featureLabels: Record<string, string>
   inputs: PricingInputs
+  billingMode: BillingMode
   overrideTier: string | null
   onOverrideTier: (platformId: string, tierName: string | null) => void
 }) {
@@ -376,6 +428,7 @@ function PricingCard({
                   selected={tier.name === activeTier.name}
                   canHandle={canHandle}
                   inputs={inputs}
+                  billingMode={billingMode}
                   onSelect={(name) => onOverrideTier(result.platformId, name)}
                 />
               ))}
@@ -396,11 +449,15 @@ export default function PricingCalculator({
   inputs,
   onInputsChange,
   results: baseResults,
+  billingMode,
+  onBillingModeChange,
 }: {
   data: EvalData
   inputs: PricingInputs
   onInputsChange: (key: keyof PricingInputs, value: number) => void
   results: PricingResult[]
+  billingMode: BillingMode
+  onBillingModeChange: (m: BillingMode) => void
 }) {
   const [tierOverrides, setTierOverrides] = useState<Record<string, string | null>>({})
 
@@ -446,7 +503,7 @@ export default function PricingCalculator({
   return (
     <main className="flex-1 overflow-y-auto dot-grid">
       <div className="p-4 md:p-6 max-w-5xl mx-auto space-y-4">
-        <PricingSliders data={data} inputs={inputs} onChange={onInputsChange} />
+        <PricingSliders data={data} inputs={inputs} onChange={onInputsChange} billingMode={billingMode} onBillingModeChange={onBillingModeChange} />
 
         {/* Summary */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -502,6 +559,7 @@ export default function PricingCalculator({
               rank={i + 1}
               featureLabels={data.pricing.featureLabels}
               inputs={inputs}
+              billingMode={billingMode}
               overrideTier={tierOverrides[result.platformId] ?? null}
               onOverrideTier={handleOverrideTier}
             />

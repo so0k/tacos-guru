@@ -263,11 +263,11 @@
   },
   {
    "id": "G4",
-   "label": "Maintained (release in last 6 months)"
+   "label": "Actively maintained (recent releases, ≥3 active committers, core team still on it)"
   },
   {
    "id": "G5",
-   "label": "OpenTofu support"
+   "label": "OpenTofu support (advisory: scored under criterion 2, does not disqualify)"
   }
  ],
  "excluded": [
@@ -275,6 +275,11 @@
    "name": "Terrakube",
    "url": "https://terrakube.io",
    "reason": "Requires Kubernetes (G1)"
+  },
+  {
+   "name": "ops0",
+   "url": "https://ops0.com",
+   "reason": "Not a TACOS: cloud-security/governance SaaS with a thin Terraform run layer, no self-hosted runners"
   }
  ],
  "platforms": [
@@ -518,7 +523,7 @@
     "Run triggers fire downstream after upstream success, cross-env via federation. No DAG, no in-change multi-apply (except Terragrunt run-all/stacks).",
     "Scheduled per-env drift with tag/name filters and time windows, not billed; Teams/Slack alerts with Ignore/Sync/Revert actions.",
     "Native AWS OIDC provider configurations per env/workspace; agents can also use EC2/ECS role. No static keys needed.",
-    "Enterprise ≈ $1,881/mo at the default calculator inputs",
+    "Business ≈ $1,881/mo at the default calculator inputs",
     "No codegen. No-code workspaces are UI deploys of registry modules; wiring can be declared via Scalr TF provider. Terragrunt stacks supported.",
     "Managed state with version history & export; state-versions:read gates human access per scope. No resource-level RBAC; own-S3 storage is Enterprise.",
     "Atlantis-style /scalr plan|apply PR comments and GitHub check actions; no atlantis.yaml import or dedicated migration guide.",
@@ -665,8 +670,8 @@
      "url": "https://terramate.io/docs/cli/orchestration/scripts"
     },
     "G4": {
-     "pass": true,
-     "evidence": "CLI v0.17.3 released 2026-09-08; v0.17.0 2026-05-06; active monthly cadence.",
+     "pass": false,
+     "evidence": "Fails. One engineer made every commit in the last 90 days; the founders now build to11 (an LLM platform); no maintainer reply on sampled issues opened Jun–Sep 2026.",
      "url": "https://github.com/terramate-io/terramate/releases"
     },
     "G5": {
@@ -675,7 +680,7 @@
      "url": "https://terramate.io/docs/get-started/opentofu"
     }
    },
-   "disqualified": false,
+   "disqualified": true,
    "tagline": "OSS orchestrator + codegen in your own CI; fogg-grade generation, DIY pipelines"
   },
   {
@@ -700,12 +705,12 @@
     0,
     3,
     3,
-    0,
+    1,
     1,
     3,
     2,
     3,
-    1,
+    2,
     0,
     0,
     3
@@ -714,24 +719,24 @@
     "Native CDKTF engine plus custom pre-plan steps; affected detection via file_patterns/tree_builder scripts. IaaD: no terraform test, .tf.json support unverified.",
     "OpenTofu first-class in Orchestration. The Stategraph CLI runs tofu by default (TF_CMD). Engine version pinnable per workflow.",
     "Runs are GitHub Actions jobs; self-hosted EC2/Docker runners with custom images. No K8s. IaaD server never runs Terraform.",
-    "Orchestration RBAC by user/team/repo role with tag scopes; login via GitHub/GitLab only. IaaD: OIDC SSO, but RBAC is Enterprise-only.",
-    "Stacks and layered runs give in-PR apply_after ordering. IaaD mtx plans several states as one run with real unknowns and applies atomically.",
+    "Orchestration: GitHub/GitLab login, tag-scoped RBAC. Unified console adds OIDC sign-in (Sep 2026 changelog). SAML on pricing only; IaaD RBAC Enterprise.",
+    "In-PR ordered layers; multi-state plan with real unknowns, applied as one atomic transaction; resource-level conflict checks, not project locks.",
     "Scheduled drift per tag query; opens a GitHub issue; optional auto-reconcile. More than one schedule per repo needs Enterprise (every hosted tier).",
     "Documented AWS OIDC setup plus an OIDC hardening guide; per-workflow and per-environment role selection.",
-    "Orchestration Pro ≈ $1,000/mo at the default calculator inputs",
+    "Professional ≈ $1,499/mo at the default calculator inputs",
     "config_builder, tree_builder, indexer and centralized config generate orchestrator config only. No backend/provider codegen like fogg.",
-    "IaaD: Postgres state, per-state and per-subgraph plan/apply tokens, SQL across states, tfstate export. Orchestration alone: bring your own S3.",
+    "IaaD: Postgres state, plan/apply tokens scoped per state and resource pattern, OIDC group rules, SQL, tfstate export. RBAC is Enterprise-tier.",
     "Same PR-comment plan/apply model as Atlantis. Stategraph docs cover running under Atlantis; no atlantis.yaml import.",
     "Arbitrary pre/post hooks and workflow steps, custom engines, apply requirements. Gatekeeper approval gates (Enterprise, every hosted tier).",
     "No private module registry. The indexer only maps module usage to trigger runs.",
-    "Built-in Infracost cost estimates on PRs with approval thresholds. IaaD adds plan-time cost deltas and FOCUS billing reconciliation.",
+    "Built-in cost estimates on PRs with approval thresholds, incl. OpenInfraQuote (MPL-2.0, runs in CI, AWS-only). IaaD adds plan-time cost deltas.",
     "OPA/Rego, Conftest and Checkov are built in and run on plan output. Policies are portable.",
-    "No native AI review. LLM steps are possible via custom workflow hooks, but self-built reviews are credited under Workflows, not here.",
+    "Native agent skills summarise state, blast radius and plan-time cost deltas with your own model, but on demand; no automated PR review.",
     "No native Slack, Teams or Google Chat integration. Notifications only via curl webhooks in hooks or workflow steps.",
     "GitHub and GitLab: PR comments, per-dirspace status checks, apply requirements, automerge. No Bitbucket or Azure DevOps.",
-    "Self-hosted Prometheus /metrics, a queryable audit trail, and hook webhooks. IaaD adds a transaction timeline and webhooks (Pro tier).",
-    "IaaD Graph Explorer, blast-radius analysis and transaction timeline. The Orchestration UI shows runs and logs.",
-    "Stategraph ships agent skills (SKILL.md) for query/plan/import. No MCP server; no agent-driven drift remediation PRs.",
+    "Self-hosted Prometheus /metrics, queryable audit trail and console audit view, hook webhooks. IaaD webhooks (Pro). No native Datadog/OTel export.",
+    "IaaD Graph Explorer, blast radius and transaction timeline; console Stacks view shows apply order with live plan/apply state (Sep 2026).",
+    "Documented SKILL.md skills drive the CLI/SQL API, with plan-only, resource-scoped agent tokens. No MCP server; no agent drift fixes or PRs.",
     "No ephemeral environment feature.",
     "No Terraform provider for Orchestration or Stategraph.",
     "AWS, GCP and Azure OIDC guides. Engine-agnostic: works with any Terraform/OpenTofu provider."
@@ -766,17 +771,17 @@
     },
     "G4": {
      "pass": true,
-     "evidence": "Very active. stategraph/stategraph ships near-daily builds (latest 2026-09-24). The Stategraph CLI released 3.0.1 on 2026-09-23 and averaged 10-27 releases/month in 2026.",
+     "evidence": "Releases 3.0.0-3.0.3 between 2026-09-21 and 2026-09-27. Three humans visible committing in the last 90 days (Josh Pollara, Malcolm, Tamiya). The OSS repo is a Copybara export of a private monorepo, so the real count is likely higher.",
      "url": "https://github.com/stategraph/releases/releases"
     },
     "G5": {
      "pass": true,
-     "evidence": "PASSES: the 'no OpenTofu' premise is wrong. The Stategraph CLI runs tofu by default (TF_CMD default: tofu; set TF_CMD=terraform to switch). Terrateam's stategraph engine accepts tf_cmd: tofu, and Orchestration supports OpenTofu natively.",
+     "evidence": "Advisory: pass. The Stategraph CLI runs tofu by default (TF_CMD, default tofu), and Orchestration supports OpenTofu natively. The IaaD engine is closed source, and self-hosting it needs Enterprise and a licence key, but the 'no OpenTofu' premise does not hold.",
      "url": "https://stategraph.com/docs/cli/tf"
     }
    },
    "disqualified": false,
-   "tagline": "Formerly Terrateam. Ex-Terrateam GitOps plus a paid graph state engine with atomic multi-state applies"
+   "tagline": "Formerly Terrateam. Ex-Terrateam GitOps plus a graph state engine; agent-ready via skills and scoped tokens"
   },
   {
    "id": "hcp-terraform",
@@ -826,12 +831,12 @@
     "Mature private registry with test-integrated and monorepo publishing, tagging. Terraform only; Essentials capped at 10 modules.",
     "Native cost estimation for AWS/Azure/GCP on Standard+. No Infracost-style PR comment.",
     "Native OPA/Rego and Sentinel policy sets, tfpolicy (HCL, beta, cloud-only). OPA input is HCP-specific; unlimited sets need Standard+.",
-    "No native LLM review of PRs or plans documented.",
+    "No native LLM plan summary or PR review. AI plan review only via third-party run tasks (e.g. Terracotta); official agent skills cover authoring.",
     "Teams and Slack formatted webhook notifications per workspace/project; no interactive approvals. Google Chat via generic webhook.",
     "GitHub, GitLab, Bitbucket, Azure DevOps VCS: commit status checks, speculative plans. No PR-comment plans or comment-driven ops.",
     "Official Datadog integration (audit logs, notification events, resource metadata), Metrics API. Audit trails need Premium.",
     "Explorer, Stacks deployment/component views, published-outputs inspector; Infragraph graph explorer in LA (US only).",
-    "Terraform MCP server GA (self-run, OSS); Infragraph knowledge graph LA. No agents auto-opening drift remediation PRs.",
+    "Terraform MCP server GA (self-hosted, state/run tools, writes gated), official agent skills and tfctl skill, Infragraph LA (US). No agent drift fixes or PRs.",
     "Ephemeral workspaces with auto-destroy schedules; Stacks destroy_all. Not a full preview-env product.",
     "Official hashicorp/tfe provider manages orgs, workspaces, Stacks, policies, teams.",
     "Provider-agnostic: any Terraform provider; dynamic credentials for AWS, Azure, GCP, Vault."
@@ -875,7 +880,7 @@
      "url": "https://developer.hashicorp.com/terraform/cloud-docs/workspaces/settings"
     }
    },
-   "disqualified": true,
+   "disqualified": false,
    "tagline": "Best-in-class Stacks orchestration and registry, but Terraform-only and RUM-priced"
   },
   {
@@ -892,7 +897,7 @@
     2,
     3,
     3,
-    3,
+    1,
     1,
     2,
     2,
@@ -918,7 +923,7 @@
     "depends_on plus respect_layers gives layer-by-layer plan/apply in one PR. Statesman flags stale edges. No plan with unknowns; PR-comment UX only.",
     "Scheduled per-project drift runs via the service or backendless GHA. Alerts go to Slack or GitHub Issues, with issue-driven apply to remediate.",
     "Uses native GHA OIDC to AWS, with aws_role_to_assume per project for separate plan/apply roles. No static keys.",
-    "Pro ≈ $440/mo at the default calculator inputs",
+    "Pro — contact sales at the default calculator inputs",
     "generate_projects only builds the project list from dir globs. It does not generate backend/provider boilerplate, so it is no fogg replacement.",
     "Self-hosted Statesman has TFE-compatible state, prefix-wildcard RBAC, versions/rollback, dependency edges. Dormant since Mar 2026; you run it.",
     "Same PR-comment plan/apply model as Atlantis, but with no atlantis.yaml import and no migration guide.",
@@ -965,8 +970,8 @@
      "url": "https://docs.opentaco.dev/ce/howto/custom-commands"
     },
     "G4": {
-     "pass": true,
-     "evidence": "v0.6.151 was released on 2026-09-13 and releases are roughly monthly. Caveat: most releases are maintenance-only, the company is focused on OpenComputer, and the state backend has been dormant since Mar 2026.",
+     "pass": false,
+     "evidence": "Fails. 7 commits in the last 90 days (0 in Aug 2026); the founders now build OpenComputer; 16 of 22 issues since April have no reply. Releases continue but are maintenance-only.",
      "url": "https://github.com/diggerhq/digger/releases"
     },
     "G5": {
@@ -975,108 +980,8 @@
      "url": "https://docs.opentaco.dev/ce/getting-started/with-opentofu"
     }
    },
-   "disqualified": false,
-   "tagline": "Formerly Digger. MIT-licensed PR automation in your own GitHub Actions; vendor focus has moved to AI agents"
-  },
-  {
-   "id": "ops0",
-   "name": "ops0",
-   "url": "https://ops0.com",
-   "icon": "ShieldCheck",
-   "color": "#E11D48",
-   "scores": [
-    0,
-    2,
-    1,
-    2,
-    1,
-    2,
-    2,
-    1,
-    1,
-    2,
-    1,
-    1,
-    0,
-    2,
-    3,
-    1,
-    1,
-    2,
-    1,
-    2,
-    2,
-    1,
-    0,
-    3
-   ],
-   "rationales": [
-    "No CDK/cdktn support and no documented pre-plan build step. Projects are plain .tf directories synced from Git.",
-    "Terraform and OpenTofu are both first-class, switchable per project. Per-project binary version pinning is not documented.",
-    "Plan/apply runs in ops0-hosted containers. No customer runner agent or custom image. Full self-hosting is Enterprise-only and undocumented.",
-    "SAML/OIDC SSO (Entra, Google, Okta), org and project roles incl. Approver via OpenFGA, audit log. SSO needs Business tier. Custom roles are Enterprise.",
-    "Variable graph detects remote_state edges and blast radius. Workflows can chain IaC deploys by hand. No unknown-value planning or downstream re-plan.",
-    "Cron-scheduled discovery scans with session diffs and drift alerts. It compares cloud inventory, not a per-stack plan. Remediation from Pro tier.",
-    "AWS access via cross-account IAM role assumption, with no stored keys and short-lived credentials per run. The role is assumed from ops0's own environment.",
-    "Enterprise — contact sales at the default calculator inputs",
-    "Blueprints and a Developer Portal offer UI templates only. No declarative codegen for backend/provider boilerplate across many components.",
-    "State stays in your own S3/GCS/Azure backend (or the ops0 DB). Has state viewer, history/restore and download. Access control is per project only.",
-    "No Atlantis migration path. A generic per-project 'import existing Terraform project' guide only.",
-    "Workflow builder with script, HTTP, condition and approval steps. No hooks inside the GitOps plan/apply path and no custom runner images.",
-    "No private module registry is documented.",
-    "Native monthly cost estimate shown before apply and in PR plan comments. Accuracy method not documented.",
-    "OPA/Rego on plan JSON plus Checkov, with a policy editor, test panel and AI-assisted authoring. Can block deployments.",
-    "Kiwi assistant can review IaC on request. Bring your own Claude or OpenAI-compatible key. No documented automated PR-intent review from trusted config.",
-    "Slack Block Kit alerts and approval notifications. Approvals happen in the ops0 UI. Teams and Google Chat only via generic webhooks.",
-    "GitHub App: auto-plan on PR, plan comments, commit checks, apply on merge. GitLab equivalent. Bitbucket planned, Azure DevOps absent.",
-    "In-app audit logs (90d/1y). Plan, log and cost forwarding only to OpenObserve. Alert webhooks. No Datadog or audit-stream export documented.",
-    "Resource graph per state, cross-project variable DAG, CMDB rollup and deployment history. No multi-stack rollout view.",
-    "Kiwi chat over live platform context, AI incident analysis, and an MCP server via ops0-cli (policy tools). Auto-fix/remediation marked 'coming soon'.",
-    "Blueprint 'environment' requests and project duplication. No PR preview environments or TTL teardown.",
-    "No Terraform provider for managing ops0 itself.",
-    "AWS, GCP, Azure and OCI across discovery, IaC and drift."
-   ],
-   "variants": {
-    "17": {
-     "slack": 2,
-     "teams": 1
-    },
-    "18": {
-     "github": 2,
-     "gitlab": 2,
-     "bitbucket": 0,
-     "azure_devops": 0
-    }
-   },
-   "gates": {
-    "G1": {
-     "pass": true,
-     "evidence": "The SaaS runs plan/apply in ops0's own isolated containers, so you do not need Kubernetes for IaC. The in-cluster agent is only for the Kubernetes-ops features. What the Enterprise self-hosted install needs is not documented.",
-     "url": "https://docs.ops0.com/docs/introduction/architecture"
-    },
-    "G2": {
-     "pass": false,
-     "evidence": "'Terraform plan and apply runs execute inside ops0's isolated execution environment' after assuming a cross-account IAM role. No customer-hosted runner or agent is documented.",
-     "url": "https://docs.ops0.com/docs/security"
-    },
-    "G3": {
-     "pass": false,
-     "evidence": "An IaC project is a directory of .tf files synced from Git. The docs describe no pre-init or pre-plan hook, no custom image and no build step. Workflow 'Script' steps (bash/python/node) exist, but nothing documented feeds their output into an IaC Deploy step.",
-     "url": "https://docs.ops0.com/docs/how-to/setup-gitops"
-    },
-    "G4": {
-     "pass": true,
-     "evidence": "SaaS uses continuous deployment. Docs sitemap lastmod 2026-09-04. ops0-cli v0.5.24 released 2026-07-06, Oxid v0.4.4 released 2026-06-12.",
-     "url": "https://github.com/ops0-ai/ops0-cli/releases"
-    },
-    "G5": {
-     "pass": true,
-     "evidence": "OpenTofu is a first-class engine next to Terraform and Oxid. Each project can be switched between terraform and tofu.",
-     "url": "https://docs.ops0.com/docs/iac/migrate"
-    }
-   },
    "disqualified": true,
-   "tagline": "AI-first cloud governance SaaS with basic TF/OpenTofu GitOps. No customer-hosted runners."
+   "tagline": "Formerly Digger. MIT-licensed PR automation in your own GitHub Actions; vendor focus has moved to AI agents"
   },
   {
    "id": "pulumi",
@@ -1170,8 +1075,8 @@
      "url": "https://github.com/pulumi/pulumi/releases"
     },
     "G5": {
-     "pass": true,
-     "evidence": "Waived: Pulumi's own engine is Apache-2.0 with self-managed state backends, so no licence lock-in, but returning to OpenTofu would mean a second migration.",
+     "pass": false,
+     "evidence": "Pulumi programs never run Terraform or OpenTofu. TF providers are reused via the bridge, but going back to OpenTofu would mean a second full migration. The engine is Apache-2.0 with self-managed state backends, so there's no licence lock-in.",
      "url": "https://www.pulumi.com/docs/iac/guides/migration/migrating-to-pulumi/from-terraform/"
     }
    },
@@ -1465,8 +1370,8 @@
      "url": "https://github.com/leg100/otf/blob/master/docs/docs/tfc_migration.md"
     },
     "G4": {
-     "pass": true,
-     "evidence": "Last release v0.6.3 on 2026-06-11 (3.5 months ago, inside the 6-month window). Warning signs: one maintainer (leg100 has ~1200 of ~1350 commits), no maintainer activity since mid-July 2026, and community PRs left unreviewed.",
+     "pass": false,
+     "evidence": "Fails. 1 commit and 0 releases in the last 90 days; single maintainer silent since Jul 2026.",
      "url": "https://github.com/leg100/otf/releases"
     },
     "G5": {
@@ -1475,7 +1380,7 @@
      "url": "https://github.com/leg100/otf/blob/master/docs/docs/engines.md"
     }
    },
-   "disqualified": false,
+   "disqualified": true,
    "tagline": "Free MPL-2.0 open-source TFE clone (Go + Postgres), OpenTofu-ready; single-maintainer risk"
   },
   {
@@ -1566,7 +1471,7 @@
     },
     "G4": {
      "pass": true,
-     "evidence": "v0.48.0 released 2026-09-22; ~11 releases in the last six months (roughly monthly or faster).",
+     "evidence": "Passes. 146 commits from 14 people in 90 days and 5 releases; security fixes ship within days. Issue triage is slow (~10% of new issues get a maintainer reply within 14 days).",
      "url": "https://github.com/runatlantis/atlantis/releases"
     },
     "G5": {
@@ -1630,7 +1535,7 @@
     "max": 5000,
     "default": 1900,
     "step": 50,
-    "label": "Monthly Runs (per-stack plans + applies)",
+    "label": "Monthly Runs (per-state plans + applies)",
     "unit": "runs/mo"
    },
    "stacks": {
@@ -1638,8 +1543,8 @@
     "max": 1000,
     "default": 277,
     "step": 1,
-    "label": "Stacks / Workspaces",
-    "unit": "stacks"
+    "label": "Terraform States (workspaces)",
+    "unit": "states"
    }
   },
   "featureLabels": {
@@ -1700,7 +1605,9 @@
        "registry": false
       },
       "notes": "2 users, 1 public worker, no private workers — not usable for a team",
-      "source": "https://spacelift.io/pricing"
+      "source": "https://spacelift.io/pricing",
+      "billing": null,
+      "monthlyBasePrice": null
      },
      {
       "name": "Starter+",
@@ -1729,7 +1636,9 @@
        "registry": false
       },
       "notes": "$20,000/yr; unlimited users; 1–2 private workers; OIDC SSO; no registry/Blueprints",
-      "source": "https://spacelift.io/pricing"
+      "source": "https://spacelift.io/pricing",
+      "billing": "annual",
+      "monthlyBasePrice": null
      },
      {
       "name": "Business",
@@ -1758,7 +1667,9 @@
        "registry": true
       },
       "notes": "Quote only; 3 private workers, Blueprints/Templates, module registry",
-      "source": "https://spacelift.io/pricing"
+      "source": "https://spacelift.io/pricing",
+      "billing": "annual",
+      "monthlyBasePrice": null
      },
      {
       "name": "Enterprise",
@@ -1787,13 +1698,15 @@
        "registry": true
       },
       "notes": "Quote only; 5–30 private workers, SAML SSO, audit trail",
-      "source": "https://spacelift.io/pricing"
+      "source": "https://spacelift.io/pricing",
+      "billing": "annual",
+      "monthlyBasePrice": null
      }
     ]
    },
    "env0": {
     "model": "Platform fee + active environments",
-    "description": "Tiers capped by active environments (≈ stacks); list prices from AWS Marketplace",
+    "description": "Tiers capped by active environments (one Terraform state each); list prices from AWS Marketplace",
     "tiers": [
      {
       "name": "Free",
@@ -1822,7 +1735,9 @@
        "registry": true
       },
       "notes": "30 active environments, 250 runs, 1 concurrent run",
-      "source": "https://docs.envzero.com/guides/billing/subscription-tiers"
+      "source": "https://docs.envzero.com/guides/billing/subscription-tiers",
+      "billing": null,
+      "monthlyBasePrice": null
      },
      {
       "name": "Cloud Navigator",
@@ -1851,7 +1766,9 @@
        "registry": true
       },
       "notes": "Marketplace list $18k/yr platform fee; up to 100 active environments; quote-based",
-      "source": "https://aws.amazon.com/marketplace/pp/prodview-t2j5oberppp7e"
+      "source": "https://aws.amazon.com/marketplace/pp/prodview-t2j5oberppp7e",
+      "billing": "annual",
+      "monthlyBasePrice": null
      },
      {
       "name": "Cloud Pilot",
@@ -1880,7 +1797,9 @@
        "registry": true
       },
       "notes": "Marketplace list $36k/yr + $365/yr per active env (worst case, bundling unpublished)",
-      "source": "https://aws.amazon.com/marketplace/pp/prodview-t2j5oberppp7e"
+      "source": "https://aws.amazon.com/marketplace/pp/prodview-t2j5oberppp7e",
+      "billing": "annual",
+      "monthlyBasePrice": null
      }
     ]
    },
@@ -1915,7 +1834,9 @@
        "registry": true
       },
       "notes": "50 runs/month",
-      "source": "https://scalr.com/pricing"
+      "source": "https://scalr.com/pricing",
+      "billing": null,
+      "monthlyBasePrice": null
      },
      {
       "name": "Business",
@@ -1944,25 +1865,27 @@
        "registry": true
       },
       "notes": "$0.99/run, volume discounts",
-      "source": "https://docs.scalr.io/docs/pricing-faq"
+      "source": "https://docs.scalr.io/docs/pricing-faq",
+      "billing": "usage",
+      "monthlyBasePrice": null
      },
      {
       "name": "Enterprise",
-      "basePrice": 1650,
+      "basePrice": 0,
       "includedUsers": null,
       "includedResources": null,
-      "includedRuns": 1667,
+      "includedRuns": null,
       "includedStacks": null,
       "perUser": 0,
       "perResource": 0,
-      "perRun": 0.99,
+      "perRun": 0,
       "perStack": 0,
       "maxUsers": null,
       "maxResources": null,
       "maxRuns": null,
       "maxStacks": null,
-      "estimated": true,
-      "quoteOnly": false,
+      "estimated": false,
+      "quoteOnly": true,
       "autoSelect": true,
       "features": {
        "privateWorkers": true,
@@ -1972,8 +1895,10 @@
        "auditLog": true,
        "registry": true
       },
-      "notes": "From 20,000 runs/yr commit; audit log streaming, own-bucket state, BYOK; quote-based",
-      "source": "https://scalr.com/pricing"
+      "notes": "Quote only; from 20,000 runs/yr commit with volume discounts; audit log streaming, own-bucket state, BYOK",
+      "source": "https://scalr.com/pricing",
+      "billing": "annual",
+      "monthlyBasePrice": null
      }
     ]
    },
@@ -2008,7 +1933,9 @@
        "registry": false
       },
       "notes": "2 users, 1,000 resources",
-      "source": "https://terramate.io/pricing"
+      "source": "https://terramate.io/pricing",
+      "billing": null,
+      "monthlyBasePrice": null
      },
      {
       "name": "Teams",
@@ -2037,7 +1964,9 @@
        "registry": false
       },
       "notes": "Unlimited users, 5,000 resources; no RBAC/SAML/audit",
-      "source": "https://terramate.io/pricing"
+      "source": "https://terramate.io/pricing",
+      "billing": "monthly",
+      "monthlyBasePrice": null
      },
      {
       "name": "Enterprise",
@@ -2066,16 +1995,18 @@
        "registry": false
       },
       "notes": "Quote only; RBAC, SAML, audit logs, custom resource limits",
-      "source": "https://terramate.io/pricing"
+      "source": "https://terramate.io/pricing",
+      "billing": "annual",
+      "monthlyBasePrice": null
      }
     ]
    },
    "stategraph": {
-    "model": "Flat annual (orchestration) + BIUs (state engine)",
-    "description": "Terrateam orchestration is flat; Stategraph IaaD is billed by BIUs",
+    "model": "Billable infrastructure units (BIUs)",
+    "description": "Orchestration (formerly Terrateam) is bundled from Professional up; BIUs count only resources that appear on the cloud bill",
     "tiers": [
      {
-      "name": "OSS self-hosted",
+      "name": "Free",
       "basePrice": 0,
       "includedUsers": null,
       "includedResources": null,
@@ -2085,8 +2016,8 @@
       "perResource": 0,
       "perRun": 0,
       "perStack": 0,
-      "maxUsers": 3,
-      "maxResources": null,
+      "maxUsers": null,
+      "maxResources": 4348,
       "maxRuns": null,
       "maxStacks": null,
       "estimated": false,
@@ -2095,16 +2026,111 @@
       "features": {
        "privateWorkers": true,
        "opa": true,
+       "driftDetection": false,
+       "samlSso": true,
+       "auditLog": false,
+       "registry": false
+      },
+      "notes": "1,000 BIUs, shared tenant; no Terraform orchestration",
+      "source": "https://stategraph.com/pricing",
+      "billing": null,
+      "monthlyBasePrice": null
+     },
+     {
+      "name": "Starter",
+      "basePrice": 999,
+      "includedUsers": null,
+      "includedResources": null,
+      "includedRuns": null,
+      "includedStacks": null,
+      "perUser": 0,
+      "perResource": 0,
+      "perRun": 0,
+      "perStack": 0,
+      "maxUsers": null,
+      "maxResources": 43478,
+      "maxRuns": null,
+      "maxStacks": null,
+      "estimated": false,
+      "quoteOnly": false,
+      "autoSelect": false,
+      "features": {
+       "privateWorkers": true,
+       "opa": true,
+       "driftDetection": false,
+       "samlSso": true,
+       "auditLog": false,
+       "registry": false
+      },
+      "notes": "$11,988/yr; 10k BIUs, single tenant, multi-state plan/apply; no Terraform orchestration (PR automation, drift)",
+      "source": "https://stategraph.com/pricing",
+      "billing": "annual",
+      "monthlyBasePrice": 1200
+     },
+     {
+      "name": "Professional",
+      "basePrice": 1499,
+      "includedUsers": null,
+      "includedResources": null,
+      "includedRuns": null,
+      "includedStacks": null,
+      "perUser": 0,
+      "perResource": 0,
+      "perRun": 0,
+      "perStack": 0,
+      "maxUsers": null,
+      "maxResources": 43478,
+      "maxRuns": null,
+      "maxStacks": null,
+      "estimated": false,
+      "quoteOnly": false,
+      "autoSelect": true,
+      "features": {
+       "privateWorkers": true,
+       "opa": true,
        "driftDetection": true,
-       "samlSso": false,
+       "samlSso": true,
        "auditLog": true,
        "registry": false
       },
-      "notes": "MPL-2.0; capped at 3 monthly active users since 2026-09-14",
-      "source": "https://docs.terrateam.io/editions/"
+      "notes": "$17,988/yr; 10k BIUs (≈43k managed resources at an estimated 0.23 BIUs per resource); adds Terraform orchestration (PR automation, drift), inventory, webhooks; no RBAC or self-hosting",
+      "source": "https://stategraph.com/pricing",
+      "billing": "annual",
+      "monthlyBasePrice": 1800
      },
      {
-      "name": "Orchestration Free",
+      "name": "Enterprise",
+      "basePrice": 2083,
+      "includedUsers": null,
+      "includedResources": null,
+      "includedRuns": null,
+      "includedStacks": null,
+      "perUser": 0,
+      "perResource": 0,
+      "perRun": 0,
+      "perStack": 0,
+      "maxUsers": null,
+      "maxResources": 43478,
+      "maxRuns": null,
+      "maxStacks": null,
+      "estimated": false,
+      "quoteOnly": false,
+      "autoSelect": true,
+      "features": {
+       "privateWorkers": true,
+       "opa": true,
+       "driftDetection": true,
+       "samlSso": true,
+       "auditLog": true,
+       "registry": false
+      },
+      "notes": "$25k/yr; 10k BIUs; RBAC, full API, self-hosted/BYOC, air-gapped",
+      "source": "https://stategraph.com/pricing",
+      "billing": "annual",
+      "monthlyBasePrice": 2500
+     },
+     {
+      "name": "Enterprise (above 10k BIUs)",
       "basePrice": 0,
       "includedUsers": null,
       "includedResources": null,
@@ -2114,41 +2140,12 @@
       "perResource": 0,
       "perRun": 0,
       "perStack": 0,
-      "maxUsers": 3,
-      "maxResources": null,
-      "maxRuns": 50,
-      "maxStacks": null,
-      "estimated": false,
-      "quoteOnly": false,
-      "autoSelect": true,
-      "features": {
-       "privateWorkers": true,
-       "opa": true,
-       "driftDetection": true,
-       "samlSso": true,
-       "auditLog": true,
-       "registry": false
-      },
-      "notes": "3 users, 50 runs/month, 1 private runner",
-      "source": "https://terrateam.io/pricing"
-     },
-     {
-      "name": "Orchestration Pro",
-      "basePrice": 1000,
-      "includedUsers": null,
-      "includedResources": null,
-      "includedRuns": null,
-      "includedStacks": null,
-      "perUser": 0,
-      "perResource": 0,
-      "perRun": 0,
-      "perStack": 0,
       "maxUsers": null,
       "maxResources": null,
       "maxRuns": null,
       "maxStacks": null,
       "estimated": false,
-      "quoteOnly": false,
+      "quoteOnly": true,
       "autoSelect": true,
       "features": {
        "privateWorkers": true,
@@ -2158,37 +2155,10 @@
        "auditLog": true,
        "registry": false
       },
-      "notes": "$12k/yr; unlimited users/runs/runners; self-hosting included; state stays in your backend",
-      "source": "https://terrateam.io/pricing"
-     },
-     {
-      "name": "Pro + Stategraph Enterprise",
-      "basePrice": 3083,
-      "includedUsers": null,
-      "includedResources": 10000,
-      "includedRuns": null,
-      "includedStacks": null,
-      "perUser": 0,
-      "perResource": 0,
-      "perRun": 0,
-      "perStack": 0,
-      "maxUsers": null,
-      "maxResources": null,
-      "maxRuns": null,
-      "maxStacks": null,
-      "estimated": true,
-      "quoteOnly": false,
-      "autoSelect": true,
-      "features": {
-       "privateWorkers": true,
-       "opa": true,
-       "driftDetection": true,
-       "samlSso": true,
-       "auditLog": true,
-       "registry": false
-      },
-      "notes": "Adds self-hosted Stategraph state engine ($25k/yr), 10k BIUs included; BIU packs above that unpublished",
-      "source": "https://stategraph.com/pricing"
+      "notes": "BIU packs ~$1.20–1.80 per BIU (period unpublished); quote builder only",
+      "source": "https://stategraph.com/pricing",
+      "billing": "annual",
+      "monthlyBasePrice": null
      }
     ]
    },
@@ -2223,7 +2193,9 @@
        "registry": true
       },
       "notes": "500 resources, 1 concurrent run, no SSO",
-      "source": "https://developer.hashicorp.com/terraform/cloud-docs/overview"
+      "source": "https://developer.hashicorp.com/terraform/cloud-docs/overview",
+      "billing": null,
+      "monthlyBasePrice": null
      },
      {
       "name": "Essentials",
@@ -2252,7 +2224,9 @@
        "registry": true
       },
       "notes": "$0.10/resource/mo; 1 concurrent agent run, no drift or policy enforcement",
-      "source": "https://www.hashicorp.com/en/pricing"
+      "source": "https://www.hashicorp.com/en/pricing",
+      "billing": "usage",
+      "monthlyBasePrice": null
      },
      {
       "name": "Standard",
@@ -2280,8 +2254,10 @@
        "auditLog": false,
        "registry": true
       },
-      "notes": "$0.47/resource/mo; 10 agent runs, drift, policy, Stacks",
-      "source": "https://www.hashicorp.com/en/pricing"
+      "notes": "$0.47/resource/mo pay-as-you-go; 10 agent runs, drift, policy, Stacks. Flex annual/multi-year discounts via sales (unpublished)",
+      "source": "https://www.hashicorp.com/en/pricing",
+      "billing": "usage",
+      "monthlyBasePrice": null
      },
      {
       "name": "Premium",
@@ -2309,8 +2285,10 @@
        "auditLog": true,
        "registry": true
       },
-      "notes": "$0.99/resource/mo; audit logging, custom RBAC, Stack auto-approve groups",
-      "source": "https://www.hashicorp.com/en/pricing"
+      "notes": "$0.99/resource/mo pay-as-you-go; audit logging, custom RBAC, Stack auto-approve groups. Flex discounts via sales (unpublished)",
+      "source": "https://www.hashicorp.com/en/pricing",
+      "billing": "usage",
+      "monthlyBasePrice": null
      }
     ]
    },
@@ -2345,7 +2323,9 @@
        "registry": false
       },
       "notes": "No UI, policy store or drift service — demo scale only",
-      "source": "https://docs.opentaco.dev/ce/howto/backendless-mode"
+      "source": "https://docs.opentaco.dev/ce/howto/backendless-mode",
+      "billing": null,
+      "monthlyBasePrice": null
      },
      {
       "name": "Cloud Free",
@@ -2374,7 +2354,9 @@
        "registry": false
       },
       "notes": "Hard-capped at 3 drift-monitored projects",
-      "source": "https://github.com/diggerhq/digger/blob/develop/backend/models/orgs.go"
+      "source": "https://github.com/diggerhq/digger/blob/develop/backend/models/orgs.go",
+      "billing": null,
+      "monthlyBasePrice": null
      },
      {
       "name": "Self-hosted CE (TCO)",
@@ -2403,16 +2385,18 @@
        "registry": false
       },
       "notes": "MIT; ~$150–250 AWS + WorkOS SSO $125/connection; excludes engineering time, no vendor support",
-      "source": "https://github.com/diggerhq/digger"
+      "source": "https://github.com/diggerhq/digger",
+      "billing": "usage",
+      "monthlyBasePrice": null
      },
      {
       "name": "Pro",
-      "basePrice": 250,
-      "includedUsers": 5,
+      "basePrice": 0,
+      "includedUsers": null,
       "includedResources": null,
       "includedRuns": null,
       "includedStacks": null,
-      "perUser": 10,
+      "perUser": 0,
       "perResource": 0,
       "perRun": 0,
       "perStack": 0,
@@ -2420,8 +2404,8 @@
       "maxResources": null,
       "maxRuns": null,
       "maxStacks": null,
-      "estimated": true,
-      "quoteOnly": false,
+      "estimated": false,
+      "quoteOnly": true,
       "autoSelect": true,
       "features": {
        "privateWorkers": true,
@@ -2431,8 +2415,10 @@
        "auditLog": false,
        "registry": false
       },
-      "notes": "Third-party figure ($250 for 5 users + $10/user); vendor pricing page removed",
-      "source": "https://toolradar.com/tools/digger"
+      "notes": "Quote only; vendor pricing page removed (an unverified third-party listing shows ~$250 for 5 users + $10/user)",
+      "source": "https://toolradar.com/tools/digger",
+      "billing": "monthly",
+      "monthlyBasePrice": null
      },
      {
       "name": "Enterprise",
@@ -2461,129 +2447,9 @@
        "registry": false
       },
       "notes": "Quote only (third-party $3–5k/mo)",
-      "source": "https://toolradar.com/tools/digger"
-     }
-    ]
-   },
-   "ops0": {
-    "model": "Governed resources",
-    "description": "Flat per-org tiers capped by cloud accounts and governed resources",
-    "tiers": [
-     {
-      "name": "Free",
-      "basePrice": 0,
-      "includedUsers": null,
-      "includedResources": null,
-      "includedRuns": null,
-      "includedStacks": null,
-      "perUser": 0,
-      "perResource": 0,
-      "perRun": 0,
-      "perStack": 0,
-      "maxUsers": null,
-      "maxResources": 250,
-      "maxRuns": null,
-      "maxStacks": null,
-      "estimated": false,
-      "quoteOnly": false,
-      "autoSelect": false,
-      "features": {
-       "privateWorkers": false,
-       "opa": true,
-       "driftDetection": true,
-       "samlSso": false,
-       "auditLog": false,
-       "registry": false
-      },
-      "notes": "250 resources; 30-day trial per billing docs",
-      "source": "https://ops0.com/pricing"
-     },
-     {
-      "name": "Pro",
-      "basePrice": 449,
-      "includedUsers": null,
-      "includedResources": null,
-      "includedRuns": null,
-      "includedStacks": null,
-      "perUser": 0,
-      "perResource": 0,
-      "perRun": 0,
-      "perStack": 0,
-      "maxUsers": null,
-      "maxResources": 1500,
-      "maxRuns": null,
-      "maxStacks": null,
-      "estimated": false,
-      "quoteOnly": false,
-      "autoSelect": true,
-      "features": {
-       "privateWorkers": false,
-       "opa": true,
-       "driftDetection": true,
-       "samlSso": false,
-       "auditLog": false,
-       "registry": false
-      },
-      "notes": "1,500 resources; 'limited time' price",
-      "source": "https://ops0.com/pricing"
-     },
-     {
-      "name": "Business",
-      "basePrice": 949,
-      "includedUsers": null,
-      "includedResources": null,
-      "includedRuns": null,
-      "includedStacks": null,
-      "perUser": 0,
-      "perResource": 0,
-      "perRun": 0,
-      "perStack": 0,
-      "maxUsers": null,
-      "maxResources": 5000,
-      "maxRuns": null,
-      "maxStacks": null,
-      "estimated": false,
-      "quoteOnly": false,
-      "autoSelect": true,
-      "features": {
-       "privateWorkers": false,
-       "opa": true,
-       "driftDetection": true,
-       "samlSso": true,
-       "auditLog": false,
-       "registry": false
-      },
-      "notes": "5,000 resources, SSO; 'limited time' price",
-      "source": "https://ops0.com/pricing"
-     },
-     {
-      "name": "Enterprise",
-      "basePrice": 0,
-      "includedUsers": null,
-      "includedResources": null,
-      "includedRuns": null,
-      "includedStacks": null,
-      "perUser": 0,
-      "perResource": 0,
-      "perRun": 0,
-      "perStack": 0,
-      "maxUsers": null,
-      "maxResources": null,
-      "maxRuns": null,
-      "maxStacks": null,
-      "estimated": false,
-      "quoteOnly": true,
-      "autoSelect": true,
-      "features": {
-       "privateWorkers": false,
-       "opa": true,
-       "driftDetection": true,
-       "samlSso": true,
-       "auditLog": true,
-       "registry": false
-      },
-      "notes": "Quote only; self-hosted option",
-      "source": "https://ops0.com/pricing"
+      "source": "https://toolradar.com/tools/digger",
+      "billing": "annual",
+      "monthlyBasePrice": null
      }
     ]
    },
@@ -2618,7 +2484,9 @@
        "registry": false
       },
       "notes": "1 user; Pulumi-hosted deployments only",
-      "source": "https://www.pulumi.com/pricing/"
+      "source": "https://www.pulumi.com/pricing/",
+      "billing": null,
+      "monthlyBasePrice": null
      },
      {
       "name": "Essentials",
@@ -2647,7 +2515,9 @@
        "registry": false
       },
       "notes": "~500 resources included; no customer-managed agents, advisory policies only",
-      "source": "https://www.pulumi.com/pricing/"
+      "source": "https://www.pulumi.com/pricing/",
+      "billing": "monthly",
+      "monthlyBasePrice": null
      },
      {
       "name": "Pro",
@@ -2675,8 +2545,10 @@
        "auditLog": true,
        "registry": true
       },
-      "notes": "~2,000 resources included; SAML, drift; Pulumi-hosted deployments only (no own agents)",
-      "source": "https://www.pulumi.com/pricing/"
+      "notes": "~2,000 resources included; SAML, drift; Pulumi-hosted deployments only (no own agents). Annual-commit discount via sales (unpublished)",
+      "source": "https://www.pulumi.com/pricing/",
+      "billing": "monthly",
+      "monthlyBasePrice": null
      },
      {
       "name": "Enterprise",
@@ -2704,14 +2576,16 @@
        "auditLog": true,
        "registry": true
       },
-      "notes": "Customer-managed agents (EC2/Docker); list-rate ceiling, volume-priced via sales above ~4,750 resources",
-      "source": "https://www.pulumi.com/pricing/"
+      "notes": "Month-to-month list rate; customer-managed agents (EC2/Docker); annual-commit and volume discounts via sales (unpublished)",
+      "source": "https://www.pulumi.com/pricing/",
+      "billing": "monthly",
+      "monthlyBasePrice": null
      }
     ]
    },
    "terragrunt-scale": {
-    "model": "Units (stacks)",
-    "description": "Billed by units — each directory with a terragrunt.hcl",
+    "model": "Units (one state each)",
+    "description": "Billed by units: each directory with a terragrunt.hcl, i.e. one Terraform state (a Terragrunt stack is a group of units)",
     "tiers": [
      {
       "name": "Free",
@@ -2740,7 +2614,9 @@
        "registry": false
       },
       "notes": "25 units; personal/small commercial use",
-      "source": "https://terragrunt.com/terragrunt-scale"
+      "source": "https://terragrunt.com/terragrunt-scale",
+      "billing": null,
+      "monthlyBasePrice": null
      },
      {
       "name": "Team",
@@ -2769,7 +2645,9 @@
        "registry": false
       },
       "notes": "200 units; Patcher + drift; annual billing (~$600 month-to-month)",
-      "source": "https://terragrunt.com/terragrunt-scale"
+      "source": "https://terragrunt.com/terragrunt-scale",
+      "billing": "annual",
+      "monthlyBasePrice": 600
      },
      {
       "name": "Enterprise",
@@ -2798,7 +2676,9 @@
        "registry": false
       },
       "notes": "Quote only; unlimited units, pipeline hooks, Infracost",
-      "source": "https://terragrunt.com/terragrunt-scale"
+      "source": "https://terragrunt.com/terragrunt-scale",
+      "billing": "annual",
+      "monthlyBasePrice": null
      }
     ]
    },
@@ -2833,7 +2713,9 @@
        "registry": false
       },
       "notes": "3 licensed users, 100 component instances",
-      "source": "https://atmos-pro.com/pricing"
+      "source": "https://atmos-pro.com/pricing",
+      "billing": null,
+      "monthlyBasePrice": null
      },
      {
       "name": "Pro Team",
@@ -2861,8 +2743,10 @@
        "auditLog": false,
        "registry": false
       },
-      "notes": "5 users + $100/user; approvals may be Business-only",
-      "source": "https://atmos-pro.com/pricing"
+      "notes": "5 users + $100/user, billed monthly (no annual discount); approvals may be Business-only",
+      "source": "https://atmos-pro.com/pricing",
+      "billing": "monthly",
+      "monthlyBasePrice": null
      },
      {
       "name": "Pro Business",
@@ -2891,7 +2775,9 @@
        "registry": false
       },
       "notes": "From $36k/yr, 25 users; governance/approvals, SLA",
-      "source": "https://atmos-pro.com/pricing"
+      "source": "https://atmos-pro.com/pricing",
+      "billing": "annual",
+      "monthlyBasePrice": null
      },
      {
       "name": "Pro Enterprise",
@@ -2920,7 +2806,9 @@
        "registry": false
       },
       "notes": "Quote only",
-      "source": "https://atmos-pro.com/pricing"
+      "source": "https://atmos-pro.com/pricing",
+      "billing": "annual",
+      "monthlyBasePrice": null
      }
     ]
    },
@@ -2955,7 +2843,9 @@
        "registry": true
       },
       "notes": "~$100–170/mo EC2 + RDS + ALB + agents; plus ~0.1–0.2 FTE ops; single maintainer",
-      "source": "https://github.com/leg100/otf"
+      "source": "https://github.com/leg100/otf",
+      "billing": "usage",
+      "monthlyBasePrice": null
      }
     ]
    },
@@ -2990,7 +2880,9 @@
        "registry": false
       },
       "notes": "One t4g.xlarge–2xlarge on a weekday schedule (~$50–100) + ~160 GB gp3 and a public IP (~$20); no plans/applies out of hours; excludes engineering time",
-      "source": "https://www.runatlantis.io/docs/deployment"
+      "source": "https://www.runatlantis.io/docs/deployment",
+      "billing": "usage",
+      "monthlyBasePrice": null
      },
      {
       "name": "Self-hosted, 24/7 (TCO)",
@@ -3019,7 +2911,9 @@
        "registry": false
       },
       "notes": "Same instance always on (~$125–250) + storage/IP; DIY LLM plan review via hooks adds ~$0.06/review (Sonnet-class model)",
-      "source": "https://www.runatlantis.io/docs/deployment"
+      "source": "https://www.runatlantis.io/docs/deployment",
+      "billing": "usage",
+      "monthlyBasePrice": null
      }
     ]
    }

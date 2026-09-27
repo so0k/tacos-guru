@@ -9,7 +9,7 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 
-import type { Criterion, Platform, EvalData, RankedPlatform, PricingInputs, PricingResult, Gate } from './types'
+import type { Criterion, Platform, EvalData, RankedPlatform, PricingInputs, PricingResult, Gate, BillingMode } from './types'
 import { computeAllPricingResults, computePricingScore } from './pricing'
 import PricingCalculator from './PricingCalculator'
 
@@ -557,7 +557,7 @@ function GatesSection({ platform, gates }: { platform: RankedPlatform; gates: Ga
   return (
     <div className="mb-3">
       <div className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">
-        Hard gates
+        Gates
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
         {gates.map((g) => {
@@ -830,6 +830,7 @@ export default function App() {
   )
   const [hoveredCriterion, setHoveredCriterion] = useState<number | null>(null)
   const [sortCriterion, setSortCriterion] = useState<number | null>(null)
+  const [billingMode, setBillingMode] = useState<BillingMode>('annual')
   const [expandedPlatform, setExpandedPlatform] = useState<string | null>(null)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [activeTab, setActiveTab] = useState<'eval' | 'pricing'>(tabFromHash)
@@ -871,6 +872,7 @@ export default function App() {
           if (v !== null) sliderDefaults[key] = v
         })
         if (params.get('dq') === '0') setShowDisqualified(false)
+        if (params.get('billing') === 'monthly') setBillingMode('monthly')
         const sortParam = params.get('sort')
         const sortTarget = sortParam ? d.criteria.find((c) => paramKey(c) === sortParam) : undefined
         if (sortTarget) setSortCriterion(sortTarget.id)
@@ -904,6 +906,7 @@ export default function App() {
       if (cfg && pricingInputs[key] !== cfg.default) params.set(key, String(pricingInputs[key]))
     })
     if (!showDisqualified) params.set('dq', '0')
+    if (billingMode === 'monthly') params.set('billing', 'monthly')
     const sortTarget = data.criteria.find((c) => c.id === sortCriterion)
     if (sortTarget) params.set('sort', paramKey(sortTarget))
     const query = params.toString()
@@ -912,7 +915,7 @@ export default function App() {
     if (url !== `${window.location.pathname}${window.location.search}${window.location.hash}`) {
       window.history.replaceState(null, '', url)
     }
-  }, [data, weights, variantSelections, pricingInputs, showDisqualified, sortCriterion, activeTab])
+  }, [data, weights, variantSelections, pricingInputs, showDisqualified, sortCriterion, billingMode, activeTab])
 
   // Sync dark mode class
   useEffect(() => {
@@ -942,8 +945,8 @@ export default function App() {
   // and Pricing tabs so criterion 8 (Pricing suitability) reflects live slider state.
   const pricingResults = useMemo(() => {
     if (!data) return []
-    return computeAllPricingResults(data.pricing, data.platforms, pricingInputs)
-  }, [data, pricingInputs])
+    return computeAllPricingResults(data.pricing, data.platforms, pricingInputs, billingMode)
+  }, [data, pricingInputs, billingMode])
 
   const pricingResultByPlatform = useMemo(() => {
     const map: Record<string, PricingResult> = {}
@@ -1277,6 +1280,8 @@ export default function App() {
             inputs={pricingInputs}
             onInputsChange={handlePricingInputChange}
             results={pricingResults}
+            billingMode={billingMode}
+            onBillingModeChange={setBillingMode}
           />
         )}
       </div>
