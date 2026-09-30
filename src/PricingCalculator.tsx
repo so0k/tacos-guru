@@ -256,6 +256,8 @@ function PricingCard({
   billingMode,
   overrideTier,
   onOverrideTier,
+  expanded,
+  onToggle,
 }: {
   result: PricingResult
   rank: number
@@ -264,8 +266,9 @@ function PricingCard({
   billingMode: BillingMode
   overrideTier: string | null
   onOverrideTier: (platformId: string, tierName: string | null) => void
+  expanded: boolean
+  onToggle: () => void
 }) {
-  const [expanded, setExpanded] = useState(false)
   const Icon = ICON_MAP[result.platformIcon] || Cloud
 
   // If user overrode tier, use that instead
@@ -280,9 +283,10 @@ function PricingCard({
 
   return (
     <div
-      className="pricing-card rounded-xl border border-border dark:border-border-dark bg-surface-raised dark:bg-surface-raised-dark hover:shadow-md hover:border-accent/20 dark:hover:border-accent-light/20 transition-all duration-200 cursor-pointer"
+      id={`pricing-${result.platformId}`}
+      className="pricing-card scroll-mt-4 rounded-xl border border-border dark:border-border-dark bg-surface-raised dark:bg-surface-raised-dark hover:shadow-md hover:border-accent/20 dark:hover:border-accent-light/20 transition-all duration-200 cursor-pointer"
       style={{ animationDelay: `${rank * 40}ms` }}
-      onClick={() => setExpanded(!expanded)}
+      onClick={onToggle}
     >
       <div className="p-3 md:p-4 flex flex-wrap items-center gap-2 md:gap-x-4 md:gap-y-1">
         {/* Rank */}
@@ -451,6 +455,8 @@ export default function PricingCalculator({
   results: baseResults,
   billingMode,
   onBillingModeChange,
+  expandedPlatform,
+  onToggleExpanded,
 }: {
   data: EvalData
   inputs: PricingInputs
@@ -458,6 +464,8 @@ export default function PricingCalculator({
   results: PricingResult[]
   billingMode: BillingMode
   onBillingModeChange: (m: BillingMode) => void
+  expandedPlatform: string | null
+  onToggleExpanded: (id: string) => void
 }) {
   const [tierOverrides, setTierOverrides] = useState<Record<string, string | null>>({})
 
@@ -562,6 +570,8 @@ export default function PricingCalculator({
               billingMode={billingMode}
               overrideTier={tierOverrides[result.platformId] ?? null}
               onOverrideTier={handleOverrideTier}
+              expanded={expandedPlatform === result.platformId}
+              onToggle={() => onToggleExpanded(result.platformId)}
             />
           ))}
         </div>

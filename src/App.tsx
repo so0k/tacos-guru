@@ -21,6 +21,18 @@ const PRICING_KEYS: Array<keyof PricingInputs> = ['users', 'resources', 'runs', 
 const paramKey = (c: Criterion) => c.short.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
 const tabFromHash = (): 'eval' | 'pricing' => (window.location.hash === '#pricing' ? 'pricing' : 'eval')
 
+// ?open=<platform id> expands and scrolls to a platform on either tab; a bare #<id> is accepted as an alias.
+const PLATFORM_ALIASES: Record<string, string> = { terrateam: 'stategraph', digger: 'opentaco' }
+function resolvePlatformId(raw: string, platforms: Platform[]): string | null {
+  const key = decodeURIComponent(raw).trim().toLowerCase()
+  const id = PLATFORM_ALIASES[key] ?? key
+  return platforms.some((p) => p.id === id) ? id : null
+}
+const hashPlatform = (): string | null => {
+  const h = window.location.hash.slice(1)
+  return h && h !== 'pricing' ? h : null
+}
+
 function readIntParam(params: URLSearchParams, key: string, min: number, max: number): number | null {
   const raw = params.get(key)
   if (raw === null || raw.trim() === '') return null
@@ -631,7 +643,8 @@ function PlatformRow({
 
   return (
     <div
-      className="platform-row"
+      id={`platform-${platform.id}`}
+      className="platform-row scroll-mt-4"
       style={{ animationDelay: `${animDelay}ms` }}
     >
       <div
@@ -832,6 +845,7 @@ export default function App() {
   const [sortCriterion, setSortCriterion] = useState<number | null>(null)
   const [billingMode, setBillingMode] = useState<BillingMode>('annual')
   const [expandedPlatform, setExpandedPlatform] = useState<string | null>(null)
+  const [scrollTarget, setScrollTarget] = useState<string | null>(null)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [activeTab, setActiveTab] = useState<'eval' | 'pricing'>(tabFromHash)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -876,6 +890,8 @@ export default function App() {
         const sortParam = params.get('sort')
         const sortTarget = sortParam ? d.criteria.find((c) => paramKey(c) === sortParam) : undefined
         if (sortTarget) setSortCriterion(sortTarget.id)
+        const openParam = params.get('open') ?? hashPlatform()
+        if (openParam) setScrollTarget(openParam)
         setWeights({ ...w })
         setVariantSelections({ ...vs })
         setPricingInputs({ ...sliderDefaults })
@@ -884,10 +900,28 @@ export default function App() {
 
   // Keep the tab in sync with back/forward navigation between #pricing and #evaluation.
   useEffect(() => {
-    const onHashChange = () => setActiveTab(tabFromHash())
+    const onHashChange = () => {
+      setActiveTab(tabFromHash())
+      const target = hashPlatform()
+      if (target) setScrollTarget(target)
+    }
     window.addEventListener('hashchange', onHashChange)
     return () => window.removeEventListener('hashchange', onHashChange)
   }, [])
+
+  // Resolve a requested platform once data is rendered: expand it, reveal it if hidden, and scroll to it.
+  useEffect(() => {
+    if (!data || !scrollTarget) return
+    const id = resolvePlatformId(scrollTarget, data.platforms)
+    setScrollTarget(null)
+    if (!id) return
+    setExpandedPlatform(id)
+    if (data.platforms.find((p) => p.id === id)?.disqualified) setShowDisqualified(true)
+    const elementId = `${activeTab === 'pricing' ? 'pricing' : 'platform'}-${id}`
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      document.getElementById(elementId)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }))
+  }, [data, scrollTarget, activeTab])
 
   // Mirror non-default state into the URL so any view can be shared.
   useEffect(() => {
@@ -909,13 +943,14 @@ export default function App() {
     if (billingMode === 'monthly') params.set('billing', 'monthly')
     const sortTarget = data.criteria.find((c) => c.id === sortCriterion)
     if (sortTarget) params.set('sort', paramKey(sortTarget))
+    if (expandedPlatform) params.set('open', expandedPlatform)
     const query = params.toString()
     const hash = activeTab === 'pricing' ? '#pricing' : ''
     const url = `${window.location.pathname}${query ? `?${query}` : ''}${hash}`
     if (url !== `${window.location.pathname}${window.location.search}${window.location.hash}`) {
       window.history.replaceState(null, '', url)
     }
-  }, [data, weights, variantSelections, pricingInputs, showDisqualified, sortCriterion, billingMode, activeTab])
+  }, [data, weights, variantSelections, pricingInputs, showDisqualified, sortCriterion, billingMode, expandedPlatform, activeTab])
 
   // Sync dark mode class
   useEffect(() => {
@@ -1282,6 +1317,8 @@ export default function App() {
             results={pricingResults}
             billingMode={billingMode}
             onBillingModeChange={setBillingMode}
+            expandedPlatform={expandedPlatform}
+            onToggleExpanded={(id) => setExpandedPlatform((prev) => (prev === id ? null : id))}
           />
         )}
       </div>
