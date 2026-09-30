@@ -133,8 +133,10 @@ function HeadToHeadSummary({
   return (
     <VersusRow
       centre={
-        <div className="text-xs font-mono text-slate-500 dark:text-slate-400 whitespace-nowrap">
-          Left wins {counts.leftWins} · Right wins {counts.rightWins} · Ties {counts.ties}
+        <div className="text-xs font-mono text-slate-500 dark:text-slate-400 text-center leading-relaxed">
+          <div>{left.name} wins {counts.leftWins}</div>
+          <div>{right.name} wins {counts.rightWins}</div>
+          <div>Ties {counts.ties}</div>
         </div>
       }
       left={<SummaryCard platform={left} isWinner={leftWins} />}
