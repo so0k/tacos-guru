@@ -1,5 +1,5 @@
 import { useMemo, type ReactNode } from 'react'
-import { Cloud, Trophy, Star, Ban, CheckCircle, XCircle } from 'lucide-react'
+import { Cloud, Trophy, Star, Ban, CheckCircle, XCircle, Link as LinkIcon } from 'lucide-react'
 import type {
   EvalData, RankedPlatform, Criterion, Gate, GateResult, PricingResult, PricingTier, BillingMode,
 } from './types'
@@ -206,6 +206,20 @@ function CriterionRow({
   )
 }
 
+function SourceLink({ url }: { url: string }) {
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex items-center gap-0.5 ml-1 text-accent dark:text-accent-light hover:underline"
+    >
+      <LinkIcon size={9} />
+      source
+    </a>
+  )
+}
+
 function GateCard({ result }: { result: GateResult | undefined }) {
   if (!result) {
     return <VersusCard state="tie"><span className="text-[11px] text-slate-400">—</span></VersusCard>
@@ -216,7 +230,10 @@ function GateCard({ result }: { result: GateResult | undefined }) {
         {result.pass
           ? <CheckCircle size={13} className="shrink-0 mt-0.5 text-score-3" />
           : <XCircle size={13} className="shrink-0 mt-0.5 text-score-0" />}
-        <span className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">{result.evidence}</span>
+        <span className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
+          {result.evidence}
+          {result.url && <SourceLink url={result.url} />}
+        </span>
       </div>
     </VersusCard>
   )
@@ -256,6 +273,7 @@ function PricingMiniCard({
         {result.quoteOnly ? 'Contact sales' : `$${result.monthlyCost.toLocaleString()}/mo`}
       </div>
       {billingNote && <div className="text-[10px] text-slate-400 mt-0.5">{billingNote}</div>}
+      {tier.source && <div className="text-[10px] -ml-1 mt-0.5"><SourceLink url={tier.source} /></div>}
     </VersusCard>
   )
 }
