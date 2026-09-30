@@ -852,7 +852,8 @@ export default function App() {
   const [billingMode, setBillingMode] = useState<BillingMode>('annual')
   const [expandedPlatform, setExpandedPlatform] = useState<string | null>(null)
   const [scrollTarget, setScrollTarget] = useState<string | null>(null)
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  // Short viewports (phones in landscape) start with the weights sidebar collapsed.
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => window.matchMedia('(max-height: 500px)').matches)
   const [activeTab, setActiveTab] = useState<'eval' | 'pricing' | 'versus'>(tabFromHash)
   const [versusSelection, setVersusSelection] = useState<[string, string] | null>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -1045,7 +1046,7 @@ export default function App() {
     data.criteria.some((c) => (weights[c.id] ?? c.defaultWeight) !== c.defaultWeight)
 
   return (
-    <div className={`min-h-screen flex flex-col bg-surface dark:bg-surface-dark text-slate-900 dark:text-slate-100 transition-colors duration-300`}>
+    <div className={`min-h-screen flex flex-col overflow-x-hidden bg-surface dark:bg-surface-dark text-slate-900 dark:text-slate-100 transition-colors duration-300`}>
       {/* Header */}
       <header className="shrink-0 border-b border-border dark:border-border-dark bg-surface-raised dark:bg-surface-raised-dark px-4 md:px-6 py-3">
         <div className="flex items-center justify-between">
@@ -1059,6 +1060,8 @@ export default function App() {
             <div className="flex items-center gap-0.5 bg-slate-100 dark:bg-slate-800 rounded-lg p-0.5 ml-1 md:ml-2">
               <button
                 onClick={() => setActiveTab('eval')}
+                title="Evaluation"
+                aria-label="Evaluation"
                 className={`px-2 md:px-3 py-1.5 rounded-md text-xs font-semibold transition-colors flex items-center gap-1.5 ${
                   activeTab === 'eval'
                     ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
@@ -1067,10 +1070,11 @@ export default function App() {
               >
                 <Info size={12} />
                 <span className="hidden sm:inline">Evaluation</span>
-                <span className="sm:hidden">Eval</span>
               </button>
               <button
                 onClick={() => setActiveTab('pricing')}
+                title="Pricing"
+                aria-label="Pricing"
                 className={`px-2 md:px-3 py-1.5 rounded-md text-xs font-semibold transition-colors flex items-center gap-1.5 ${
                   activeTab === 'pricing'
                     ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
@@ -1078,10 +1082,12 @@ export default function App() {
                 }`}
               >
                 <DollarSign size={12} />
-                Pricing
+                <span className="hidden sm:inline">Pricing</span>
               </button>
               <button
                 onClick={() => setActiveTab('versus')}
+                title="Versus"
+                aria-label="Versus"
                 className={`px-2 md:px-3 py-1.5 rounded-md text-xs font-semibold transition-colors flex items-center gap-1.5 ${
                   activeTab === 'versus'
                     ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
@@ -1089,7 +1095,7 @@ export default function App() {
                 }`}
               >
                 <Swords size={12} />
-                Versus
+                <span className="hidden sm:inline">Versus</span>
               </button>
             </div>
           </div>

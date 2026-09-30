@@ -36,9 +36,9 @@ function VersusRow({ centre, left, right }: { centre: ReactNode; left: ReactNode
           <div className="min-w-0">{right}</div>
         </div>
       </div>
-      <div className="hidden md:grid md:grid-cols-[1fr_auto_1fr] md:gap-3 md:items-center">
+      <div className="hidden md:grid md:grid-cols-[minmax(0,1fr)_7.5rem_minmax(0,1fr)] md:gap-3 md:items-center">
         <div className="min-w-0">{left}</div>
-        <div className="flex items-center justify-center text-center px-2">{centre}</div>
+        <div className="flex items-center justify-center text-center min-w-0">{centre}</div>
         <div className="min-w-0">{right}</div>
       </div>
     </>
