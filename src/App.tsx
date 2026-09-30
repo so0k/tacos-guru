@@ -6,12 +6,14 @@ import {
   XCircle, AlertCircle, CheckCircle, CircleCheckBig,
   Info, TrendingUp, TrendingDown, Minus, ExternalLink, DollarSign, Github,
   Menu, X, SlidersHorizontal, Ban, Link as LinkIcon, Eye, EyeOff, ArrowUpDown, ArrowDownWideNarrow,
+  Swords,
   type LucideIcon,
 } from 'lucide-react'
 
 import type { Criterion, Platform, EvalData, RankedPlatform, PricingInputs, PricingResult, Gate, BillingMode } from './types'
 import { computeAllPricingResults, computePricingScore } from './pricing'
 import PricingCalculator from './PricingCalculator'
+import Versus from './Versus'
 
 const REPO_URL = 'https://github.com/so0k/tacos-guru'
 
@@ -19,7 +21,11 @@ const REPO_URL = 'https://github.com/so0k/tacos-guru'
 // as absolute values (e.g. ?users=15&orchestration=3&collab=slack).
 const PRICING_KEYS: Array<keyof PricingInputs> = ['users', 'resources', 'runs', 'stacks']
 const paramKey = (c: Criterion) => c.short.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
-const tabFromHash = (): 'eval' | 'pricing' => (window.location.hash === '#pricing' ? 'pricing' : 'eval')
+const tabFromHash = (): 'eval' | 'pricing' | 'versus' => {
+  if (window.location.hash === '#pricing') return 'pricing'
+  if (window.location.hash === '#versus') return 'versus'
+  return 'eval'
+}
 
 // ?open=<platform id> expands and scrolls to a platform on either tab; a bare #<id> is accepted as an alias.
 const PLATFORM_ALIASES: Record<string, string> = { terrateam: 'stategraph', digger: 'opentaco' }
@@ -30,7 +36,7 @@ function resolvePlatformId(raw: string, platforms: Platform[]): string | null {
 }
 const hashPlatform = (): string | null => {
   const h = window.location.hash.slice(1)
-  return h && h !== 'pricing' ? h : null
+  return h && h !== 'pricing' && h !== 'versus' ? h : null
 }
 
 function readIntParam(params: URLSearchParams, key: string, min: number, max: number): number | null {
@@ -45,14 +51,14 @@ function readIntParam(params: URLSearchParams, key: string, min: number, max: nu
 // Constants
 // ---------------------------------------------------------------------------
 
-const ICON_MAP: Record<string, LucideIcon> = {
+export const ICON_MAP: Record<string, LucideIcon> = {
   Rocket, Leaf, Scale, Mountain, GitBranch, Cloud, Terminal,
   Network, ShieldCheck, Layers, Blocks, Atom, Server,
 }
 
-const SCORE_ICONS: LucideIcon[] = [XCircle, AlertCircle, CheckCircle, CircleCheckBig]
+export const SCORE_ICONS: LucideIcon[] = [XCircle, AlertCircle, CheckCircle, CircleCheckBig]
 
-const SCORE_COLORS = [
+export const SCORE_COLORS = [
   'text-score-0', 'text-score-1', 'text-score-2', 'text-score-3',
 ]
 
@@ -60,11 +66,11 @@ const SCORE_BG = [
   'bg-score-0', 'bg-score-1', 'bg-score-2', 'bg-score-3',
 ]
 
-const CATEGORY_ORDER = ['critical', 'high', 'medium', 'low', 'nice']
+export const CATEGORY_ORDER = ['critical', 'high', 'medium', 'low', 'nice']
 
 // Criterion id for "Pricing suitability" — its score is derived live from
 // the pricing calculator rather than taken from the static scores array.
-const PRICING_CRITERION_ID = 8
+export const PRICING_CRITERION_ID = 8
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -77,7 +83,7 @@ function formatResearched(researched: string): string {
   return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
 }
 
-function pricingRationale(result: PricingResult | undefined): string | null {
+export function pricingRationale(result: PricingResult | undefined): string | null {
   if (!result) return null
   if (result.quoteOnly) {
     return `${result.selectedTier.name} — quote only at current calculator inputs`
@@ -847,7 +853,8 @@ export default function App() {
   const [expandedPlatform, setExpandedPlatform] = useState<string | null>(null)
   const [scrollTarget, setScrollTarget] = useState<string | null>(null)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
-  const [activeTab, setActiveTab] = useState<'eval' | 'pricing'>(tabFromHash)
+  const [activeTab, setActiveTab] = useState<'eval' | 'pricing' | 'versus'>(tabFromHash)
+  const [versusSelection, setVersusSelection] = useState<[string, string] | null>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [weightsSheetOpen, setWeightsSheetOpen] = useState(false)
 
@@ -887,6 +894,13 @@ export default function App() {
         })
         if (params.get('dq') === '0') setShowDisqualified(false)
         if (params.get('billing') === 'monthly') setBillingMode('monthly')
+        const vsParam = params.get('vs')
+        if (vsParam) {
+          const [rawLeft, rawRight] = vsParam.split(',')
+          const left = rawLeft ? resolvePlatformId(rawLeft, d.platforms) : null
+          const right = rawRight ? resolvePlatformId(rawRight, d.platforms) : null
+          if (left && right && left !== right) setVersusSelection([left, right])
+        }
         const sortParam = params.get('sort')
         const sortTarget = sortParam ? d.criteria.find((c) => paramKey(c) === sortParam) : undefined
         if (sortTarget) setSortCriterion(sortTarget.id)
@@ -944,13 +958,14 @@ export default function App() {
     const sortTarget = data.criteria.find((c) => c.id === sortCriterion)
     if (sortTarget) params.set('sort', paramKey(sortTarget))
     if (expandedPlatform) params.set('open', expandedPlatform)
+    if (versusSelection) params.set('vs', `${versusSelection[0]},${versusSelection[1]}`)
     const query = params.toString()
-    const hash = activeTab === 'pricing' ? '#pricing' : ''
+    const hash = activeTab === 'pricing' ? '#pricing' : activeTab === 'versus' ? '#versus' : ''
     const url = `${window.location.pathname}${query ? `?${query}` : ''}${hash}`
     if (url !== `${window.location.pathname}${window.location.search}${window.location.hash}`) {
       window.history.replaceState(null, '', url)
     }
-  }, [data, weights, variantSelections, pricingInputs, showDisqualified, sortCriterion, billingMode, expandedPlatform, activeTab])
+  }, [data, weights, variantSelections, pricingInputs, showDisqualified, sortCriterion, billingMode, expandedPlatform, versusSelection, activeTab])
 
   // Sync dark mode class
   useEffect(() => {
@@ -1004,6 +1019,12 @@ export default function App() {
   const handleToggleSort = useCallback((id: number) => {
     setSortCriterion((prev) => (prev === id ? null : id))
   }, [])
+
+  // Default to #1 vs #2 of the current weighted ranking until the user picks explicitly.
+  const versusPair = useMemo<[string, string]>(() => {
+    if (versusSelection) return versusSelection
+    return ranked.length >= 2 ? [ranked[0].id, ranked[1].id] : ['', '']
+  }, [versusSelection, ranked])
 
   const visibleRanked = useMemo(
     () => ranked.filter((p) => showDisqualified || !p.disqualified),
@@ -1059,6 +1080,17 @@ export default function App() {
                 <DollarSign size={12} />
                 Pricing
               </button>
+              <button
+                onClick={() => setActiveTab('versus')}
+                className={`px-2 md:px-3 py-1.5 rounded-md text-xs font-semibold transition-colors flex items-center gap-1.5 ${
+                  activeTab === 'versus'
+                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
+                    : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+                }`}
+              >
+                <Swords size={12} />
+                Versus
+              </button>
             </div>
           </div>
 
@@ -1106,7 +1138,7 @@ export default function App() {
                   {darkMode ? <Sun size={16} /> : <Moon size={16} />}
                   {darkMode ? 'Light mode' : 'Dark mode'}
                 </button>
-                {activeTab === 'eval' && (
+                {(activeTab === 'eval' || activeTab === 'versus') && (
                   <button
                     onClick={() => { setWeightsSheetOpen(true); setMobileMenuOpen(false) }}
                     className="w-full px-4 py-2.5 text-left text-sm flex items-center gap-3 hover:bg-surface-hover dark:hover:bg-surface-hover-dark text-slate-700 dark:text-slate-300 transition-colors"
@@ -1184,7 +1216,18 @@ export default function App() {
 
       {/* Body */}
       <div className="flex flex-1 overflow-hidden">
-        {activeTab === 'eval' ? (
+        {activeTab === 'pricing' ? (
+          <PricingCalculator
+            data={data}
+            inputs={pricingInputs}
+            onInputsChange={handlePricingInputChange}
+            results={pricingResults}
+            billingMode={billingMode}
+            onBillingModeChange={setBillingMode}
+            expandedPlatform={expandedPlatform}
+            onToggleExpanded={(id) => setExpandedPlatform((prev) => (prev === id ? null : id))}
+          />
+        ) : (
           <>
             <div className="hidden md:flex">
               <Sidebar
@@ -1205,6 +1248,18 @@ export default function App() {
               />
             </div>
 
+            {activeTab === 'versus' ? (
+              <Versus
+                data={data}
+                ranked={ranked}
+                weights={weights}
+                variantSelections={variantSelections}
+                pricingResultByPlatform={pricingResultByPlatform}
+                billingMode={billingMode}
+                selection={versusPair}
+                onSelectionChange={setVersusSelection}
+              />
+            ) : (
             <main className="flex-1 overflow-y-auto dot-grid">
               <div className="p-4 md:p-6 max-w-5xl mx-auto space-y-3">
                 {/* Column legend for heatmap */}
@@ -1308,23 +1363,13 @@ export default function App() {
                 </div>
               </div>
             </main>
+            )}
           </>
-        ) : (
-          <PricingCalculator
-            data={data}
-            inputs={pricingInputs}
-            onInputsChange={handlePricingInputChange}
-            results={pricingResults}
-            billingMode={billingMode}
-            onBillingModeChange={setBillingMode}
-            expandedPlatform={expandedPlatform}
-            onToggleExpanded={(id) => setExpandedPlatform((prev) => (prev === id ? null : id))}
-          />
         )}
       </div>
 
       {/* Mobile FAB — open weights bottom sheet */}
-      {activeTab === 'eval' && !weightsSheetOpen && (
+      {(activeTab === 'eval' || activeTab === 'versus') && !weightsSheetOpen && (
         <button
           onClick={() => setWeightsSheetOpen(true)}
           className="fixed bottom-5 right-5 z-30 md:hidden flex items-center gap-2 px-4 py-2.5 rounded-full bg-accent dark:bg-accent-light text-white dark:text-slate-900 shadow-lg hover:shadow-xl active:scale-95 transition-all font-display font-bold text-sm"
